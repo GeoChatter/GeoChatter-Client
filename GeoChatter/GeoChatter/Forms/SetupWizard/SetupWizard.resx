@@ -1,0 +1,109 @@
+﻿<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="labelWelcome.Text" xml:space="preserve">
+    <value>Thank you for choosing GeoChatter!
+
+This wizard will help you set up GeoChatter for basic play.
+
+To access all settings at any time simply press F2 to open the menu and select "File"-&gt;"Settings".
+Alternativly you can press Ctrl+Shift+S to open the settings directly!
+
+By clicking "Show advanced settings" in the settings dialog
+you can access many more settings then through this wizard.</value>
+  </data>
+  <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+  <data name="label27.Text" xml:space="preserve">
+    <value>The GeoChatter app will automatically receive the required token locally 
+(without it ever leaving your PC!) and test that it works correctly!
+This token only gives GeoChatter permission to read &amp;&amp; write chat &amp;&amp; whisper messages.</value>
+  </data>
+  <data name="labelFlagPacks.Text" xml:space="preserve">
+    <value>In addition to currently over 370 default flags that are available for use in Geochatter, 
+we also offer the ability to install custom packs.
+
+You can either manually create or download and install custom flag packs
+or you can automatically install from our curated list of packs.
+
+To open the official flag pack installer simply click the button below!</value>
+  </data>
+  <data name="lblFormulas.Text" xml:space="preserve">
+    <value>GeoChatter supports custom formulas for the calculation of points.
+
+We have added a feature-rich Score Formulator to create those.
+
+Within this Formulator you can click a formula together, do test 
+guesses and check the calculations.
+
+This way you can verify that the created formula has the desired affect!
+
+Press "F2" -&gt; "Score Formulator" to access it!
+</value>
+  </data>
+  <data name="txtGeneralOauthToken.ToolTip" xml:space="preserve">
+    <value>Enter your Twitch-OAuth-Token here! NOTE: Make sure to be logged in with your bot account when retrieving the token!
+
+If you don't have or want to use a seperate bot account, stay logged in with your main account.</value>
+  </data>
+  <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+</root>

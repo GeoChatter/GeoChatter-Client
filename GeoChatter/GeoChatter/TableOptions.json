@@ -1,0 +1,489 @@
+{
+  "Options": [
+    {
+      "Mode": "DEFAULT",
+      "Stages": [
+        {
+          "Stage": "INROUND",
+          "Top": 10,
+          "Left": 5,
+          "Width": 665,
+          "Height": 400,
+          "IsMinimized": false,
+          "ShowRowNumbers": false,
+          "MinimapLayer": "roadmap",
+          "Columns": [
+            {
+              "Position": 0,
+              "Name": "Player",
+              "DataField": "PlayerName",
+              "Width": 193,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "",
+              "SortIndex": -1,
+              "DefaultSortOrder": "",
+              "DefaultSortIndex": -1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 1,
+              "Name": "Streak",
+              "DataField": "CountryStreak",
+              "Width": 85,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "",
+              "SortIndex": -1,
+              "DefaultSortOrder": "",
+              "DefaultSortIndex": -1,
+              "AllowedWithMultiGuess": false
+            },
+            {
+              "Position": 2,
+              "Name": "Distance",
+              "DataField": "Distance",
+              "Width": 110,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "asc",
+              "SortIndex": 1,
+              "DefaultSortOrder": "asc",
+              "DefaultSortIndex": 1,
+              "AllowedWithMultiGuess": false
+            },
+            {
+              "Position": 3,
+              "Name": "Score",
+              "DataField": "Score",
+              "Width": 93,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "desc",
+              "SortIndex": 0,
+              "DefaultSortOrder": "desc",
+              "DefaultSortIndex": 0,
+              "AllowedWithMultiGuess": false
+            },
+            {
+              "Position": 4,
+              "Name": "Time",
+              "DataField": "TimeTaken",
+              "Width": 99,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "asc",
+              "SortIndex": 2,
+              "DefaultSortOrder": "asc",
+              "DefaultSortIndex": 2,
+              "AllowedWithMultiGuess": true
+            }
+          ]
+        },
+        {
+          "Stage": "ENDROUND",
+          "Top": 10,
+          "Left": 5,
+          "Width": 820,
+          "Height": 400,
+          "IsMinimized": false,
+          "ShowRowNumbers": false,
+          "MinimapLayer": "roadmap",
+          "Columns": [
+            {
+              "Position": 0,
+              "Name": "Player",
+              "DataField": "PlayerName",
+              "Width": 195,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "",
+              "SortIndex": -1,
+              "DefaultSortOrder": "",
+              "DefaultSortIndex": -1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 1,
+              "Name": "Streak",
+              "DataField": "CountryStreak",
+              "Width": 85,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "",
+              "SortIndex": -1,
+              "DefaultSortOrder": "",
+              "DefaultSortIndex": -1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 2,
+              "Name": "Guess",
+              "DataField": "GuessPoint",
+              "Width": 65,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "",
+              "SortIndex": -1,
+              "DefaultSortOrder": "",
+              "DefaultSortIndex": -1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 3,
+              "Name": "Distance",
+              "DataField": "Distance",
+              "Width": 130,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "asc",
+              "SortIndex": 1,
+              "DefaultSortOrder": "asc",
+              "DefaultSortIndex": 1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 4,
+              "Name": "Score",
+              "DataField": "Score",
+              "Width": 97,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "desc",
+              "SortIndex": 0,
+              "DefaultSortOrder": "desc",
+              "DefaultSortIndex": 0,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 5,
+              "Name": "Time",
+              "DataField": "TimeTaken",
+              "Width": 98,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "asc",
+              "SortIndex": 2,
+              "DefaultSortOrder": "asc",
+              "DefaultSortIndex": 2,
+              "AllowedWithMultiGuess": true
+            }
+          ]
+        },
+        {
+          "Stage": "ENDGAME",
+          "Top": 10,
+          "Left": 5,
+          "Width": 858,
+          "Height": 400,
+          "IsMinimized": false,
+          "ShowRowNumbers": false,
+          "MinimapLayer": "roadmap",
+          "Columns": [
+            {
+              "Position": 0,
+              "DataField": "PlayerName",
+              "Name": "Player",
+              "Width": 200,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "",
+              "SortIndex": -1,
+              "DefaultSortOrder": "",
+              "DefaultSortIndex": -1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 1,
+              "DataField": "CountryStreak",
+              "Name": "Streak",
+              "Width": 85,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "",
+              "SortIndex": -1,
+              "DefaultSortOrder": "",
+              "DefaultSortIndex": -1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 2,
+              "DataField": "Guesses",
+              "Name": "Guesses",
+              "Width": 198,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "",
+              "SortIndex": -1,
+              "DefaultSortOrder": "",
+              "DefaultSortIndex": -1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 3,
+              "DataField": "Distance",
+              "Name": "Distance",
+              "Width": 115,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "asc",
+              "SortIndex": 1,
+              "DefaultSortOrder": "asc",
+              "DefaultSortIndex": 1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 4,
+              "DataField": "Score",
+              "Name": "Score",
+              "Width": 100,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "desc",
+              "SortIndex": 0,
+              "DefaultSortOrder": "desc",
+              "DefaultSortIndex": 0,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 5,
+              "DataField": "TimeTaken",
+              "Name": "Time",
+              "Width": 80,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "asc",
+              "SortIndex": 2,
+              "DefaultSortOrder": "asc",
+              "DefaultSortIndex": 2,
+              "AllowedWithMultiGuess": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Mode": "STREAK",
+      "Stages": [
+        {
+          "Stage": "INROUND",
+          "Top": 10,
+          "Left": 5,
+          "Width": 440,
+          "Height": 400,
+          "IsMinimized": false,
+          "ShowRowNumbers": false,
+          "MinimapLayer": "roadmap",
+          "Columns": [
+            {
+              "Position": 0,
+              "DataField": "GuessPoint",
+              "Name": "Guess",
+              "Width": 104,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "asc",
+              "SortIndex": 0,
+              "DefaultSortOrder": "asc",
+              "DefaultSortIndex": 0,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 1,
+              "DataField": "PlayerName",
+              "Name": "Player",
+              "Width": 210,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "",
+              "SortIndex": -1,
+              "DefaultSortOrder": "",
+              "DefaultSortIndex": -1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 2,
+              "DataField": "TimeTaken",
+              "Name": "Time",
+              "Width": 126,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "asc",
+              "SortIndex": 1,
+              "DefaultSortOrder": "asc",
+              "DefaultSortIndex": 1,
+              "AllowedWithMultiGuess": true
+            }
+          ]
+        },
+        {
+          "Stage": "ENDROUND",
+          "Top": 10,
+          "Left": 5,
+          "Width": 690,
+          "Height": 400,
+          "IsMinimized": false,
+          "ShowRowNumbers": false,
+          "MinimapLayer": "roadmap",
+          "Columns": [
+            {
+              "Position": 0,
+              "DataField": "PlayerName",
+              "Name": "Player",
+              "Width": 228,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "",
+              "SortIndex": -1,
+              "DefaultSortOrder": "",
+              "DefaultSortIndex": -1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 1,
+              "DataField": "CountryStreak",
+              "Name": "Streak",
+              "Width": 105,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "",
+              "SortIndex": -1,
+              "DefaultSortOrder": "",
+              "DefaultSortIndex": -1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 2,
+              "DataField": "GuessPoint",
+              "Name": "Guess",
+              "Width": 97,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "desc",
+              "SortIndex": 0,
+              "DefaultSortOrder": "desc",
+              "DefaultSortIndex": 0,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 3,
+              "DataField": "Distance",
+              "Name": "Distance",
+              "Width": 163,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "asc",
+              "SortIndex": 1,
+              "DefaultSortOrder": "asc",
+              "DefaultSortIndex": 1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 4,
+              "DataField": "TimeTaken",
+              "Name": "Time",
+              "Width": 97,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "asc",
+              "SortIndex": 2,
+              "DefaultSortOrder": "asc",
+              "DefaultSortIndex": 2,
+              "AllowedWithMultiGuess": true
+            }
+          ]
+        },
+        {
+          "Stage": "ENDGAME",
+          "Top": 10,
+          "Left": 5,
+          "Width": 855,
+          "Height": 400,
+          "IsMinimized": false,
+          "ShowRowNumbers": false,
+          "MinimapLayer": "roadmap",
+          "Columns": [
+            {
+              "Position": 0,
+              "DataField": "PlayerName",
+              "Name": "Player",
+              "Width": 210,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "",
+              "SortIndex": -1,
+              "DefaultSortOrder": "",
+              "DefaultSortIndex": -1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 1,
+              "DataField": "CountryStreak",
+              "Name": "Streak",
+              "Width": 85,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "",
+              "SortIndex": -1,
+              "DefaultSortOrder": "",
+              "DefaultSortIndex": -1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 2,
+              "DataField": "Guesses",
+              "Name": "Guesses",
+              "Width": 230,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "",
+              "SortIndex": -1,
+              "DefaultSortOrder": "",
+              "DefaultSortIndex": -1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 3,
+              "DataField": "Distance",
+              "Name": "Distance",
+              "Width": 110,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "asc",
+              "SortIndex": 1,
+              "DefaultSortOrder": "asc",
+              "DefaultSortIndex": 1,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 4,
+              "DataField": "CorrectTotal",
+              "Name": "Correct/Total",
+              "Width": 120,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "desc",
+              "SortIndex": 0,
+              "DefaultSortOrder": "desc",
+              "DefaultSortIndex": 0,
+              "AllowedWithMultiGuess": true
+            },
+            {
+              "Position": 5,
+              "DataField": "TimeTaken",
+              "Name": "Time",
+              "Width": 100,
+              "Visible": true,
+              "Sortable": true,
+              "SortOrder": "asc",
+              "SortIndex": 2,
+              "DefaultSortOrder": "asc",
+              "DefaultSortIndex": 2,
+              "AllowedWithMultiGuess": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

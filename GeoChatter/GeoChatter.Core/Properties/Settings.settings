@@ -1,0 +1,18 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="GeoChatter.Core.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="FlagBase" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Styles/flag-base.css</Value>
+    </Setting>
+    <Setting Name="Styles" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Styles/styles.css</Value>
+    </Setting>
+    <Setting Name="FlagStylesCustom" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Styles/flag-custom.min.css</Value>
+    </Setting>
+    <Setting Name="FlagStyles" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Styles/flag-icon.min.css</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

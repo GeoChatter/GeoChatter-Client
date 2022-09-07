@@ -1,0 +1,227 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TypeScriptTarget>ES2021</TypeScriptTarget>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <TypeScriptTarget>ES2021</TypeScriptTarget>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <Deterministic>False</Deterministic>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <PlatformTarget>x64</PlatformTarget>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>6.0-all</AnalysisLevel>
+    <AnalysisMode>All</AnalysisMode>
+  </PropertyGroup>
+  <ItemGroup>
+    <Antlr4 Remove="Scripts\TestScripts\**" />
+    <Compile Remove="Scripts\TestScripts\**" />
+    <EmbeddedResource Remove="Scripts\TestScripts\**" />
+    <None Remove="Scripts\TestScripts\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Debug' ">
+	<Content Include="ScoreFormulatorMap.html">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+	<None Update="Properties\Settings.settings">
+	  <Generator>SettingsSingleFileGenerator</Generator>
+	  <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+	</None>
+	  <None Update="Scripts\dist\main.js">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	<None Update="Scripts\src\cef.d.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	<None Update="Scripts\src\colors.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	<None Update="Scripts\src\constants.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	<None Update="Scripts\src\controls.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	<None Update="Scripts\src\core.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	<None Update="Scripts\src\divs.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	<None Update="Scripts\src\enums.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	<None Update="Scripts\src\events.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	<None Update="Scripts\src\geochatter.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	<None Update="Scripts\src\geoguessr.d.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	<None Update="Scripts\src\interfaces.d.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	<None Update="Scripts\src\main.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	<None Update="Scripts\src\maps.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	<None Update="Scripts\src\settings.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	<None Update="Scripts\src\types.d.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	<None Update="Scripts\src\utils.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	<None Update="Scripts\src\visuals.ts">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	  <None Update="Styles\dist\main.css">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	<None Update="Styles\flag-base.css">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</None>
+	<None Update="Styles\flag-custom.min.css">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</None>
+	<None Update="Styles\flag-icon.min.css">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</None>
+	<None Update="Styles\src\main.scss">
+	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</None>
+	  <None Update="Styles\build\main.css">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </None>
+    <Content Include="appsettings.json" />
+    <Content Include="Scripts\build.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\tsconfig.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Styles\build.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\GeoChatter.GeoGuessr\GeoChatter.GeoGuessr\GeoChatter.GeoGuessr\GeoChatter.GeoGuessr.csproj" />
+    <ProjectReference Include="..\GeoChatter.Core\GeoChatter.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="IdentityModel" Version="6.0.0" />
+    <PackageReference Include="log4net" Version="2.0.14" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.6" />
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="RestSharp" Version="108.0.1" />
+    <PackageReference Include="StreamingClientLibrary.YouTube" Version="1.0.0.12" />
+    <PackageReference Include="SuperSocket.ClientEngine" Version="0.10.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="6.0.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
+    <PackageReference Include="System.Runtime" Version="4.3.1" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
+    <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.2" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.330701">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Antlr4" Version="4.6.6" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="GuessServerSuperSocketClient.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="ScoreFormulatorMap.html" />
+    <None Remove="Scripts\build.js" />
+    <None Remove="Scripts\tsconfig.json" />
+    <None Remove="Styles\build.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Remove="Scripts\src\models.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="GeoChatter.Security.Client">
+      <HintPath>..\..\References\GeoChatter.Security.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Api">
+      <HintPath>..\..\References\TwitchLib.Api.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Api.Core">
+      <HintPath>..\..\References\TwitchLib.Api.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Api.Core.Enums">
+      <HintPath>..\..\References\TwitchLib.Api.Core.Enums.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Api.Core.Interfaces">
+      <HintPath>..\..\References\TwitchLib.Api.Core.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Api.Core.Models">
+      <HintPath>..\..\References\TwitchLib.Api.Core.Models.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Api.Helix">
+      <HintPath>..\..\References\TwitchLib.Api.Helix.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Api.Helix.Models">
+      <HintPath>..\..\References\TwitchLib.Api.Helix.Models.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Api.V5">
+      <HintPath>..\..\References\TwitchLib.Api.V5.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Api.V5.Models">
+      <HintPath>..\..\References\TwitchLib.Api.V5.Models.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Client">
+      <HintPath>..\..\References\TwitchLib.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Client.Enums">
+      <HintPath>..\..\References\TwitchLib.Client.Enums.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Client.Models">
+      <HintPath>..\..\References\TwitchLib.Client.Models.dll</HintPath>
+    </Reference>
+    <Reference Include="TwitchLib.Communication">
+      <HintPath>..\..\References\TwitchLib.Communication.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+	<Folder Include="Styles\dist\" />
+    <Folder Include="Styles\flags\" />
+  </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="prebuild.sh" />
+  </Target>
+</Project>

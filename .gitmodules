@@ -1,0 +1,3 @@
+[submodule "GeoChatter.GeoGuessr"]
+	path = GeoChatter.GeoGuessr
+	url = https://github.com/GeoChatter/GeoChatter.GeoGuessr.git

@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "sass": "^1.54.5",
+    "tailwindcss": "^3.1.8"
+  },
+  "dependencies": {
+  },
+  "scripts": {
+    "build": "node build.js"
+  }
+}
