@@ -3,7 +3,6 @@ using GeoChatter.Core.Interfaces;
 using GeoChatter.Core.Logging;
 using GeoChatter.Model.Enums;
 using GeoChatter.Core.Model;
-using GeoChatter.Security.Client;
 using GuessServerApiInterfaces;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;

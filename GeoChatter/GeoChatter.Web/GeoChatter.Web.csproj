@@ -173,9 +173,6 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="GeoChatter.Security.Client">
-      <HintPath>..\..\References\GeoChatter.Security.Client.dll</HintPath>
-    </Reference>
     <Reference Include="TwitchLib.Api">
       <HintPath>..\..\References\TwitchLib.Api.dll</HintPath>
     </Reference>
