@@ -50,7 +50,7 @@ namespace GeoChatter.Forms
         {
             try
             {
-                Player player = ClientDbCache.RunningGame?.Players?.FirstOrDefault(p => p.PlatformId == args.UserId);
+                Player player = ClientDbCache.RunningGame?.Players?.FirstOrDefault(p => p.PlatformId == args.UserId && p.SourcePlatform == args.UserPlatform);
                 if (player == null)
                 {
                     player = ClientDbCache.Instance.GetPlayerByIDOrName(args.UserId, args.Username, args.DisplayName, args.ProfilePicUrl, GCResourceRequestHandler.ClientUserID.ToLowerInvariant(), platform: args.UserPlatform);
@@ -109,23 +109,7 @@ namespace GeoChatter.Forms
         {
             try
             {
-                Platforms sourcePlatform = Platforms.Unknown;
-                if (args.Bot is TwitchBot)
-                    sourcePlatform = Platforms.Twitch;
-                else if (args.Bot is YoutubeBot)
-                    sourcePlatform = Platforms.YouTube;
-
-                if (sourcePlatform == Platforms.Unknown)
-                {
-                    logger.Error("Flag request from unknown Platform received");
-                    return;
-                }
-
-                Player player = ClientDbCache.RunningGame?.Players?.FirstOrDefault(p => p.PlatformId == args.UserId && p.SourcePlatform == sourcePlatform);
-                if (player == null && sourcePlatform == Platforms.Twitch)
-                {
-                    player = ClientDbCache.Instance.GetPlayerByIDOrName(args.UserId, args.Username, args.DisplayName, args.ProfilePicUrl, GCResourceRequestHandler.ClientUserID.ToLowerInvariant(), platform: args.UserPlatform);
-                }
+                Player player = ClientDbCache.Instance.GetPlayerByIDOrName(args.UserId, args.Username, channelName: GCResourceRequestHandler.ClientUserID.ToLowerInvariant(), platform: args.UserPlatform);
 
                 if (player == null || player.IsBanned)
                 {
