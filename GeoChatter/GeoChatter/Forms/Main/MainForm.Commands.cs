@@ -250,11 +250,11 @@ namespace GeoChatter.Forms
                 {
 
                     if (Settings.Default.EnableTwitchChatMsgs)
-                        args.Bot.SendMessage(LanguageStrings.Get("Chat_Msg_CurrentFlag", new Dictionary<string, string>() { { "playerName", args.Username }, { "flagName", target.PlayerName }, { "flagCode", target.PlayerFlag.ToUpperInvariant() } }));
+                        args.Bot.SendMessage(LanguageStrings.Get("Chat_Msg_CurrentFlag", new Dictionary<string, string>() { { "playerName", args.Username }, { "flagName", target.PlayerFlagName }, { "flagCode", target.PlayerFlag.ToUpperInvariant() } }));
                     return;
                 }
                 if (Settings.Default.EnableTwitchChatMsgs)
-                    args.Bot.SendMessage(LanguageStrings.Get("Chat_Msg_CurrentFlagTarget", new Dictionary<string, string>() { { "playerName", args.Username }, { "targetName", args.Target }, { "flagName", target.PlayerName }, { "flagCode", target.PlayerFlag.ToUpperInvariant() } }));
+                    args.Bot.SendMessage(LanguageStrings.Get("Chat_Msg_CurrentFlagTarget", new Dictionary<string, string>() { { "playerName", args.Username }, { "targetName", args.Target }, { "flagName", target.PlayerFlagName }, { "flagCode", target.PlayerFlag.ToUpperInvariant() } }));
             }
             catch (Exception ex)
             {
