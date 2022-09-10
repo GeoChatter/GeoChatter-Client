@@ -11,7 +11,7 @@ reviewers:
   
 # A number of reviewers added to the PR
 # Set 0 to add all the reviewers (default: 0)
-numberOfReviewers: 2
+numberOfReviewers: 1
 
 # A list of keywords to be skipped the process if PR's title include it
 skipKeywords:
