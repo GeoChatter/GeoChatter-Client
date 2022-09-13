@@ -74,7 +74,7 @@ namespace GeoChatter.Forms
             string huburl = Settings.Default.GuessServer;
 #if DEBUG
             huburl = Settings.Default.AlternateGuessApiUrl;
-           // huburl = "https://localhost:44350/geoChatterHub";
+           //huburl = "https://localhost:44350/geoChatterHub";
 #endif
 
             bool success = await guessApiClient.Initialize(huburl, this, Settings.Default.GCClientId, Settings.Default.EnableDebugLogging, isGGLogon);
@@ -121,6 +121,7 @@ namespace GeoChatter.Forms
                 Version = version,
                 ChannelId = GCResourceRequestHandler.ClientUserID,
                 ChannelName = GCResourceRequestHandler.ClientGeoGuessrName,
+                
             };
 
 
