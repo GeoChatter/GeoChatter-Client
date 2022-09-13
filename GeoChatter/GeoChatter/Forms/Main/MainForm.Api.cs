@@ -198,6 +198,8 @@ namespace GeoChatter.Forms
                 roundResult.DisplayName = result.Player.DisplayName;
                 roundResult.UserName = result.Player.PlayerName;
                 roundResult.ProfilePicUrl = result.Player.ProfilePictureUrl;
+                roundResult.PlayerFlagName = result.Player.PlayerFlagName;
+                roundResult.PlayerFlag = result.Player.PlayerFlag;
                 roundResult.WasRandom = guess.WasRandom;
                 roundResult.Score = result.Score;
                 roundResult.Distance = result.Distance;
@@ -224,6 +226,8 @@ namespace GeoChatter.Forms
                 gameResult.DisplayName = result.Player.DisplayName;
                 gameResult.UserName = result.Player.PlayerName;
                 gameResult.ProfilePicUrl = result.Player.ProfilePictureUrl;
+                gameResult.PlayerFlagName = result.Player.PlayerFlagName;
+                gameResult.PlayerFlag = result.Player.PlayerFlag;
                 gameResult.Score = result.Score;
                 gameResult.Distance = result.Distance;
                 gameResult.TimeTaken = result.TimeTaken;
