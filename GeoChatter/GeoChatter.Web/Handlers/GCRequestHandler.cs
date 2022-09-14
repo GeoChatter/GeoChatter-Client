@@ -28,14 +28,17 @@ namespace GeoChatter.Web
         public event EventHandler<EventArgs> OnGeoGuessrSignedOut;
         public void FireOnGeoGuessrCookieHijackedFirst()
         {
+            logger.Debug("Firing GeoGuessr API cookie hijack");
             OnGeoGuessrCookieHijackedFirst?.Invoke(this, null);
         }
         public void FireOnGeoGuessrSignedIn()
         {
+            logger.Debug("Firing GeoGuessr sign in");
             OnGeoGuessrSignedIn?.Invoke(this, null);
         }
         public void FireOnGeoGuessrSignedOut()
         {
+            logger.Debug("Firing GeoGuessr sign out");
             OnGeoGuessrSignedOut?.Invoke(this, null);
         }
         /// <summary>
@@ -199,6 +202,7 @@ namespace GeoChatter.Web
         }
 
         public const string GoogleSignInPath = "/googleplus/signin";
+        public const string AppleSignInPath = "/apple/signin";
         public const string FacebookSignInPath = "/facebook/signin";
         public const string GeoGuessrSignInPath = "/accounts/signin";
         public const string SignOutPath = "/accounts/signout";
@@ -222,14 +226,17 @@ namespace GeoChatter.Web
                 return null;
             }
 
+            // TODO: Figure a way around Google login blocks
             if (request.Url.ToLowerInvariant().StartsWithDefault(GeoGuessrClient.GeoGuessrAPI))
             {
                 bool isGGAccount = request.Url.EndsWithDefault(GeoGuessrSignInPath);
                 bool isFacebookAccount = request.Url.EndsWithDefault(FacebookSignInPath);
                 bool isGoogleAccount = request.Url.EndsWithDefault(GoogleSignInPath);
+                bool isAppleAccount = request.Url.EndsWithDefault(AppleSignInPath);
                 if (isGGAccount
                     || isFacebookAccount
-                    || isGoogleAccount)
+                    || isGoogleAccount
+                    || isAppleAccount)
                 {
                     try
                     {
@@ -247,9 +254,13 @@ namespace GeoChatter.Web
                         {
                             return new GCResourceRequestHandler(this, FacebookSignInPath);
                         }
-                        else
+                        else if (isGoogleAccount)
                         {
                             return new GCResourceRequestHandler(this, GoogleSignInPath);
+                        }
+                        else
+                        {
+                            return new GCResourceRequestHandler(this, AppleSignInPath);
                         }
                     }
                     catch(Exception _e)

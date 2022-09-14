@@ -241,6 +241,12 @@ namespace GeoChatter.Web
             }
             return new CefSharp.ResponseFilter.StreamResponseFilter(memoryStream);
         }
+
+        // Thanks a lot GeoGuessr and Apple
+        private static bool HandlingAppleSignIn { get; set; }
+
+        private static DateTime LastAppleSignInHandling { get; set; }
+
         /// <summary>
         /// 
         /// </summary>
@@ -277,6 +283,40 @@ namespace GeoChatter.Web
                         catch (Exception ex)
                         {
                             logger.Warn(ex.Summarize());
+                        }
+                        break;
+                    }
+                case GCRequestHandler.AppleSignInPath:
+                    {
+                        if (HandlingAppleSignIn || DateTime.Now - LastAppleSignInHandling < TimeSpan.FromSeconds(10))
+                        {
+                            logger.Warn("Ignoring excessive Apple sign in requests");
+                            break;
+                        }
+                        LastAppleSignInHandling = DateTime.Now;
+                        HandlingAppleSignIn = true;
+                        try
+                        {
+                            var resp = Encoding.ASCII.GetString(memoryStream.ToArray());
+                            if (response?.StatusCode == 200)
+                            {
+                                SignInData = JsonConvert.DeserializeObject<GGSignInResponse>(resp);
+                                ClientUserID = SignInData?.id;
+                                GeoGuessrClient.Cookie = response.Headers.Get("Set-Cookie");
+                                Parent.FireOnGeoGuessrSignedIn();
+                            }
+                            else
+                            {
+                                logger.Error($"Sign in failed. {response?.ErrorCode}: \r\n\t{resp}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Warn(ex.Summarize());
+                        }
+                        finally
+                        {
+                            HandlingAppleSignIn = false;
                         }
                         break;
                     }
