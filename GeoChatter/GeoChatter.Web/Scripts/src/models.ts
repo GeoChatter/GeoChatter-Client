@@ -5,6 +5,7 @@ import { Util } from "./utils";
 import { Enum } from "./enums"
 import { Color } from "./colors";
 import { Setting } from "./settings";
+import { Visual } from "./visuals";
 
 export class Chain<Model extends Chain<Model>>
     implements IChained<Model>
@@ -473,7 +474,7 @@ export class Game
                     }
                 }
 
-                row.PlayerName = Util.AsDataTableRowCell(`${summary.PlayerData.FlagDisplay}${Color.ColorUsername(color, summary.PlayerData.Display)}`, summary.PlayerData.Name.toLowerCase());
+                row.PlayerName = Util.AsDataTableRowCell(`${summary.PlayerData.FlagDisplay}${Color.ColorUsername(color, summary.PlayerData.Display)}`, summary.PlayerData.Name.toLowerCase(), Visual.PlatformCSSFromPlatform(summary.PlayerData.Platform));
                 row.CountryStreak = Util.AsDataTableRowCell(summary.CountryStreak.toString(), summary.CountryStreak);
                 row.Guesses = Util.AsDataTableRowCell(fl, fsort);
                 row.Distance = Util.GetConvertedDistance(summary.Distance);
@@ -532,7 +533,7 @@ export class Game
                     }
                 }
 
-                row.PlayerName = Util.AsDataTableRowCell(`${summary.PlayerData.FlagDisplay}${Color.ColorUsername(color, summary.PlayerData.Display)}`, summary.PlayerData.Name.toLowerCase());
+                row.PlayerName = Util.AsDataTableRowCell(`${summary.PlayerData.FlagDisplay}${Color.ColorUsername(color, summary.PlayerData.Display)}`, summary.PlayerData.Name.toLowerCase(), Visual.PlatformCSSFromPlatform(summary.PlayerData.Platform));
                 row.CountryStreak = Util.AsDataTableRowCell(summary.CountryStreak.toString(), summary.CountryStreak);
                 row.Guesses = Util.AsDataTableRowCell("<div style='overflow-x:auto;overflow-y:hidden'>" + fl + "</div>", fsort);
                 row.CorrectTotal = Util.AsDataTableRowCell(`${correct}/${total}`, correct);
@@ -744,7 +745,7 @@ export class Round
                 let fl = guess.WrapFlagWithBorder();
                 let fsort = guess.GetGuessPoints();
 
-                row.PlayerName = Util.AsDataTableRowCell(guess.GetPlayerNameDisplayHTML(), guess.PlayerData.Name.toLowerCase());
+                row.PlayerName = Util.AsDataTableRowCell(guess.GetPlayerNameDisplayHTML(), guess.PlayerData.Name.toLowerCase(), Visual.PlatformCSSFromPlatform(guess.PlayerData.Platform));
                 row.CountryStreak = Util.AsDataTableRowCell(guess.CountryStreak.toString(), guess.CountryStreak);
                 row.GuessPoint = Util.AsDataTableRowCell(fl, fsort);
                 row.Distance = Util.GetConvertedDistance(guess.Distance);
@@ -772,7 +773,7 @@ export class Round
                 let fl = guess.WrapFlagWithBorder();
                 let fsort = guess.GetGuessPoints();
 
-                row.PlayerName = Util.AsDataTableRowCell(guess.GetPlayerNameDisplayHTML(), guess.PlayerData.Name.toLowerCase());
+                row.PlayerName = Util.AsDataTableRowCell(guess.GetPlayerNameDisplayHTML(), guess.PlayerData.Name.toLowerCase(), Visual.PlatformCSSFromPlatform(guess.PlayerData.Platform));
                 row.CountryStreak = Util.AsDataTableRowCell(guess.CountryStreak.toString(), guess.CountryStreak);
                 row.GuessPoint = Util.AsDataTableRowCell(fl, fsort);
                 row.Distance = Util.GetConvertedDistance(guess.Distance);
@@ -1088,7 +1089,7 @@ export class Guess
 
         if (this.Round.Game.Mode == Enum.GAMEMODE.DEFAULT)
         {
-            row.PlayerName = Util.AsDataTableRowCell(this.GetPlayerNameDisplayHTML(), this.PlayerData.Name.toLowerCase());
+            row.PlayerName = Util.AsDataTableRowCell(this.GetPlayerNameDisplayHTML(), this.PlayerData.Name.toLowerCase(), Visual.PlatformCSSFromPlatform(this.PlayerData.Platform));
             row.CountryStreak = Util.AsDataTableRowCell(this.CountryStreak.toString(), this.CountryStreak);
             row.Distance = Util.GetConvertedDistance(this.Distance);
             row.Score = Util.AsDataTableRowCell(this.Score.toString(), this.Score);
@@ -1097,7 +1098,7 @@ export class Guess
         else if (this.Round.Game.Mode == Enum.GAMEMODE.STREAK)
         {
             row.GuessPoint = Util.AsDataTableRowCell(this.WrapFlagWithBorder(), this.Location.ExactCountryCode);
-            row.PlayerName = Util.AsDataTableRowCell(this.GetPlayerNameDisplayHTML(), this.PlayerData.Name.toLowerCase());
+            row.PlayerName = Util.AsDataTableRowCell(this.GetPlayerNameDisplayHTML(), this.PlayerData.Name.toLowerCase(), Visual.PlatformCSSFromPlatform(this.PlayerData.Platform));
             row.TimeTaken = Util.FormatTimeToString(this.TimeTaken);
         }
 

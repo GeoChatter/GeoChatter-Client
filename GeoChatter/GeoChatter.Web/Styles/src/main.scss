@@ -29,6 +29,7 @@ $Stage_EndGame: "ENDGAME";
     --gc-gg-main-color-lightest-transparent-high: #b177ff56;
     --gc-table-button-border: 1px solid #FFFFFFAA;
     --gc-font: neo-sans,sans-serif;
+    --gc-platform-indicator-hidden-width: 2px;
 }
 
 body {
@@ -1339,4 +1340,47 @@ th.sorting, th.sorting_asc, th.sorting_desc {
     to {
         transform: rotate(1turn)
     }
+}
+
+[data-colfield="#{$PlayerNameFieldName}"] > span:last-child:before {
+    background-color: var(--platform-color);
+    border-color: var(--platform-color);
+    content: "\00a0";
+    float: left;
+    transition: all 0.35s cubic-bezier(0.54, 0, 0.29, 1.02);
+    font-size: 18px;
+    overflow-x: hidden;
+    width: 2px;
+}
+
+[data-colfield="#{$PlayerNameFieldName}"] > span:last-child:hover:before {
+    padding: 0px 3px;
+    background-color: var(--platform-color-hover);
+    border-color: var(--platform-color-hover);
+    content: var(--platform-icon);
+    float: left;
+    font-family: var(--platform-font-family);
+    width: 27px;
+    border-radius: 0px var(--gc-border-radius-default) var(--gc-border-radius-default) 0px;
+}
+
+.platform-twitch {
+    --platform-color: #a970ff;
+    --platform-color-hover: #a970ffbb;
+    --platform-font-family: "Font Awesome 6 Brands";
+    --platform-icon: "\f1e8"
+}
+
+.platform-youtube {
+    --platform-color: red;
+    --platform-color-hover: #ff0000bb;
+    --platform-font-family: "Font Awesome 6 Brands";
+    --platform-icon: "\f167"
+}
+
+.platform-other {
+    --platform-color: #3373ff;
+    --platform-color-hover: #3373ffcc;
+    --platform-font-family: "Font Awesome 6 Free";
+    --platform-icon: "\f7a2"
 }

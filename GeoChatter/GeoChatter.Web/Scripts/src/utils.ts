@@ -46,9 +46,9 @@ export namespace Util
         return null;
     }
 
-    export function TooltipTitleWrap(title: number | string, data: string): string
+    export function TooltipTitleWrap(title: number | string, data: string, classes: Nullable<string> = null): string
     {
-        return '<span data-toggle="tooltip" title="' + title + '">' + data + '</span>';
+        return '<span data-toggle="tooltip" title="' + title + '" class="' + (classes ? classes : "") + '">' + data + '</span>';
     }
 
     export function FormatTimeToString(ms: number, decimals: number = 2): TableCell
@@ -56,10 +56,10 @@ export namespace Util
         return AsDataTableRowCell((ms / 1000).toFixed(decimals) + "s", ms);
     }
 
-    export function AsDataTableRowCell(display: string, sort: number | string): TableCell
+    export function AsDataTableRowCell(display: string, sort: number | string, classes: Nullable<string> = null): TableCell
     {
         return {
-            display: TooltipTitleWrap(sort, display),
+            display: TooltipTitleWrap(sort, display, classes),
             sort: sort
         };
     }

@@ -26,6 +26,7 @@ export namespace Dependency
         (_e: Nullable<Event>) => IncludeStyle("https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.min.css", "sha384-J3tLcWkdGTGEaRTYfKrKVaK5EGVBuxR9rg5ZzQFWRuQD+0hZABemSLVXimw8Nrb9", null, Includes[++LastIncludedIndex]),
         (_e: Nullable<Event>) => IncludeStyle("https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/css/bootstrap-multiselect.min.css", "sha384-EzNvbrCmODYdwmi/UWiRDLKmfJAL5loYlm3Bf+zRAmUAc7UBRI2VRdvP/O9A8z9w", null, Includes[++LastIncludedIndex]),
         (_e: Nullable<Event>) => IncludeScript("https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.1/js/bootstrap-multiselect.min.js", "sha512-fp+kGodOXYBIPyIXInWgdH2vTMiOfbLC9YqwEHslkUxc8JLI7eBL2UQ8/HbB5YehvynU3gA3klc84rAQcTQvXA==", null, Includes[++LastIncludedIndex]),
+        (_e: Nullable<Event>) => IncludeStyle("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css", "sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==", null, Includes[++LastIncludedIndex]),
         (_e: Nullable<Event>) => IncludeSchemeStyle("Styles/flag-icon.min.css", Includes[++LastIncludedIndex]),
         (_e: Nullable<Event>) => IncludeSchemeStyle("Styles/flag-custom.min.css", Includes[++LastIncludedIndex]),
         (_e: Nullable<Event>) => IncludeSchemeStyle(Constant.MainCSS, Includes[++LastIncludedIndex]),
