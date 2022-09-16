@@ -1,4 +1,6 @@
-﻿using GeoChatter.Integrations.Classes;
+﻿using GeoChatter.Core.Interfaces;
+using GeoChatter.Integrations.Classes;
+using log4net;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,7 +17,7 @@ namespace GeoChatter.Integrations
         /// Action recieve event
         /// </summary>
         public event EventHandler<ActionsReceivedEventArgs> ActionsReceived;
-
+        private static readonly ILog logger = LogManager.GetLogger(typeof(StreamerbotClient));
         private static WebSocket ws;
 
         /// <summary>
@@ -63,6 +65,7 @@ namespace GeoChatter.Integrations
         /// <param name="e"></param>
         protected virtual void OnActionsReceived(ActionsReceivedEventArgs e)
         {
+            logger.Debug($"Received actions");
             ActionsReceived?.Invoke(this, e);
         }
 
@@ -71,6 +74,7 @@ namespace GeoChatter.Integrations
         /// </summary>
         public static void GetActions()
         {
+            logger.Debug($"Getting actions");
             if (ws != null && !ws.IsAlive)
             {
                 ws.Connect();
@@ -97,6 +101,7 @@ namespace GeoChatter.Integrations
             {
                 string argsString = JsonConvert.SerializeObject(args);
                 string reqString = @"{""request"": ""DoAction"",""action"": { ""id"": """ + guid + @""", ""name"": """ + name + @""" }, ""args"":  " + argsString + @" , ""id"": ""1402""}";
+                logger.Debug($"Executing action: {reqString}");
                 ws.Send(reqString);
             }
         }
@@ -109,7 +114,7 @@ namespace GeoChatter.Integrations
         /// <returns></returns>
         public static bool TestConnection(string ip, string port)
         {
-
+            logger.Debug($"Testing Streamerbot connection");
             if (ws == null)
             {
                 ws = new WebSocket($"ws://{ip}:{port}/");
@@ -123,6 +128,7 @@ namespace GeoChatter.Integrations
             }
 
             success = ws.IsAlive;
+            logger.Debug($"SB connection is {success}");
             if (ws.IsAlive)
             {
                 ws.Close();
@@ -136,6 +142,7 @@ namespace GeoChatter.Integrations
         /// </summary>
         public static void CloseConnection()
         {
+            logger.Debug($"Closing Streamer.Bot connection");
             if (ws != null)
             {
                 ws.Close();
