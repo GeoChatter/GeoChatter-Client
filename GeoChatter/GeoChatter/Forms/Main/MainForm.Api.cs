@@ -72,10 +72,10 @@ namespace GeoChatter.Forms
             string version = fvi.FileVersion;
 
             string huburl = Settings.Default.GuessServer;
-#if DEBUG
+//#if DEBUG
             huburl = Settings.Default.AlternateGuessApiUrl;
            //huburl = "https://localhost:44350/geoChatterHub";
-#endif
+//#endif
 
             bool success = await guessApiClient.Initialize(huburl, this, Settings.Default.GCClientId, Settings.Default.EnableDebugLogging, isGGLogon);
             if (success)
@@ -174,7 +174,7 @@ namespace GeoChatter.Forms
             {
                 logger.Error("Connection to GuessServer lost: ");
                 logger.Error(e.Message);
-                MessageBox.Show($"Connection to guess server lost!\r\nTrying to reconnect\r\n{e.Message}", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                MessageBox.Show($"Connection to guess server lost!\r\nPlease restart the client!\r\n\r\n{e.Message}", "FATAL ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                 LoadingScreen(true, "Lost connection to GeoChatter servers...");
             }
         }

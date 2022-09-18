@@ -236,8 +236,7 @@ namespace GeoChatter.Web
             if (forcedReconnect || arg != null)
             {
                 FireDisconnected($"Connection to guess server closed due to an error: {arg?.Message}", "Trying to reconnect!", LogLevel.Error);
-                await Initialize(apiUrl, mainForm, gcClientId, uploadLog, false);
-                await Connect(client, null, true, true);
+             
             }
             return;
         }
