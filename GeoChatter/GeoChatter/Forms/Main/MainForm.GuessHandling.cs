@@ -515,7 +515,7 @@ namespace GeoChatter.Forms
                 {
                     guessesOpen = false;
                     SendEndGameToJS(ClientDbCache.RunningGame);
-                    SendEndGameToMaps(ClientDbCache.RunningGame);
+                    SendEndRoundToMaps(finishedRound);
                     SetRefreshMenuItemsEnabledState(false);
                     FinalizeGame();
                 }
