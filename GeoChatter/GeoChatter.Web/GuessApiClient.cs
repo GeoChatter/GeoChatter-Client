@@ -237,7 +237,7 @@ namespace GeoChatter.Web
             {
                 FireDisconnected($"Connection to guess server closed due to an error: {arg?.Message}", "Trying to reconnect!", LogLevel.Error);
                 await Initialize(apiUrl, mainForm, gcClientId, uploadLog, false);
-                Connect(client, null, true, true);
+                await Connect(client, null, true, true);
             }
             return;
         }
@@ -252,8 +252,8 @@ namespace GeoChatter.Web
                 {
                     throw new InvalidDataException("Login failed, please restart the client!");
                 }
-
-                MapIdentifier = client.MapIdentifier = loginResponse.MapIdentifier;
+                string reclaimedMapId =  await InvokeAsync<string>(nameof(IGeoChatterHub.ReclaimMapIdentifier), MapIdentifier, gcClientId);
+                MapIdentifier = client.MapIdentifier = (!string.IsNullOrEmpty(reclaimedMapId)) ? reclaimedMapId : loginResponse.MapIdentifier;
                 LanguageStrings.SetMapIdentifier(MapIdentifier);
                 FireLog($"Received MapId: {MapIdentifier} for {GCResourceRequestHandler.ClientGeoGuessrName} from reconnect attempt", LogLevel.Debug);
                 FireReconnected();
@@ -329,7 +329,7 @@ namespace GeoChatter.Web
                     connection.Reconnecting += Connection_Reconnecting;
                     connection.Reconnected += Connection_Reconnected;
                     connection.Closed += Connection_Closed;
-
+                    
 
                     //connection.On<string, string>(nameof(IGeoChatterClient.ReceiveMessage), async (user, message) =>
                     //{
@@ -999,15 +999,17 @@ namespace GeoChatter.Web
         {
             return await InvokeAsync<List<LogFile>>(nameof(IGeoChatterHub.GetLogFiles));
         }
-        public async Task<TResult> InvokeAsync<TResult>(string methodName, object arg1 = null)
+        public async Task<TResult> InvokeAsync<TResult>(string methodName, object arg1 = null, object arg2 = null)
         {
             if (connection != null)
             {
                 await ensureConnection();
-                if(arg1 == null)
+                if(arg1 == null && arg2 == null)
                     return await connection.InvokeAsync<TResult>(methodName);
-                else
+                else if(arg1 != null && arg2 == null)
                     return await connection.InvokeAsync<TResult>(methodName, arg1);
+                else
+                    return await connection.InvokeAsync<TResult>(methodName, arg1, arg2);
             }
             return default(TResult);
         }
