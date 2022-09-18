@@ -415,6 +415,43 @@ namespace GeoChatter.Forms
             
         }
 
+        private delegate void EnableSaveButtonCallback();
+
+        private void EnableSaveButton()
+        {
+            // InvokeRequired required compares the thread ID of the
+            // calling thread to the thread ID of the creating thread.
+            // If these threads are different, it returns true.
+            if (btnSave.InvokeRequired)
+            {
+                EnableSaveButtonCallback d = new(EnableSaveButton);
+                Invoke(d);
+            }
+            else
+            {
+                btnSave.Enabled = true;
+
+            }
+        }
+        private delegate void EnableApplyButtonCallback();
+
+        private void EnableApplyButton()
+        {
+            // InvokeRequired required compares the thread ID of the
+            // calling thread to the thread ID of the creating thread.
+            // If these threads are different, it returns true.
+            if (btnApply.InvokeRequired)
+            {
+                EnableApplyButtonCallback d = new(EnableApplyButton);
+                Invoke(d);
+            }
+            else
+            {
+                btnApply.Enabled = true;
+
+            }
+
+        }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
@@ -523,6 +560,7 @@ namespace GeoChatter.Forms
             logger.Debug("setting up streamer.bot");
             if (chkStreamerBotConnectAtStartup.Checked && StreamerbotClient.IsAlive())
             {
+                btnSave.Enabled = btnApply.Enabled = false;
                 StreamerbotClient.GetActions();
             }
 
@@ -530,6 +568,7 @@ namespace GeoChatter.Forms
             logger.Debug("Setting up OBS");
             if (chkObsConnectAtStartup.Checked && obsClient.IsAlive())
             {
+                
                 GetAndSetOBSScenes();
             }
 
@@ -794,6 +833,8 @@ namespace GeoChatter.Forms
                 {
                     buttonConnectStreamerBot.Enabled = true;
                 }
+                EnableApplyButton();
+                EnableSaveButton();
             };
             checkBoxSpecialDistanceAction.Checked = Settings.Default.SpecialDistanceAction;
             checkBoxSpecialScoreAction.Checked = Settings.Default.SpecialScoreAction;
@@ -895,6 +936,7 @@ namespace GeoChatter.Forms
                         {
                             logger.Debug("connection succeeded");
                             buttonConnectStreamerBot.Text = "Disconnect";
+                            btnSave.Enabled = btnApply.Enabled = false;
                             StreamerbotClient.GetActions();
                         }
                         else
@@ -915,6 +957,7 @@ namespace GeoChatter.Forms
                     else
                     {
                         buttonConnectStreamerBot.Text = "Disconnect";
+                        btnSave.Enabled = btnApply.Enabled = false;
                         StreamerbotClient.GetActions();
                     }
                 }
@@ -1174,6 +1217,7 @@ namespace GeoChatter.Forms
 
         private void GetAndSetOBSScenes()
         {
+            btnSave.Enabled = btnApply.Enabled = false;
             logger.Debug("Getting round start scenes");
             List<OBSScene> allscenes = obsClient.GetScenes();
             List<MyOBSScene> timerScenes = new(allscenes.ConvertAll(o => new MyOBSScene(o)).ToList());
@@ -1226,6 +1270,7 @@ namespace GeoChatter.Forms
             }
 
             logger.Debug("All OBS scenes successfully set");
+            btnSave.Enabled = btnApply.Enabled = true;
         }
 
         private void SetUpObsInputs()
@@ -1530,6 +1575,7 @@ namespace GeoChatter.Forms
             btnShowAdvanced.Text = (showAdvancedSettings ? "Hide" : "Show") + " advanced settings";
             if (showAdvancedSettings)
             {
+                btnSave.Enabled = btnApply.Enabled = false;
                 StreamerbotClient.GetActions();
             }
         }
