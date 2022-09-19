@@ -72,10 +72,10 @@ namespace GeoChatter.Forms
             string version = fvi.FileVersion;
 
             string huburl = Settings.Default.GuessServer;
-//#if DEBUG
+#if DEBUG
             huburl = Settings.Default.AlternateGuessApiUrl;
            //huburl = "https://localhost:44350/geoChatterHub";
-//#endif
+#endif
 
             bool success = await guessApiClient.Initialize(huburl, this, Settings.Default.GCClientId, Settings.Default.EnableDebugLogging, isGGLogon);
             if (success)

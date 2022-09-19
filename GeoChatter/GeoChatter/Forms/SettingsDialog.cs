@@ -815,9 +815,10 @@ namespace GeoChatter.Forms
         List<StreamerbotAction> roundStartList, scoreList,distanceList, roundendList, gameendList;
         private void SetStreamerBotActions()
         {
-            while(streamerbotClient.IsAlive() && !streamerbotClient.Actions.Any())
+            if(streamerbotClient.IsAlive() && !streamerbotClient.Actions.Any())
             {
-                Thread.Sleep(5);
+                streamerbotClient.GetActions();
+                Thread.Sleep(10);
             }
             if (streamerbotClient.Actions.Any() && tabControl1.TabPages.Contains(tabPageEvents))
             {
