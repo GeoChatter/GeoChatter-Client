@@ -92,11 +92,10 @@ export namespace Util
      */
     export function FixFlagHTML(flag: Nullable<string>, name?: Nullable<string>): string
     {
-        return (typeof flag === "string" && flag != "") ?
-            `<div class="flagWrapper" style="display:inline"${(typeof name === "string"
-                ? (` title="${name} (${flag?.toUpperCase()})" data-tooltip="${name} (${flag?.toUpperCase()})"`)
-                : "")}><span class="flag-icon flag-icon-${flag}"></span></div>` :
-            "";
+        let fs = (typeof flag === "string" && flag != "");
+        return `<div class="flagWrapper"${(fs && typeof name === "string"
+            ? (` title="${name} (${flag?.toUpperCase()})" data-tooltip="${name} (${flag?.toUpperCase()})"`)
+            : "")}><span class="flag-icon flag-icon-${(fs ? flag : Constant.TransparentFlagCSSSuffix)}"></span></div>`;
     }
 
     /**

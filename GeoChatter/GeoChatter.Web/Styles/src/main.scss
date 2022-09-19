@@ -12,6 +12,7 @@ $Stage_EndRound: "ENDROUND";
 $Stage_EndGame: "ENDGAME";
 
 :root {
+    --gc-border-radius-low: 5px;
     --gc-border-radius-default: 8px;
     --gc-border-radius-high: 3.75rem;
     --gc-datatable-header-height: 5rem;
@@ -142,30 +143,34 @@ body {
 
 .flagBack {
     display: -webkit-inline-box !important;
-    width: auto !important;
     border: 1px dashed black !important;
-    border-radius: var(--gc-border-radius-default) !important;
-    padding: 0px 4px;
+    border-radius: var(--gc-border-radius-low);
+    width: calc(var(--gc-flag-container-width) + 7px);
+    margin: auto;
 }
+
+    .flagBack .flag-icon {
+        border-radius: var(--gc-border-radius-low);
+    }
 
 .flagNotGuessed {
     background-color: rgba(75, 75, 75, 0.862745098) !important;
-    border: 2px dashed #aa8800 !important;
+    border: 3px dotted #aa8800 !important;
 }
 
 .flagBackCorrectRegion {
     background-color: #00ff0042 !important;
-    border: 2px dashed #44ff07 !important;
+    border: 3px dotted #44ff07 !important;
 }
 
 .flagBackCorrectCountry {
     background-color: #ff00ff42 !important;
-    border: 2px dashed #ff41d6 !important;
+    border: 3px dotted #ff41d6 !important;
 }
 
 .flagBackIncorrect {
     background-color: #ff000042 !important;
-    border: 2px dashed #ff2812 !important;
+    border: 3px dotted #ff2812 !important;
 }
 
 .debug_button {
@@ -440,6 +445,7 @@ input:checked + .slider:before {
 td [data-tooltip]:before {
     position: absolute;
     content: attr(data-tooltip);
+    transition: all 0.35s ease;
     opacity: 0;
     padding: 4px;
     color: white;
@@ -449,6 +455,7 @@ td [data-tooltip]:before {
 td [data-tooltip]:hover:before {
     display: flex;
     opacity: 1;
+    transition: all 0.25s ease;
     background: #000000cc;
     margin-left: 2em;
     z-index: 100000000;
@@ -1122,6 +1129,11 @@ th.sorting, th.sorting_asc, th.sorting_desc {
     display: none;
 }
 
+.flagWrapper {
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
 #resizeable_container {
     pointer-events: auto;
 }
@@ -1345,22 +1357,22 @@ th.sorting, th.sorting_asc, th.sorting_desc {
 [data-colfield="#{$PlayerNameFieldName}"] > span:last-child:before {
     background-color: var(--platform-color);
     border-color: var(--platform-color);
-    content: "\00a0";
+    content: var(--platform-icon);
+    font-family: var(--platform-font-family);
     float: left;
     transition: all 0.35s cubic-bezier(0.54, 0, 0.29, 1.02);
+    transition-delay: 0.2s;
     font-size: 18px;
     overflow-x: hidden;
-    width: 2px;
+    width: var(--platform-icon-width-hidden);
 }
 
 [data-colfield="#{$PlayerNameFieldName}"] > span:last-child:hover:before {
     padding: 0px 3px;
     background-color: var(--platform-color-hover);
     border-color: var(--platform-color-hover);
-    content: var(--platform-icon);
     float: left;
-    font-family: var(--platform-font-family);
-    width: 27px;
+    width: var(--platform-icon-width);
     border-radius: 0px var(--gc-border-radius-default) var(--gc-border-radius-default) 0px;
 }
 
@@ -1368,19 +1380,25 @@ th.sorting, th.sorting_asc, th.sorting_desc {
     --platform-color: #a970ff;
     --platform-color-hover: #a970ffbb;
     --platform-font-family: "Font Awesome 6 Brands";
-    --platform-icon: "\f1e8"
+    --platform-icon: "\f1e8";
+    --platform-icon-width: 27px;
+    --platform-icon-width-hidden: 4px;
 }
 
 .platform-youtube {
     --platform-color: red;
     --platform-color-hover: #ff0000bb;
     --platform-font-family: "Font Awesome 6 Brands";
-    --platform-icon: "\f167"
+    --platform-icon: "\f167";
+    --platform-icon-width: 27px;
+    --platform-icon-width-hidden: 4px;
 }
 
 .platform-other {
     --platform-color: #3373ff;
     --platform-color-hover: #3373ffcc;
     --platform-font-family: "Font Awesome 6 Free";
-    --platform-icon: "\f7a2"
+    --platform-icon: "\f7a2";
+    --platform-icon-width: 27px;
+    --platform-icon-width-hidden: 4px;
 }
