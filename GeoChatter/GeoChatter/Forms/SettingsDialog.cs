@@ -27,6 +27,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Svg;
 using System.Windows.Media;
 using GeoChatter.Core.Handlers;
+using CefSharp.DevTools.Accessibility;
 
 namespace GeoChatter.Forms
 {
@@ -148,14 +149,7 @@ namespace GeoChatter.Forms
             Settings.Default.SpecialDistanceFrom = disanceFrom;
             Settings.Default.SpecialDistanceTo = distanceTo;
 
-            Settings.Default.SpecialDistanceAction = checkBoxSpecialDistanceAction.Checked;
-            Settings.Default.SpecialDistanceActionID = ((StreamerbotAction)comboBoxSpecialDistanceActions.SelectedItem)?.id;
-            Settings.Default.SpecialDistanceActionName = ((StreamerbotAction)comboBoxSpecialDistanceActions.SelectedItem)?.name;
-
-            Settings.Default.SpecialScoreAction = checkBoxSpecialScoreAction.Checked;
-            Settings.Default.SpecialScoreActionID = ((StreamerbotAction)comboBoxSpecialScoreActions.SelectedItem)?.id;
-            Settings.Default.SpecialScoreActionName = ((StreamerbotAction)comboBoxSpecialScoreActions.SelectedItem)?.name;
-
+          
             Settings.Default.StreamerBotIP = txtStreamerBotIP.Text;
             Settings.Default.StreamerBotPort = txtStreamerBotPort.Text;
             Settings.Default.StreamerBotConnectAtStartup = chkStreamerBotConnectAtStartup.Checked;
@@ -186,19 +180,28 @@ namespace GeoChatter.Forms
             Settings.Default.ScoreboardFGA = (byte)ScoreboardFGAnumericUpDown2.Value;
 
             Settings.Default.ScrollSpeed = (int)ScoreboardScrollSpeednumericUpDown1.Value;
+            if (chkStreamerBotConnectAtStartup.Checked)
+            {
+                Settings.Default.SpecialDistanceAction = checkBoxSpecialDistanceAction.Checked;
+                Settings.Default.SpecialDistanceActionID = ((StreamerbotAction)comboBoxSpecialDistanceActions.SelectedItem)?.id;
+                Settings.Default.SpecialDistanceActionName = ((StreamerbotAction)comboBoxSpecialDistanceActions.SelectedItem)?.name;
 
-            Settings.Default.RoundStartAction = checkBoxRoundTimerExecuteStreamerBotAction.Checked;
-            Settings.Default.RoundStartActionID = ((StreamerbotAction)comboBoxRoundTimerAction.SelectedItem)?.id;
-            Settings.Default.RoundStartActionName = ((StreamerbotAction)comboBoxRoundTimerAction.SelectedItem)?.name;
+                Settings.Default.SpecialScoreAction = checkBoxSpecialScoreAction.Checked;
+                Settings.Default.SpecialScoreActionID = ((StreamerbotAction)comboBoxSpecialScoreActions.SelectedItem)?.id;
+                Settings.Default.SpecialScoreActionName = ((StreamerbotAction)comboBoxSpecialScoreActions.SelectedItem)?.name;
 
-            Settings.Default.RoundEndAction = chkBotRoundEndExecute.Checked;
-            Settings.Default.RoundEndActionID = ((StreamerbotAction)comboBotRoundEndAction.SelectedItem)?.id;
-            Settings.Default.RoundEndActionName = ((StreamerbotAction)comboBotRoundEndAction.SelectedItem)?.name;
+                Settings.Default.RoundStartAction = checkBoxRoundTimerExecuteStreamerBotAction.Checked;
+                Settings.Default.RoundStartActionID = ((StreamerbotAction)comboBoxRoundStartAction.SelectedItem)?.id;
+                Settings.Default.RoundStartActionName = ((StreamerbotAction)comboBoxRoundStartAction.SelectedItem)?.name;
 
-            Settings.Default.GameEndAction = chkBotGameEndExecute.Checked;
-            Settings.Default.GameEndActionID = ((StreamerbotAction)comboBotGameEndAction.SelectedItem)?.id;
-            Settings.Default.GameEndActionName = ((StreamerbotAction)comboBotGameEndAction.SelectedItem)?.name;
+                Settings.Default.RoundEndAction = chkBotRoundEndExecute.Checked;
+                Settings.Default.RoundEndActionID = ((StreamerbotAction)comboBoxRoundEndAction.SelectedItem)?.id;
+                Settings.Default.RoundEndActionName = ((StreamerbotAction)comboBoxRoundEndAction.SelectedItem)?.name;
 
+                Settings.Default.GameEndAction = chkBotGameEndExecute.Checked;
+                Settings.Default.GameEndActionID = ((StreamerbotAction)comboBoxGameEndAction.SelectedItem)?.id;
+                Settings.Default.GameEndActionName = ((StreamerbotAction)comboBoxGameEndAction.SelectedItem)?.name;
+            }
             Settings.Default.OverlayInfoPopupShowStreak = chkGuessInfoStreak.Checked;
             Settings.Default.OverlayInfoPopupShowCoordinates = chkGuessInfoCoordinates.Checked;
             Settings.Default.OverlayInfoPopupShowDistance = chkGuessInfoDistance.Checked;
@@ -209,32 +212,33 @@ namespace GeoChatter.Forms
             Settings.Default.ObsIP = txtObsIp.Text;
             Settings.Default.ObsPort = txtObsPort.Text;
             Settings.Default.ObsConnectAtStartUp = chkObsConnectAtStartup.Checked;
+            if (chkObsConnectAtStartup.Checked)
+            {
+                Settings.Default.ObsRoundStartExecute = chkRoundTimerOBS.Checked;
+                Settings.Default.ObsRoundStartScene = comboRoundTimerObsScene.SelectedValue?.ToStringDefault();
+                Settings.Default.ObsRoundStartSource = comboRoundTimerObsSource.SelectedValue?.ToStringDefault();
+                Settings.Default.ObsRoundStartAction = comboRoundTimerObsAction.SelectedItem?.ToStringDefault();
 
-            Settings.Default.ObsRoundStartExecute = chkRoundTimerOBS.Checked;
-            Settings.Default.ObsRoundStartScene = comboRoundTimerObsScene.SelectedValue?.ToStringDefault();
-            Settings.Default.ObsRoundStartSource = comboRoundTimerObsSource.SelectedValue?.ToStringDefault();
-            Settings.Default.ObsRoundStartAction = comboRoundTimerObsAction.SelectedItem?.ToStringDefault();
+                Settings.Default.ObsRoundEndExecute = chkOBSRoundEndExecute.Checked;
+                Settings.Default.ObsRoundEndScene = comboOBSRoundEndScene.SelectedValue?.ToStringDefault();
+                Settings.Default.ObsRoundEndSource = comboOBSRoundEndSource.SelectedValue?.ToStringDefault();
+                Settings.Default.ObsRoundEndAction = comboOBSRoundEndAction.SelectedItem?.ToStringDefault();
 
-            Settings.Default.ObsRoundEndExecute = chkOBSRoundEndExecute.Checked;
-            Settings.Default.ObsRoundEndScene = comboOBSRoundEndScene.SelectedValue?.ToStringDefault();
-            Settings.Default.ObsRoundEndSource = comboOBSRoundEndSource.SelectedValue?.ToStringDefault();
-            Settings.Default.ObsRoundEndAction = comboOBSRoundEndAction.SelectedItem?.ToStringDefault();
-
-            Settings.Default.ObsGameEndExecute = chkOBSGameEndExecute.Checked;
-            Settings.Default.ObsGameEndScene = comboOBSGameEndScene.SelectedValue?.ToStringDefault();
-            Settings.Default.ObsGameEndSource = comboOBSGameEndSource.SelectedValue?.ToStringDefault();
-            Settings.Default.ObsGameEndAction = comboOBSGameEndAction.SelectedItem?.ToStringDefault();
+                Settings.Default.ObsGameEndExecute = chkOBSGameEndExecute.Checked;
+                Settings.Default.ObsGameEndScene = comboOBSGameEndScene.SelectedValue?.ToStringDefault();
+                Settings.Default.ObsGameEndSource = comboOBSGameEndSource.SelectedValue?.ToStringDefault();
+                Settings.Default.ObsGameEndAction = comboOBSGameEndAction.SelectedItem?.ToStringDefault();
 
 
-            Settings.Default.ObsSpecialDistanceExecute = chkSpecialDistanceObs.Checked;
-            Settings.Default.ObsSpecialDistanceScene = comboSpecialDistanceObsScene.SelectedValue?.ToStringDefault();
-            Settings.Default.ObsSpecialDistanceSource = comboSpecialDistanceObsSource.SelectedValue?.ToStringDefault();
-            Settings.Default.ObsSpecialDistanceAction = comboSpecialDistanceObsAction.SelectedItem?.ToStringDefault();
-            Settings.Default.ObsSpecialScoreExecute = chkSpecialScoreObs.Checked;
-            Settings.Default.ObsSpecialScoreScene = comboSpecialScoreObsScene.SelectedValue?.ToStringDefault();
-            Settings.Default.ObsSpecialScoreSource = comboSpecialScoreObsSource.SelectedValue?.ToStringDefault();
-            Settings.Default.ObsSpecialScoreAction = comboSpecialScoreObsAction.SelectedItem?.ToStringDefault();
-
+                Settings.Default.ObsSpecialDistanceExecute = chkSpecialDistanceObs.Checked;
+                Settings.Default.ObsSpecialDistanceScene = comboSpecialDistanceObsScene.SelectedValue?.ToStringDefault();
+                Settings.Default.ObsSpecialDistanceSource = comboSpecialDistanceObsSource.SelectedValue?.ToStringDefault();
+                Settings.Default.ObsSpecialDistanceAction = comboSpecialDistanceObsAction.SelectedItem?.ToStringDefault();
+                Settings.Default.ObsSpecialScoreExecute = chkSpecialScoreObs.Checked;
+                Settings.Default.ObsSpecialScoreScene = comboSpecialScoreObsScene.SelectedValue?.ToStringDefault();
+                Settings.Default.ObsSpecialScoreSource = comboSpecialScoreObsSource.SelectedValue?.ToStringDefault();
+                Settings.Default.ObsSpecialScoreAction = comboSpecialScoreObsAction.SelectedItem?.ToStringDefault();
+            }
             var player = ClientDbCache.Instance.Streamer;
             if(player != null)
             {
@@ -558,17 +562,17 @@ namespace GeoChatter.Forms
                 logger.Error(ex.Summarize());
             }
             logger.Debug("setting up streamer.bot");
-            if (chkStreamerBotConnectAtStartup.Checked && StreamerbotClient.IsAlive())
+            if (chkStreamerBotConnectAtStartup.Checked && streamerbotClient.IsAlive())
             {
-                btnSave.Enabled = btnApply.Enabled = false;
-                StreamerbotClient.GetActions();
+            //    btnSave.Enabled = btnApply.Enabled = false;
+              //  streamerbotClient.GetActions();
             }
 
             SetUpStreambotInputs();
             logger.Debug("Setting up OBS");
             if (chkObsConnectAtStartup.Checked && obsClient.IsAlive())
             {
-                
+                obsClient.GetScenes();
                 GetAndSetOBSScenes();
             }
 
@@ -769,73 +773,7 @@ namespace GeoChatter.Forms
                 streamer = ClientDbCache.Instance.GetPlayerByIDOrName(GCResourceRequestHandler.ClientUserID, GCResourceRequestHandler.ClientGeoGuessrName, profilePicUrl: GCResourceRequestHandler.ClientGeoGuessrPic, channelName: GCResourceRequestHandler.ClientUserID.ToLowerInvariant(), isStreamer: true);
             if(streamer != null)
                 txtStreamerDisplayname.Text = streamer.DisplayName;
-            streamerbotClient.ActionsReceived += (object mysender, ActionsReceivedEventArgs args) =>
-            {
-
-                logger.Debug("Actions from streamer bot received");
-                if (args.Actions == null)
-                {
-                    logger.Debug("not actions found");
-                    return;
-                }
-                logger.Debug("setting distance actions");
-                if(!args.Actions.Any(a => a.name == "[none]"))
-                    args.Actions.Add(new StreamerbotAction() { name = "[none]", id = string.Empty });
-                List<StreamerbotAction> distanceList = new(args.Actions);
-                comboBoxSpecialDistanceActions.DataSource = distanceList.OrderBy(a => a.name).ToList();
-                comboBoxSpecialDistanceActions.DisplayMember = "name";
-                comboBoxSpecialDistanceActions.ValueMember = "id";
-
-                if (!string.IsNullOrEmpty(Settings.Default.SpecialDistanceActionID))
-                {
-                    comboBoxSpecialDistanceActions.SelectedValue = Settings.Default.SpecialDistanceActionID;
-                }
-
-                logger.Debug("Setting score actions");
-                List<StreamerbotAction> scoreList = new(args.Actions);
-                comboBoxSpecialScoreActions.DataSource = scoreList.OrderBy(a => a.name).ToList();
-                comboBoxSpecialScoreActions.DisplayMember = "name";
-                comboBoxSpecialScoreActions.ValueMember = "id";
-                if (!string.IsNullOrEmpty(Settings.Default.SpecialScoreActionID))
-                {
-                    comboBoxSpecialScoreActions.SelectedValue = Settings.Default.SpecialScoreActionID;
-                }
-                logger.Debug("setting round start actions");
-                List<StreamerbotAction> timerList = new(args.Actions);
-                comboBoxRoundTimerAction.DataSource = timerList.OrderBy(a => a.name).ToList();
-                comboBoxRoundTimerAction.DisplayMember = "name";
-                comboBoxRoundTimerAction.ValueMember = "id";
-                if (!string.IsNullOrEmpty(Settings.Default.RoundStartActionID))
-                {
-                    comboBoxRoundTimerAction.SelectedValue = Settings.Default.RoundStartActionID;
-                }
-                logger.Debug("setting round end actions");
-                List<StreamerbotAction> roundendList = new(args.Actions);
-                comboBotRoundEndAction.DataSource = roundendList.OrderBy(a => a.name).ToList();
-                comboBotRoundEndAction.DisplayMember = "name";
-                comboBotRoundEndAction.ValueMember = "id";
-                if (!string.IsNullOrEmpty(Settings.Default.RoundEndActionID))
-                {
-                    comboBotRoundEndAction.SelectedValue = Settings.Default.RoundEndActionID;
-                }
-                logger.Debug("setting game end actions");
-                List<StreamerbotAction> gameendList = new(args.Actions);
-                comboBotGameEndAction.DataSource = gameendList.OrderBy(a => a.name).ToList();
-                comboBotGameEndAction.DisplayMember = "name";
-                comboBotGameEndAction.ValueMember = "id";
-                if (!string.IsNullOrEmpty(Settings.Default.GameEndActionID))
-                {
-                    comboBotGameEndAction.SelectedValue = Settings.Default.GameEndActionID;
-                }
-
-
-                if (chkStreamerBotConnectAtStartup.Checked)
-                {
-                    buttonConnectStreamerBot.Enabled = true;
-                }
-                EnableApplyButton();
-                EnableSaveButton();
-            };
+            SetStreamerBotActions();
             checkBoxSpecialDistanceAction.Checked = Settings.Default.SpecialDistanceAction;
             checkBoxSpecialScoreAction.Checked = Settings.Default.SpecialScoreAction;
             checkBoxRoundTimerExecuteStreamerBotAction.Checked = Settings.Default.RoundStartAction;
@@ -873,6 +811,88 @@ namespace GeoChatter.Forms
             scrSettings.SetShortcut(Settings.Default.ShortcutsSettingsKeycode, Settings.Default.ShortcutsSettingsModifiers);
             scrMenu.SetShortcut(Settings.Default.ShortcutsMenuKey, Settings.Default.ShortcutsMenuModifiers);
             scrFullscreen.SetShortcut(Settings.Default.ShortcutsFullscreenKey, Settings.Default.ShortcutsFullscreenModifiers);
+        }
+        List<StreamerbotAction> roundStartList, scoreList,distanceList, roundendList, gameendList;
+        private void SetStreamerBotActions()
+        {
+            while(!streamerbotClient.Actions.Any() && chkStreamerBotConnectAtStartup.Checked)
+            {
+                Thread.Sleep(5);
+            }
+            if (streamerbotClient.Actions.Any() && tabControl1.TabPages.Contains(tabPageEvents))
+            {
+
+
+                logger.Debug("Actions from streamer bot received");
+
+                logger.Debug("setting distance actions");
+                if (!streamerbotClient.Actions.Any(a => a.name == "[none]"))
+                    streamerbotClient.Actions.Add(new StreamerbotAction() { name = "[none]", id = string.Empty });
+
+                distanceList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+                comboBoxSpecialDistanceActions.DataSource = distanceList;
+                comboBoxSpecialDistanceActions.DisplayMember = "name";
+                comboBoxSpecialDistanceActions.ValueMember = "id";
+
+                scoreList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+                comboBoxSpecialScoreActions.DataSource = scoreList;
+                comboBoxSpecialScoreActions.DisplayMember = "name";
+                comboBoxSpecialScoreActions.ValueMember = "id";
+
+                roundStartList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+                comboBoxRoundStartAction.DataSource = roundStartList;
+                comboBoxRoundStartAction.DisplayMember = "name";
+                comboBoxRoundStartAction.ValueMember = "id";
+
+                roundendList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+                comboBoxRoundEndAction.DataSource = roundendList;
+                comboBoxRoundEndAction.DisplayMember = "name";
+                comboBoxRoundEndAction.ValueMember = "id";
+
+                gameendList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+                comboBoxGameEndAction.DataSource = gameendList;
+                comboBoxGameEndAction.DisplayMember = "name";
+                comboBoxGameEndAction.ValueMember = "id";
+
+                if (!string.IsNullOrEmpty(Settings.Default.SpecialDistanceActionID))
+                {
+
+                    comboBoxSpecialDistanceActions.SelectedValue = Settings.Default.SpecialDistanceActionID;
+                }
+
+                logger.Debug("Setting score actions");
+
+                if (!string.IsNullOrEmpty(Settings.Default.SpecialScoreActionID))
+                {
+                    comboBoxSpecialScoreActions.SelectedValue = Settings.Default.SpecialScoreActionID;
+                }
+                logger.Debug("setting round start actions");
+
+                if (!string.IsNullOrEmpty(Settings.Default.RoundStartActionID))
+                {
+
+                    comboBoxRoundStartAction.SelectedValue = Settings.Default.RoundStartActionID;
+                }
+                logger.Debug("setting round end actions");
+
+                if (!string.IsNullOrEmpty(Settings.Default.RoundEndActionID))
+                {
+                    comboBoxRoundEndAction.SelectedValue = Settings.Default.RoundEndActionID;
+
+                }
+                logger.Debug("setting game end actions");
+
+                if (!string.IsNullOrEmpty(Settings.Default.GameEndActionID))
+                {
+                    comboBoxGameEndAction.SelectedValue = Settings.Default.GameEndActionID;
+                }
+
+
+                if (chkStreamerBotConnectAtStartup.Checked)
+                {
+                    buttonConnectStreamerBot.Enabled = true;
+                }
+            }
         }
 
         private void BindTableOptionsToTreeview(TableOptions to)
@@ -927,7 +947,7 @@ namespace GeoChatter.Forms
             if (chkStreamerBotConnectAtStartup.Checked)
             {
                 logger.Debug("connection because at startup");
-                if (!StreamerbotClient.IsAlive())
+                if (!streamerbotClient.IsAlive())
                 {
                     logger.Debug("disconnected, connect needed");
                     try
@@ -936,8 +956,9 @@ namespace GeoChatter.Forms
                         {
                             logger.Debug("connection succeeded");
                             buttonConnectStreamerBot.Text = "Disconnect";
-                            btnSave.Enabled = btnApply.Enabled = false;
-                            StreamerbotClient.GetActions();
+                          //  btnSave.Enabled = btnApply.Enabled = false;
+                            streamerbotClient.GetActions();
+                            SetStreamerBotActions();
                         }
                         else
                         {
@@ -952,13 +973,14 @@ namespace GeoChatter.Forms
                     if (sender == buttonConnectStreamerBot)
                     {
                         buttonConnectStreamerBot.Text = "Connect";
-                        StreamerbotClient.CloseConnection();
+                        streamerbotClient.CloseConnection();
                     }
                     else
                     {
                         buttonConnectStreamerBot.Text = "Disconnect";
-                        btnSave.Enabled = btnApply.Enabled = false;
-                        StreamerbotClient.GetActions();
+                      //  btnSave.Enabled = btnApply.Enabled = false;
+                        streamerbotClient.GetActions();
+                        SetStreamerBotActions();
                     }
                 }
 
@@ -970,7 +992,7 @@ namespace GeoChatter.Forms
                 {
                     try
                     {
-                        if (StreamerbotClient.TestConnection(txtStreamerBotIP.Text, txtStreamerBotPort.Text))
+                        if (streamerbotClient.TestConnection(txtStreamerBotIP.Text, txtStreamerBotPort.Text))
                         {
                             logger.Debug("test successful");
                             MessageBox.Show("Connection succeeded!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
@@ -990,6 +1012,7 @@ namespace GeoChatter.Forms
                 txtStreamerBotPort.Enabled = true;
             }
             SetUpStreambotInputs();
+            
         }
 
         private void chkStreamerBotConnectAtStartup_CheckedChanged(object sender, EventArgs e)
@@ -1004,7 +1027,7 @@ namespace GeoChatter.Forms
         {
             if (chkStreamerBotConnectAtStartup.Checked)
             {
-                if (StreamerbotClient.IsAlive())
+                if (streamerbotClient.IsAlive())
                 {
                     buttonConnectStreamerBot.Text = "Disconnect";
                     txtStreamerBotIP.Enabled =
@@ -1029,14 +1052,14 @@ namespace GeoChatter.Forms
                checkBoxSpecialDistanceAction.Enabled =
                comboBoxSpecialDistanceActions.Enabled =
                checkBoxRoundTimerExecuteStreamerBotAction.Enabled =
-               comboBoxRoundTimerAction.Enabled =
+               comboBoxRoundStartAction.Enabled =
                chkBotGameEndExecute.Enabled =
-               comboBotGameEndAction.Enabled =
+               comboBoxGameEndAction.Enabled =
                chkBotRoundEndExecute.Enabled =
-               comboBotRoundEndAction.Enabled =
+               comboBoxRoundEndAction.Enabled =
                checkBoxRoundTimerExecuteStreamerBotAction.Enabled =
-               comboBoxRoundTimerAction.Enabled =
-               comboBoxSpecialScoreActions.Enabled = chkStreamerBotConnectAtStartup.Checked && StreamerbotClient.IsAlive();
+               comboBoxRoundStartAction.Enabled =
+               comboBoxSpecialScoreActions.Enabled = chkStreamerBotConnectAtStartup.Checked && streamerbotClient.IsAlive();
         }
 
         private void tabPageOverlay_Click(object sender, EventArgs e)
@@ -1133,7 +1156,7 @@ namespace GeoChatter.Forms
 
         private void checkBoxRoundTimerExecuteStreamerBotAction_CheckedChanged(object sender, EventArgs e)
         {
-            comboBoxRoundTimerAction.Enabled = checkBoxRoundTimerExecuteStreamerBotAction.Checked;
+            comboBoxRoundStartAction.Enabled = checkBoxRoundTimerExecuteStreamerBotAction.Checked;
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
@@ -1214,63 +1237,74 @@ namespace GeoChatter.Forms
             }
             SetUpObsInputs();
         }
-
+        List<MyOBSScene> roundstartScenes, roundendScenes, gameendScenes, distanceScenes, scoreScenes;
         private void GetAndSetOBSScenes()
         {
-            btnSave.Enabled = btnApply.Enabled = false;
-            logger.Debug("Getting round start scenes");
-            List<OBSScene> allscenes = obsClient.GetScenes();
-            List<MyOBSScene> timerScenes = new(allscenes.ConvertAll(o => new MyOBSScene(o)).ToList());
-            comboRoundTimerObsScene.DataSource = timerScenes;
-            comboRoundTimerObsScene.DisplayMember = "DisplayName";
-            comboRoundTimerObsScene.ValueMember = "DisplayName";
-            if (!string.IsNullOrEmpty(Settings.Default.ObsRoundStartScene))
+            if(obsClient.IsAlive() && !obsClient.Scenes.Any())
             {
-                comboRoundTimerObsScene.SelectedValue = Settings.Default.ObsRoundStartScene;
+                obsClient.GetScenes();
             }
-
-            logger.Debug("Round start set, getting round end");
-            List<MyOBSScene> roundendScenes = new(allscenes.ConvertAll(o => new MyOBSScene(o)).ToList());
-            comboOBSRoundEndScene.DataSource = roundendScenes;
-            comboOBSRoundEndScene.DisplayMember = "DisplayName";
-            comboOBSRoundEndScene.ValueMember = "DisplayName";
-            if (!string.IsNullOrEmpty(Settings.Default.ObsRoundEndScene))
+            if (obsClient.Scenes.Any() && tabControl1.TabPages.Contains(tabPageEvents))
             {
-                comboOBSRoundEndScene.SelectedValue = Settings.Default.ObsRoundEndScene;
-            }
+                logger.Debug("Getting round start scenes");
+                roundstartScenes = new(obsClient.Scenes.ConvertAll(o => new MyOBSScene(o)).ToList().OrderBy(o => o.Name));
+                comboRoundTimerObsScene.DataSource = roundstartScenes;
+                comboRoundTimerObsScene.DisplayMember = "DisplayName";
+                comboRoundTimerObsScene.ValueMember = "DisplayName";
 
-            logger.Debug("Round end set, getting game end");
-            List<MyOBSScene> roundstartScenes = new(allscenes.ConvertAll(o => new MyOBSScene(o)).ToList());
-            comboOBSGameEndScene.DataSource = roundstartScenes;
-            comboOBSGameEndScene.DisplayMember = "DisplayName";
-            comboOBSGameEndScene.ValueMember = "DisplayName";
-            if (!string.IsNullOrEmpty(Settings.Default.ObsGameEndScene))
-            {
-                comboOBSGameEndScene.SelectedValue = Settings.Default.ObsGameEndScene;
-            }
+                logger.Debug("Round start set, getting round end");
+                roundendScenes = new(obsClient.Scenes.ConvertAll(o => new MyOBSScene(o)).ToList().OrderBy(o => o.Name));
+                comboOBSRoundEndScene.DataSource = roundendScenes;
+                comboOBSRoundEndScene.DisplayMember = "DisplayName";
+                comboOBSRoundEndScene.ValueMember = "DisplayName";
 
-            logger.Debug("game end set, getting distnace");
-            List<MyOBSScene> distanceScenes = new(allscenes.ConvertAll(o => new MyOBSScene(o)).ToList());
-            comboSpecialDistanceObsScene.DataSource = distanceScenes;
-            comboSpecialDistanceObsScene.ValueMember = "DisplayName";
-            comboSpecialDistanceObsScene.DisplayMember = "DisplayName";
-            if (!string.IsNullOrEmpty(Settings.Default.ObsSpecialDistanceScene))
-            {
-                comboSpecialDistanceObsScene.SelectedValue = Settings.Default.ObsSpecialDistanceScene;
-            }
+                logger.Debug("Round end set, getting game end");
+                gameendScenes = new(obsClient.Scenes.ConvertAll(o => new MyOBSScene(o)).ToList().OrderBy(o => o.Name));
+                comboOBSGameEndScene.DataSource = gameendScenes;
+                comboOBSGameEndScene.DisplayMember = "DisplayName";
+                comboOBSGameEndScene.ValueMember = "DisplayName";
 
-            logger.Debug("distance set, getting score");
-            List<MyOBSScene> scoreScenes = new(allscenes.ConvertAll(o => new MyOBSScene(o)).ToList());
-            comboSpecialScoreObsScene.DataSource = scoreScenes;
-            comboSpecialScoreObsScene.ValueMember = "DisplayName";
-            comboSpecialScoreObsScene.DisplayMember = "DisplayName";
-            if (!string.IsNullOrEmpty(Settings.Default.ObsSpecialScoreScene))
-            {
-                comboSpecialScoreObsScene.SelectedValue = Settings.Default.ObsSpecialScoreScene;
-            }
+                logger.Debug("game end set, getting distnace");
+                distanceScenes = new(obsClient.Scenes.ConvertAll(o => new MyOBSScene(o)).ToList().OrderBy(o => o.Name));
+                comboSpecialDistanceObsScene.DataSource = distanceScenes;
+                comboSpecialDistanceObsScene.ValueMember = "DisplayName";
+                comboSpecialDistanceObsScene.DisplayMember = "DisplayName";
 
-            logger.Debug("All OBS scenes successfully set");
-            btnSave.Enabled = btnApply.Enabled = true;
+                logger.Debug("distance set, getting score");
+                scoreScenes = new(obsClient.Scenes.ConvertAll(o => new MyOBSScene(o)).ToList().OrderBy(o => o.Name));
+                comboSpecialScoreObsScene.DataSource = scoreScenes;
+                comboSpecialScoreObsScene.ValueMember = "DisplayName";
+                comboSpecialScoreObsScene.DisplayMember = "DisplayName";
+
+                if (!string.IsNullOrEmpty(Settings.Default.ObsRoundStartScene))
+                {
+                    comboRoundTimerObsScene.SelectedText = Settings.Default.ObsRoundStartScene;
+                }
+
+                if (!string.IsNullOrEmpty(Settings.Default.ObsRoundEndScene))
+                {
+                    comboOBSRoundEndScene.SelectedText = Settings.Default.ObsRoundEndScene; 
+                }
+
+                if (!string.IsNullOrEmpty(Settings.Default.ObsGameEndScene))
+                {
+                    comboOBSGameEndScene.SelectedText = Settings.Default.ObsGameEndScene;
+                }
+
+                if (!string.IsNullOrEmpty(Settings.Default.ObsSpecialDistanceScene))
+                {
+                    comboSpecialDistanceObsScene.SelectedText = Settings.Default.ObsSpecialDistanceScene;
+
+                }
+
+                if (!string.IsNullOrEmpty(Settings.Default.ObsSpecialScoreScene))
+                {
+                    comboSpecialScoreObsScene.SelectedText = Settings.Default.ObsSpecialScoreScene;
+
+                }
+
+                logger.Debug("All OBS scenes successfully set");
+            }
         }
 
         private void SetUpObsInputs()
@@ -1522,8 +1556,8 @@ namespace GeoChatter.Forms
         private bool showAdvancedSettings;
         private void btnShowAdvanced_Click(object sender, EventArgs e)
         {
-            showAdvancedSettings = !showAdvancedSettings;
-            parent.ShowAdvancedSettings = showAdvancedSettings;
+            showAdvancedSettings = true;
+            parent.ShowAdvancedSettings = true;
             HandleAdvancedSettings();
         }
 
@@ -1549,6 +1583,8 @@ namespace GeoChatter.Forms
             if (showAdvancedSettings && !tabControl1.TabPages.Contains(tabPageEvents))
             {
                 tabControl1.TabPages.Insert(3, tabPageEvents);
+                SetStreamerBotActions();
+                GetAndSetOBSScenes();
             }
             else if (!showAdvancedSettings && tabControl1.TabPages.Contains(tabPageEvents))
             {
@@ -1563,21 +1599,10 @@ namespace GeoChatter.Forms
                 tabControl1.TabPages.Remove(tabPageConnections);
             }
 
-            //if (showAdvancedSettings && !tabControl1.TabPages.Contains(tabPageLabels))
-            //{
-            //    tabControl1.TabPages.Insert(4, tabPageLabels);
-            //}
-            //else if (!showAdvancedSettings && tabControl1.TabPages.Contains(tabPageLabels))
-            //{
+            
                 tabControl1.TabPages.Remove(tabPageLabels);
-            //}
-
-            btnShowAdvanced.Text = (showAdvancedSettings ? "Hide" : "Show") + " advanced settings";
-            if (showAdvancedSettings)
-            {
-                btnSave.Enabled = btnApply.Enabled = false;
-                StreamerbotClient.GetActions();
-            }
+            
+            btnShowAdvanced.Enabled = !showAdvancedSettings;
         }
 
         private async void button1_Click(object sender, EventArgs e)

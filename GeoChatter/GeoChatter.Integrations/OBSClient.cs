@@ -18,7 +18,9 @@ namespace GeoChatter.Integrations
         /// </summary>
         protected OBSWebsocket obs { get; init; }
         private static readonly ILog logger = LogManager.GetLogger(typeof(OBSClient));
+        private List<OBSScene> scenes = new List<OBSScene>();
 
+        public List<OBSScene> Scenes { get { return scenes; } }
         /// <summary>
         /// 
         /// </summary>
@@ -46,7 +48,7 @@ namespace GeoChatter.Integrations
                 return new List<OBSScene>();
             }
 
-            List<OBSScene> scenes = obs.ListScenes();
+            scenes = obs.ListScenes();
             logger.Debug($"Received {scenes.Count} sources");
             return scenes;
         }
