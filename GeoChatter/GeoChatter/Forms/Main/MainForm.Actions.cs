@@ -16,7 +16,7 @@ namespace GeoChatter.Forms
         {
             if (Settings.Default.GameEndAction && !string.IsNullOrEmpty(Settings.Default.GameEndActionID) && Settings.Default.GameEndActionName != "[none]")
             {
-                StreamerbotClient.ExecuteAction(Settings.Default.GameEndActionID, Settings.Default.GameEndActionName);
+                streamerbotClient.ExecuteAction(Settings.Default.GameEndActionID, Settings.Default.GameEndActionName);
             }
             if (Settings.Default.ObsGameEndExecute && !string.IsNullOrEmpty(Settings.Default.ObsGameEndAction) && !string.IsNullOrEmpty(Settings.Default.ObsGameEndSource))
             {
@@ -27,7 +27,7 @@ namespace GeoChatter.Forms
         {
             if (Settings.Default.RoundEndAction && !string.IsNullOrEmpty(Settings.Default.RoundEndActionID) && Settings.Default.RoundEndActionName != "[none]")
             {
-                StreamerbotClient.ExecuteAction(Settings.Default.RoundEndActionID, Settings.Default.RoundEndActionName);
+                streamerbotClient.ExecuteAction(Settings.Default.RoundEndActionID, Settings.Default.RoundEndActionName);
             }
             if (Settings.Default.ObsRoundEndExecute && !string.IsNullOrEmpty(Settings.Default.ObsRoundEndAction) && !string.IsNullOrEmpty(Settings.Default.ObsRoundEndSource))
             {
@@ -38,7 +38,7 @@ namespace GeoChatter.Forms
         {
             if (Settings.Default.RoundStartAction && !string.IsNullOrEmpty(Settings.Default.RoundStartActionID) && Settings.Default.RoundStartActionName != "[none]")
             {
-                StreamerbotClient.ExecuteAction(Settings.Default.RoundStartActionID, Settings.Default.RoundStartActionName);
+                streamerbotClient.ExecuteAction(Settings.Default.RoundStartActionID, Settings.Default.RoundStartActionName);
             }
             if (Settings.Default.ObsRoundStartExecute && !string.IsNullOrEmpty(Settings.Default.ObsRoundStartAction) && !string.IsNullOrEmpty(Settings.Default.ObsRoundStartSource))
             {
@@ -60,7 +60,7 @@ namespace GeoChatter.Forms
 
             if (Settings.Default.SpecialScoreAction && !string.IsNullOrEmpty(Settings.Default.SpecialScoreActionID) && Settings.Default.SpecialScoreActionName != "[none]" && specialScoreHit)
             {
-                StreamerbotClient.ExecuteAction(Settings.Default.SpecialScoreActionID, Settings.Default.SpecialScoreActionName);
+                streamerbotClient.ExecuteAction(Settings.Default.SpecialScoreActionID, Settings.Default.SpecialScoreActionName);
             }
             if (Settings.Default.ObsSpecialScoreExecute && !string.IsNullOrEmpty(Settings.Default.ObsSpecialScoreSource) && !string.IsNullOrEmpty(Settings.Default.ObsSpecialScoreAction) && specialScoreHit)
             {
@@ -84,7 +84,7 @@ namespace GeoChatter.Forms
 
             if (Settings.Default.SpecialDistanceAction && !string.IsNullOrEmpty(Settings.Default.SpecialDistanceActionID) && Settings.Default.SpecialDistanceActionName != "[none]" && specialDistanceHit)
             {
-                StreamerbotClient.ExecuteAction(Settings.Default.SpecialDistanceActionID, Settings.Default.SpecialDistanceActionName);
+                streamerbotClient.ExecuteAction(Settings.Default.SpecialDistanceActionID, Settings.Default.SpecialDistanceActionName);
             }
             if (Settings.Default.ObsSpecialDistanceExecute && !string.IsNullOrEmpty(Settings.Default.ObsSpecialDistanceSource) && !string.IsNullOrEmpty(Settings.Default.ObsSpecialDistanceAction) && specialDistanceHit)
             {

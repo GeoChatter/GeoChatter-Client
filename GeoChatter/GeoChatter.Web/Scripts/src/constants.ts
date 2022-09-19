@@ -36,6 +36,8 @@
     export const DataGridRowView = `#${_id_datatable} .dx-datagrid-rowsview .dx-scrollable-container`;
 
     export const PlayerStatsEmbedID = "GCStatsContainer";
+
+    export const TransparentFlagCSSSuffix = "gc-transparent";
 }
 
 window.GC.Constant = Constant;

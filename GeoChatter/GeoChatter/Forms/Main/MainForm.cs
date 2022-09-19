@@ -820,7 +820,9 @@ namespace GeoChatter.Forms
                     if (!obsClient.Connect("ws://" + Settings.Default.ObsIP + ":" + Settings.Default.ObsPort, Settings.Default.ObsPassword))
                     {
                         MessageBox.Show("Could not connect to OBS\r\nPlease make sure that IP, port  and password are correct,\rthat OBS and its websocket server are running!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                        return;
                     }
+                    obsClient.GetScenes();
                 }
                 catch (Exception ex) { logger.Error(ex.Summarize()); }
             }
@@ -836,7 +838,9 @@ namespace GeoChatter.Forms
                     if (!streamerbotClient.Connect(Settings.Default.StreamerBotIP, Settings.Default.StreamerBotPort))
                     {
                         MessageBox.Show("Could not connect to Streamer.Bot\r\nPlease make sure that IP and port are correct,\rthat Streamer.Bot and its websocket server are running!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                        return;
                     }
+                    streamerbotClient.GetActions();
                 }
                 catch (Exception ex) { logger.Error(ex.Summarize()); }
             }

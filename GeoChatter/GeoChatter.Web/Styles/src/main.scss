@@ -12,6 +12,7 @@ $Stage_EndRound: "ENDROUND";
 $Stage_EndGame: "ENDGAME";
 
 :root {
+    --gc-border-radius-low: 5px;
     --gc-border-radius-default: 8px;
     --gc-border-radius-high: 3.75rem;
     --gc-datatable-header-height: 5rem;
@@ -29,6 +30,8 @@ $Stage_EndGame: "ENDGAME";
     --gc-gg-main-color-lightest-transparent-high: #b177ff56;
     --gc-table-button-border: 1px solid #FFFFFFAA;
     --gc-font: neo-sans,sans-serif;
+    --gc-platform-indicator-hidden-width: 2px;
+    --gc-default-transition: all 0.3s ease;
 }
 
 body {
@@ -69,13 +72,14 @@ body {
     z-index: 100000000000;
     float: right;
     border: unset !important;
+    transition: var(--gc-default-transition);
 }
 
     .randomGuessBtn:hover {
         background-color: #6812a5;
     }
 
-.mapLinkBtnIngame {
+.mapLinkBtnIngame, .resultLinkBtn, .mapLinkBtnPage {
     color: white;
     background-color: var(--gc-gg-main-color);
     background-origin: padding-box;
@@ -85,52 +89,22 @@ body {
     height: 2em;
     margin-right: 1em;
     border-radius: var(--gc-border-radius-default);
-    border: 2px solid white;
+    border: var(--gc-table-button-border);
     cursor: pointer;
     z-index: 100000000000;
     display: flex;
     float: right;
     align-items: center;
     margin-top: 0.2em;
+    transition: var(--gc-default-transition);
 }
 
-.resultLinkBtn{
-    color: white;
-    background-color: var(--gc-gg-main-color);
-    background-origin: padding-box;
-    background-repeat: no-repeat;
-    background-size: 35px;
-    background-position: center;
-    height: 2em;
-    margin-right: 1em;
-    border-radius: var(--gc-border-radius-default);
-    border: 2px solid white;
-    cursor: pointer;
-    z-index: 100000000000;
-    display: flex;
-    float: right;
-    align-items: center;
-    margin-top: 0.2em;
-}
-
-.mapLinkBtnPage {
-    color: white;
-    background-color: var(--gc-gg-main-color);
-    background-origin: padding-box;
-    background-repeat: no-repeat;
-    background-size: 35px;
-    background-position: center;
-    height: 2em;
-    margin-right: 22em;
-    border-radius: var(--gc-border-radius-default);
-    border: 2px solid white;
-    cursor: pointer;
-    z-index: 100000000000;
-    display: flex;
-    float: right;
-    align-items: center;
-    margin-top: 0.2em;
-}
+    .mapLinkBtnIngame:hover, .mapLinkBtnIngame:focus,
+    .resultLinkBtn:hover, .resultLinkBtn:focus,
+    .mapLinkBtnPage:hover, .mapLinkBtnPage:focus {
+        background-color: white;
+        color: black;
+    }
 
 
 .flagBackSummary {
@@ -141,30 +115,34 @@ body {
 
 .flagBack {
     display: -webkit-inline-box !important;
-    width: auto !important;
     border: 1px dashed black !important;
-    border-radius: var(--gc-border-radius-default) !important;
-    padding: 0px 4px;
+    border-radius: var(--gc-border-radius-low);
+    width: calc(var(--gc-flag-container-width) + 7px) !important;
+    margin: auto;
 }
+
+    .flagBack .flag-icon {
+        border-radius: var(--gc-border-radius-low);
+    }
 
 .flagNotGuessed {
     background-color: rgba(75, 75, 75, 0.862745098) !important;
-    border: 2px dashed #aa8800 !important;
+    border: 3px dotted #aa8800 !important;
 }
 
 .flagBackCorrectRegion {
     background-color: #00ff0042 !important;
-    border: 2px dashed #44ff07 !important;
+    border: 3px dotted #44ff07 !important;
 }
 
 .flagBackCorrectCountry {
     background-color: #ff00ff42 !important;
-    border: 2px dashed #ff41d6 !important;
+    border: 3px dotted #ff41d6 !important;
 }
 
 .flagBackIncorrect {
     background-color: #ff000042 !important;
-    border: 2px dashed #ff2812 !important;
+    border: 3px dotted #ff2812 !important;
 }
 
 .debug_button {
@@ -235,8 +213,12 @@ body {
         right: 50%;
         border-radius: var(--gc-border-radius-default);
         background-color: white;
-        -webkit-transition: .4s;
-        transition: .4s;
+        transition: var(--gc-default-transition);
+    }
+
+    .slider:hover:before {
+        background: lightgrey;
+        border: 1px solid grey;
     }
 
 input:checked + .slider {
@@ -282,6 +264,7 @@ input:checked + .slider:before {
     border: var(--gc-table-button-border);
     cursor: pointer;
     height: 32px;
+    transition: var(--gc-default-transition);
 }
 
     /* Dropdown button on hover & focus */
@@ -439,6 +422,7 @@ input:checked + .slider:before {
 td [data-tooltip]:before {
     position: absolute;
     content: attr(data-tooltip);
+    transition: all 0.35s ease;
     opacity: 0;
     padding: 4px;
     color: white;
@@ -448,6 +432,7 @@ td [data-tooltip]:before {
 td [data-tooltip]:hover:before {
     display: flex;
     opacity: 1;
+    transition: all 0.25s ease;
     background: #000000cc;
     margin-left: 2em;
     z-index: 100000000;
@@ -1113,12 +1098,26 @@ th.sorting, th.sorting_asc, th.sorting_desc {
         margin-top: -0.27em;
     }
 
+        .scoreboard-subtitle #flagstitle .flagWrapper:hover:before {
+            display: flex;
+            opacity: 1;
+            transition: all 0.25s ease;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100000000;
+            margin-left: var(--gc-flag-container-width);
+        }
+
 .dx-datagrid .dx-row-alt > td, .dx-datagrid .dx-row-alt > tr > td {
     background-color: #34343444;
 }
 
 .dx-datagrid-nodata {
     display: none;
+}
+
+.flagWrapper {
+    display: inline-block;
+    transition: var(--gc-default-transition);
 }
 
 #resizeable_container {
@@ -1187,7 +1186,16 @@ th.sorting, th.sorting_asc, th.sorting_desc {
     border-radius: var(--gc-border-radius-default) !important;
     margin-right: 5px !important;
     border: var(--gc-table-button-border) !important;
+    padding: 0px 5px !important;
+    height: 2rem !important;
+    transition: var(--gc-default-transition);
 }
+
+    [role='menuitemradio']:hover,
+    [role='menuitemradio']:focus {
+        background-color: white !important;
+        color: black !important;
+    }
 
 .map-pin {
     transition: opacity 0.25s ease;
@@ -1339,4 +1347,53 @@ th.sorting, th.sorting_asc, th.sorting_desc {
     to {
         transform: rotate(1turn)
     }
+}
+
+[data-colfield="#{$PlayerNameFieldName}"] > span:last-child:before {
+    background-color: var(--platform-color);
+    border-color: var(--platform-color);
+    content: var(--platform-icon);
+    font-family: var(--platform-font-family);
+    float: left;
+    transition: all 0.35s cubic-bezier(0.54, 0, 0.29, 1.02);
+    transition-delay: 0.2s;
+    font-size: 18px;
+    overflow-x: hidden;
+    width: var(--platform-icon-width-hidden);
+}
+
+[data-colfield="#{$PlayerNameFieldName}"] > span:last-child:hover:before {
+    padding: 0px 3px;
+    background-color: var(--platform-color-hover);
+    border-color: var(--platform-color-hover);
+    float: left;
+    width: var(--platform-icon-width);
+    border-radius: 0px var(--gc-border-radius-default) var(--gc-border-radius-default) 0px;
+}
+
+.platform-twitch {
+    --platform-color: #a970ff;
+    --platform-color-hover: #a970ffbb;
+    --platform-font-family: "Font Awesome 6 Brands";
+    --platform-icon: "\f1e8";
+    --platform-icon-width: 27px;
+    --platform-icon-width-hidden: 4px;
+}
+
+.platform-youtube {
+    --platform-color: red;
+    --platform-color-hover: #ff0000bb;
+    --platform-font-family: "Font Awesome 6 Brands";
+    --platform-icon: "\f167";
+    --platform-icon-width: 27px;
+    --platform-icon-width-hidden: 4px;
+}
+
+.platform-other {
+    --platform-color: #3373ff;
+    --platform-color-hover: #3373ffcc;
+    --platform-font-family: "Font Awesome 6 Free";
+    --platform-icon: "\f7a2";
+    --platform-icon-width: 27px;
+    --platform-icon-width-hidden: 4px;
 }

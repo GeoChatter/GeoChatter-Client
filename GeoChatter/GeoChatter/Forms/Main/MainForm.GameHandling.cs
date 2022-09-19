@@ -368,6 +368,7 @@ namespace GeoChatter.Forms
                 }
                 else
                 {
+                    
                     Game g = ClientDbCache.RunningGame;
                     while (g.Previous != null)
                     {
@@ -379,7 +380,7 @@ namespace GeoChatter.Forms
                         else
                             CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_gameEndNoSummary", new Dictionary<string, string>() { { "winner", player.FullDisplayName } }));
                 }
-
+                SendEndGameToMaps(ClientDbCache.RunningGame);
                 if (ClientDbCache.RunningGame.IsPartOfInfiniteGame)
                 {
                     SendEndInfinityGameToJS(ClientDbCache.RunningGame);

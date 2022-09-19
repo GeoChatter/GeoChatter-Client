@@ -218,7 +218,7 @@
 	<Folder Include="Styles\dist\" />
     <Folder Include="Styles\flags\" />
   </ItemGroup>
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="prebuild.sh" />
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="postbuild.sh" />
   </Target>
 </Project>

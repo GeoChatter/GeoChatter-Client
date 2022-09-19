@@ -74,17 +74,17 @@ declare export global
     /** Source containing panorama data */
     export type PanoramaSource = {
         /** Panorama unique identifier */
-        Pano: Nullable<string> = "";
+        Pano: Nullable<string>,
         /** Wheter or not the pano id was overwritten after round start */
-        PanoOverwritten: boolean = false;
+        PanoOverwritten: boolean,
         /** Heading angle */
-        Heading: number = 0;
+        Heading: number,
         /** Pitch angle */
-        Pitch: number = 0;
+        Pitch: number,
         /** FOV */
-        FOV: number = 180;
+        FOV: number,
         /** Zoom level */
-        Zoom: number = 0;
+        Zoom: number
     } & Coordinate
 
     /** Feature containing regional data */
