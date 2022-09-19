@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "GeoChatter"
-#define MyAppVersion "v0.9.7.1"
+#define MyAppVersion "v1.1.0.0 Update"
 #define MyAppPublisher "NoBuddy&Rhino"
 #define MyAppURL "https://geochatter.tv"
 #define MyAppExeName "GeoChatter.exe"
@@ -21,10 +21,10 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
-;PrivilegesRequired=lowest
+; PrivilegesRequired=lowest
 OutputDir=C:\Users\Denis\Desktop\Setup
-OutputBaseFilename=GeoChatter_v0.9.7.1_hotfix
-SetupIconFile=D:\Projects\Github\GeoChatter\GeoChatter\GeoChatter\GeoChatter\Resources\logo_clean.ico
+OutputBaseFilename=GeoChatter_v1.1.0.0_update
+SetupIconFile=D:\Projects\Github\GeoChatter\GeoChatter-Client\GeoChatter\GeoChatter\Resources\logo_clean.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -38,9 +38,9 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Dirs]
 Name: {app}; Permissions: everyone-full
 [Files]
-Source: "D:\Projects\Github\GeoChatter\GeoChatter\GeoChatter\GeoChatter\bin\Release\publish\*"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\Projects\Github\GeoChatter\GeoChatter\GeoChatter\GeoChatter\bin\Release\publish\Styles\*"; DestDir: "{app}\Styles"; Flags: ignoreversion recursesubdirs
-Source: "D:\Projects\Github\GeoChatter\GeoChatter\GeoChatter\GeoChatter\bin\Release\publish\Scripts\*"; DestDir: "{app}\Scripts"; Flags: ignoreversion recursesubdirs
+Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\GeoChatter\GeoChatter\bin\release\publish\*"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\GeoChatter\GeoChatter\bin\Release\publish\Styles\*"; DestDir: "{app}\Styles"; Flags: ignoreversion recursesubdirs
+Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\GeoChatter\GeoChatter\bin\Release\publish\Scripts\*"; DestDir: "{app}\Scripts"; Flags: ignoreversion recursesubdirs
 
 
 
