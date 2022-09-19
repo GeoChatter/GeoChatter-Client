@@ -31,6 +31,7 @@ $Stage_EndGame: "ENDGAME";
     --gc-table-button-border: 1px solid #FFFFFFAA;
     --gc-font: neo-sans,sans-serif;
     --gc-platform-indicator-hidden-width: 2px;
+    --gc-default-transition: all 0.3s ease;
 }
 
 body {
@@ -71,13 +72,14 @@ body {
     z-index: 100000000000;
     float: right;
     border: unset !important;
+    transition: var(--gc-default-transition);
 }
 
     .randomGuessBtn:hover {
         background-color: #6812a5;
     }
 
-.mapLinkBtnIngame {
+.mapLinkBtnIngame, .resultLinkBtn, .mapLinkBtnPage {
     color: white;
     background-color: var(--gc-gg-main-color);
     background-origin: padding-box;
@@ -87,52 +89,22 @@ body {
     height: 2em;
     margin-right: 1em;
     border-radius: var(--gc-border-radius-default);
-    border: 2px solid white;
+    border: var(--gc-table-button-border);
     cursor: pointer;
     z-index: 100000000000;
     display: flex;
     float: right;
     align-items: center;
     margin-top: 0.2em;
+    transition: var(--gc-default-transition);
 }
 
-.resultLinkBtn{
-    color: white;
-    background-color: var(--gc-gg-main-color);
-    background-origin: padding-box;
-    background-repeat: no-repeat;
-    background-size: 35px;
-    background-position: center;
-    height: 2em;
-    margin-right: 1em;
-    border-radius: var(--gc-border-radius-default);
-    border: 2px solid white;
-    cursor: pointer;
-    z-index: 100000000000;
-    display: flex;
-    float: right;
-    align-items: center;
-    margin-top: 0.2em;
-}
-
-.mapLinkBtnPage {
-    color: white;
-    background-color: var(--gc-gg-main-color);
-    background-origin: padding-box;
-    background-repeat: no-repeat;
-    background-size: 35px;
-    background-position: center;
-    height: 2em;
-    margin-right: 22em;
-    border-radius: var(--gc-border-radius-default);
-    border: 2px solid white;
-    cursor: pointer;
-    z-index: 100000000000;
-    display: flex;
-    float: right;
-    align-items: center;
-    margin-top: 0.2em;
-}
+    .mapLinkBtnIngame:hover, .mapLinkBtnIngame:focus,
+    .resultLinkBtn:hover, .resultLinkBtn:focus,
+    .mapLinkBtnPage:hover, .mapLinkBtnPage:focus {
+        background-color: white;
+        color: black;
+    }
 
 
 .flagBackSummary {
@@ -145,7 +117,7 @@ body {
     display: -webkit-inline-box !important;
     border: 1px dashed black !important;
     border-radius: var(--gc-border-radius-low);
-    width: calc(var(--gc-flag-container-width) + 7px);
+    width: calc(var(--gc-flag-container-width) + 7px) !important;
     margin: auto;
 }
 
@@ -241,8 +213,12 @@ body {
         right: 50%;
         border-radius: var(--gc-border-radius-default);
         background-color: white;
-        -webkit-transition: .4s;
-        transition: .4s;
+        transition: var(--gc-default-transition);
+    }
+
+    .slider:hover:before {
+        background: lightgrey;
+        border: 1px solid grey;
     }
 
 input:checked + .slider {
@@ -288,6 +264,7 @@ input:checked + .slider:before {
     border: var(--gc-table-button-border);
     cursor: pointer;
     height: 32px;
+    transition: var(--gc-default-transition);
 }
 
     /* Dropdown button on hover & focus */
@@ -1121,6 +1098,15 @@ th.sorting, th.sorting_asc, th.sorting_desc {
         margin-top: -0.27em;
     }
 
+        .scoreboard-subtitle #flagstitle .flagWrapper:hover:before {
+            display: flex;
+            opacity: 1;
+            transition: all 0.25s ease;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100000000;
+            margin-left: var(--gc-flag-container-width);
+        }
+
 .dx-datagrid .dx-row-alt > td, .dx-datagrid .dx-row-alt > tr > td {
     background-color: #34343444;
 }
@@ -1131,7 +1117,7 @@ th.sorting, th.sorting_asc, th.sorting_desc {
 
 .flagWrapper {
     display: inline-block;
-    transition: all 0.3s ease;
+    transition: var(--gc-default-transition);
 }
 
 #resizeable_container {
@@ -1200,7 +1186,16 @@ th.sorting, th.sorting_asc, th.sorting_desc {
     border-radius: var(--gc-border-radius-default) !important;
     margin-right: 5px !important;
     border: var(--gc-table-button-border) !important;
+    padding: 0px 5px !important;
+    height: 2rem !important;
+    transition: var(--gc-default-transition);
 }
+
+    [role='menuitemradio']:hover,
+    [role='menuitemradio']:focus {
+        background-color: white !important;
+        color: black !important;
+    }
 
 .map-pin {
     transition: opacity 0.25s ease;

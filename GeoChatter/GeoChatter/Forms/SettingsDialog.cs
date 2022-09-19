@@ -580,7 +580,7 @@ namespace GeoChatter.Forms
             logger.Debug("Finished loading settings");
         }
 
-        private Dictionary<string, string> Flags { get; } = new Dictionary<string, string>();
+        private Dictionary<string, string> Flags { get; } = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
 
         private static string FlagCodeFromComboboxItem(string item)
         {
