@@ -180,7 +180,7 @@ namespace GeoChatter.Forms
             Settings.Default.ScoreboardFGA = (byte)ScoreboardFGAnumericUpDown2.Value;
 
             Settings.Default.ScrollSpeed = (int)ScoreboardScrollSpeednumericUpDown1.Value;
-            if (chkStreamerBotConnectAtStartup.Checked)
+            if (chkStreamerBotConnectAtStartup.Checked && streamerbotClient.IsAlive())
             {
                 Settings.Default.SpecialDistanceAction = checkBoxSpecialDistanceAction.Checked;
                 Settings.Default.SpecialDistanceActionID = ((StreamerbotAction)comboBoxSpecialDistanceActions.SelectedItem)?.id;
@@ -212,7 +212,7 @@ namespace GeoChatter.Forms
             Settings.Default.ObsIP = txtObsIp.Text;
             Settings.Default.ObsPort = txtObsPort.Text;
             Settings.Default.ObsConnectAtStartUp = chkObsConnectAtStartup.Checked;
-            if (chkObsConnectAtStartup.Checked)
+            if (chkObsConnectAtStartup.Checked && obsClient.IsAlive())
             {
                 Settings.Default.ObsRoundStartExecute = chkRoundTimerOBS.Checked;
                 Settings.Default.ObsRoundStartScene = comboRoundTimerObsScene.SelectedValue?.ToStringDefault();
@@ -815,7 +815,7 @@ namespace GeoChatter.Forms
         List<StreamerbotAction> roundStartList, scoreList,distanceList, roundendList, gameendList;
         private void SetStreamerBotActions()
         {
-            while(!streamerbotClient.Actions.Any() && chkStreamerBotConnectAtStartup.Checked)
+            while(streamerbotClient.IsAlive() && !streamerbotClient.Actions.Any())
             {
                 Thread.Sleep(5);
             }
