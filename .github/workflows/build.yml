@@ -36,6 +36,15 @@ jobs:
         run: |
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+      - name: Submodules
+        shell: bash
+        run: |
+          git submodule update --init
+          git submodule update --init --recursive
+          git submodule sync
+          git submodule update --remote
+          git submodule update --remote --merge
+          git submodule update --remote --merge --recursive
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
