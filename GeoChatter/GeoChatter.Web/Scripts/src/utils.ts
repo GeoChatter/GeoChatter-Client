@@ -46,9 +46,9 @@ export namespace Util
         return null;
     }
 
-    export function TooltipTitleWrap(title: number | string, data: string): string
+    export function TooltipTitleWrap(title: number | string, data: string, classes: Nullable<string> = null): string
     {
-        return '<span data-toggle="tooltip" title="' + title + '">' + data + '</span>';
+        return '<span data-toggle="tooltip" title="' + title + '" class="' + (classes ? classes : "") + '">' + data + '</span>';
     }
 
     export function FormatTimeToString(ms: number, decimals: number = 2): TableCell
@@ -56,10 +56,10 @@ export namespace Util
         return AsDataTableRowCell((ms / 1000).toFixed(decimals) + "s", ms);
     }
 
-    export function AsDataTableRowCell(display: string, sort: number | string): TableCell
+    export function AsDataTableRowCell(display: string, sort: number | string, classes: Nullable<string> = null): TableCell
     {
         return {
-            display: TooltipTitleWrap(sort, display),
+            display: TooltipTitleWrap(sort, display, classes),
             sort: sort
         };
     }
@@ -92,11 +92,10 @@ export namespace Util
      */
     export function FixFlagHTML(flag: Nullable<string>, name?: Nullable<string>): string
     {
-        return (typeof flag === "string" && flag != "") ?
-            `<div class="flagWrapper" style="display:inline"${(typeof name === "string"
-                ? (` title="${name} (${flag?.toUpperCase()})" data-tooltip="${name} (${flag?.toUpperCase()})"`)
-                : "")}><span class="flag-icon flag-icon-${flag}"></span></div>` :
-            "";
+        let fs = (typeof flag === "string" && flag != "");
+        return `<div class="flagWrapper"${(fs && typeof name === "string"
+            ? (` title="${name} (${flag?.toUpperCase()})" data-tooltip="${name} (${flag?.toUpperCase()})"`)
+            : "")}><span class="flag-icon flag-icon-${(fs ? flag : Constant.TransparentFlagCSSSuffix)}"></span></div>`;
     }
 
     /**

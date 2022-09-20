@@ -74,7 +74,7 @@ namespace GeoChatter.Forms
             string huburl = Settings.Default.GuessServer;
 #if DEBUG
             huburl = Settings.Default.AlternateGuessApiUrl;
-           // huburl = "https://localhost:44350/geoChatterHub";
+           //huburl = "https://localhost:44350/geoChatterHub";
 #endif
 
             bool success = await guessApiClient.Initialize(huburl, this, Settings.Default.GCClientId, Settings.Default.EnableDebugLogging, isGGLogon);
@@ -121,6 +121,7 @@ namespace GeoChatter.Forms
                 Version = version,
                 ChannelId = GCResourceRequestHandler.ClientUserID,
                 ChannelName = GCResourceRequestHandler.ClientGeoGuessrName,
+                
             };
 
 
@@ -173,7 +174,7 @@ namespace GeoChatter.Forms
             {
                 logger.Error("Connection to GuessServer lost: ");
                 logger.Error(e.Message);
-                MessageBox.Show($"Connection to guess server lost!\r\nTrying to reconnect\r\n{e.Message}", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                MessageBox.Show($"Connection to guess server lost!\r\nPlease restart the client!\r\n\r\n{e.Message}", "FATAL ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                 LoadingScreen(true, "Lost connection to GeoChatter servers...");
             }
         }
@@ -197,6 +198,8 @@ namespace GeoChatter.Forms
                 roundResult.DisplayName = result.Player.DisplayName;
                 roundResult.UserName = result.Player.PlayerName;
                 roundResult.ProfilePicUrl = result.Player.ProfilePictureUrl;
+                roundResult.PlayerFlagName = result.Player.PlayerFlagName;
+                roundResult.PlayerFlag = result.Player.PlayerFlag;
                 roundResult.WasRandom = guess.WasRandom;
                 roundResult.Score = result.Score;
                 roundResult.Distance = result.Distance;
@@ -223,6 +226,8 @@ namespace GeoChatter.Forms
                 gameResult.DisplayName = result.Player.DisplayName;
                 gameResult.UserName = result.Player.PlayerName;
                 gameResult.ProfilePicUrl = result.Player.ProfilePictureUrl;
+                gameResult.PlayerFlagName = result.Player.PlayerFlagName;
+                gameResult.PlayerFlag = result.Player.PlayerFlag;
                 gameResult.Score = result.Score;
                 gameResult.Distance = result.Distance;
                 gameResult.TimeTaken = result.TimeTaken;

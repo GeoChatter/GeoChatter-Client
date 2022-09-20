@@ -28,6 +28,10 @@ using GeoChatter.Core.Model.Enums;
 using System.Linq;
 using System.ComponentModel;
 using System.Timers;
+using Microsoft.AspNetCore.Connections;
+using Microsoft.AspNetCore.SignalR.Protocol;
+using System.Net;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace GeoChatter.Web
 {
@@ -109,7 +113,7 @@ namespace GeoChatter.Web
     /// </summary>
     public class GuessApiClient
     {
-       
+
 
         private static readonly object _mutex = new();
         private static volatile GuessApiClient _instance;
@@ -232,8 +236,7 @@ namespace GeoChatter.Web
             if (forcedReconnect || arg != null)
             {
                 FireDisconnected($"Connection to guess server closed due to an error: {arg?.Message}", "Trying to reconnect!", LogLevel.Error);
-                await Initialize(apiUrl, mainForm, gcClientId, uploadLog, false);
-                Connect(client, null, true, true);
+             
             }
             return;
         }
@@ -243,13 +246,13 @@ namespace GeoChatter.Web
             try
             {
                 FireLog($"Connection reconnected: {arg}", LogLevel.Information);
-                loginResponse = await connection.InvokeAsync<LoginResponse>(nameof(IGeoChatterHub.Login), client);
+                loginResponse = await InvokeAsync<LoginResponse>(nameof(IGeoChatterHub.Login), client);
                 if (loginResponse == null)
                 {
                     throw new InvalidDataException("Login failed, please restart the client!");
                 }
-
-                MapIdentifier = client.MapIdentifier = loginResponse.MapIdentifier;
+                string reclaimedMapId =  await InvokeAsync<string>(nameof(IGeoChatterHub.ReclaimMapIdentifier), MapIdentifier, gcClientId);
+                MapIdentifier = client.MapIdentifier = (!string.IsNullOrEmpty(reclaimedMapId)) ? reclaimedMapId : loginResponse.MapIdentifier;
                 LanguageStrings.SetMapIdentifier(MapIdentifier);
                 FireLog($"Received MapId: {MapIdentifier} for {GCResourceRequestHandler.ClientGeoGuessrName} from reconnect attempt", LogLevel.Debug);
                 FireReconnected();
@@ -265,7 +268,7 @@ namespace GeoChatter.Web
         /// </summary>
         public bool IsConnected => connection != null && connection.State == HubConnectionState.Connected;
         private IMainForm mainForm;
-        string gcClientId="";
+        string gcClientId = "";
         string token = "";
         /// <summary>
         /// Initialize connection to API
@@ -279,7 +282,7 @@ namespace GeoChatter.Web
                 if (string.IsNullOrEmpty(clientId))
                 {
                     FireLog($"Connection could not be initialized due to an error: ClientId is empty", LogLevel.Error);
-                    FireDisconnected($"Connection to guess server could not be initialized due to an error: ClientId is empty","GeoGuessr user could not be identified", LogLevel.Error);
+                    FireDisconnected($"Connection to guess server could not be initialized due to an error: ClientId is empty", "GeoGuessr user could not be identified", LogLevel.Error);
                     return false;
                 }
                 gcClientId = clientId;
@@ -325,7 +328,7 @@ namespace GeoChatter.Web
                     connection.Reconnecting += Connection_Reconnecting;
                     connection.Reconnected += Connection_Reconnected;
                     connection.Closed += Connection_Closed;
-
+                    
 
                     //connection.On<string, string>(nameof(IGeoChatterClient.ReceiveMessage), async (user, message) =>
                     //{
@@ -351,8 +354,8 @@ namespace GeoChatter.Web
             {
                 string msg = ex.Summarize();
                 FireLog($"Connection could not be initialized due to an error: {msg}", LogLevel.Error);
-                FireDisconnected($"Connection to guess server could not be initialized due to an error: {msg}","There was an error initializing the connection", LogLevel.Error, ex);
-            
+                FireDisconnected($"Connection to guess server could not be initialized due to an error: {msg}", "There was an error initializing the connection", LogLevel.Error, ex);
+
             }
             return false;
         }
@@ -378,7 +381,7 @@ namespace GeoChatter.Web
                 if (jwtSecurityToken.ValidTo > DateTime.UtcNow.AddSeconds(10))
                 {
                     FireLog("valid token", LogLevel.Debug);
-                    return "token not expired"; 
+                    return "token not expired";
                 }
                 else
                     FireLog("expired token, needs refresh", LogLevel.Debug);
@@ -389,15 +392,15 @@ namespace GeoChatter.Web
         /// Requests Bearer token from API
         /// </summary>
         /// <returns></returns>
-        private async Task<string> GetToken(bool isLogin=false)
+        private async Task<string> GetToken(bool isLogin = false)
         {
-           // isLogin = true;
+            // isLogin = true;
             TokenResponse tokenResponse = null;
 
             // discover endpoints from metadata
             using (var client = new HttpClient())
             {
-                FireLog("getting discovery endpoint: "+ apiUrl.ReplaceDefault("/geoChatterHub"), LogLevel.Debug);
+                FireLog("getting discovery endpoint: " + apiUrl.ReplaceDefault("/geoChatterHub"), LogLevel.Debug);
                 var disco = await client.GetDiscoveryDocumentAsync(apiUrl.ReplaceDefault("/geoChatterHub"));
                 if (disco.IsError)
                 {
@@ -454,7 +457,7 @@ namespace GeoChatter.Web
                             else
                                 FireLog("ERROR: " + tokenResponse.Error + ", Desc: " + tokenResponse.ErrorDescription, LogLevel.Error);
                         }
-                        if(!string.IsNullOrEmpty(resp.DuelId))
+                        if (!string.IsNullOrEmpty(resp.DuelId))
                         {
                             FireLog("Party ID received: " + resp.PartyId, LogLevel.Debug);
                             FireLog("Duel ID received: " + resp.DuelId, LogLevel.Debug);
@@ -494,11 +497,11 @@ namespace GeoChatter.Web
 
                             }
                         }
-                       
-                       
+
+
                         FireLog("token response: " + tokenResponse.Json.ToStringDefault(), LogLevel.Debug);
                         token = tokenResponse.AccessToken;
-                     
+
                     }
                     else
                     {
@@ -575,7 +578,7 @@ namespace GeoChatter.Web
                     GuessState? state = mainForm?.ProcessViewerGuess(guess.Player.PlatformId.ToStringDefault(), guess.Player.PlayerName, guess.Player.SourcePlatform, guess.GuessLocation.Latitude.ToStringDefault(), guess.GuessLocation.Longitude.ToStringDefault(), "", guess.Player.DisplayName, guess.Player.ProfilePictureUrl, guess.WasRandom, guess.IsTemporary);
                     result = state.HasValue ? state.Value : GuessState.UndefinedError;
 
-                    connection.SendAsync(nameof(IGeoChatterHub.ReportGuessState), guess.Id, result);
+                    SendAsync(nameof(IGeoChatterHub.ReportGuessState), guess.Id, result);
                 }
                 catch (Exception ex)
                 {
@@ -605,6 +608,7 @@ namespace GeoChatter.Web
         Stopwatch watch;
         DateTime lastKeepalive;
         System.Threading.Timer timer;
+        MapOptions mapOptions;
         /// <summary>
         /// Connect given instance to server
         /// </summary>
@@ -614,14 +618,16 @@ namespace GeoChatter.Web
         /// <param name="reconnect"></param>
         public async Task Connect(ApiClient apiClient, MapOptions options, bool login = true, bool reconnect = false)
         {
-            
-            if (connection == null )
+            if (connection == null)
             {
                 FireLog($"Connect called before initialized due to an error", LogLevel.Error);
                 FireDisconnected($"Connect to guess server called before initialized due to an error", "Connect to guess server called too early!", LogLevel.Error);
 
             }
+            apiClient.ClientId = gcClientId;
+
             client = apiClient;
+            mapOptions = options;
             try
             {
                 if (!reconnect || (reconnect && connection.State != HubConnectionState.Connected))
@@ -630,28 +636,28 @@ namespace GeoChatter.Web
                     timer = new System.Threading.Timer(async (state) =>
                     {
                         if (connection.State == HubConnectionState.Connected && lastKeepalive.AddMinutes(30) < DateTime.Now)
-                            await connection.SendAsync(nameof(IGeoChatterHub.KeepAlive), client);
-                        
-                    },null, 0, 600000);
-                    
+                            await SendAsync(nameof(IGeoChatterHub.KeepAlive), client);
+
+                    }, null, 0, 600000);
+
                     FireLog("Starting connection...", LogLevel.Debug);
                     await connection.StartAsync();
 
                 }
                 if (login)
                 {
-                 
-                    loginResponse = await connection.InvokeAsync<LoginResponse>(nameof(IGeoChatterHub.Login), client);
+
+                    loginResponse = await InvokeAsync<LoginResponse>(nameof(IGeoChatterHub.Login), client);
                     if (loginResponse == null || loginResponse.Result == LoginResult.Failure)
                     {
                         throw new InvalidDataException("Login failed, please restart the client!");
                     }
-                    if(loginResponse.Result == LoginResult.OtherClient)
+                    if (loginResponse.Result == LoginResult.OtherClient)
                     {
                         DialogResult res = MessageBox.Show("Another client is already connected using the same GeoGuessr account\n\rPlease make sure to only have one instance of GeoChatter running!\n\rTo close the other clients connection and continue to login click OK!", "User already connected", MessageBoxButtons.OKCancel, MessageBoxIcon.Stop, MessageBoxDefaultButton.Button2);
                         if (res == DialogResult.OK)
                         {
-                            await connection.InvokeAsync<Task>(nameof(IGeoChatterHub.DisconnectClients), GCResourceRequestHandler.ClientUserID);
+                            await InvokeAsync<Task>(nameof(IGeoChatterHub.DisconnectClients), GCResourceRequestHandler.ClientUserID);
                             Thread.Sleep(2000);
                             await Connect(apiClient, options, true, true);
                         }
@@ -669,37 +675,37 @@ namespace GeoChatter.Web
                     FireLog($"Received MapId : {MapIdentifier} for {GCResourceRequestHandler.ClientGeoGuessrName} from login in apiclient.connect", LogLevel.Debug);
                 }
 
-                
 
-                    FireLog($"Retrieving troll list", LogLevel.Debug);
-                    Trolls = await connection.InvokeAsync<IEnumerable<string>>(nameof(IGeoChatterHub.GetCgTrollIds)) as List<string>;
-                    FireLog($"No of Trolls received: {Trolls.Count}", LogLevel.Debug);
-                    FireLog($"Retrieving ApiKeys", LogLevel.Debug);
-                    Keys = await connection.InvokeAsync<Dictionary<string, string>>(nameof(IGeoChatterHub.GetApiKeys));
-                    if (Keys != null)
-                    {
-                        FireLog($"No of ApiKeysReceived: {Keys.Count}", LogLevel.Debug);
-                        foreach (KeyValuePair<string, string> apikey in Keys)
-                        {
-                            FireLog($"key: '{apikey.Key}', value: '{apikey.Value[..8]}'", LogLevel.Debug);
-                        }
-                        mainForm?.InitializeGlobalSecrets();
-                    }
-                    else
-                    {
-                        FireLog($"could not retrieve apikeys", LogLevel.Debug);
-                    }
-                    FireLog($"Retrieval successful", LogLevel.Debug);
-                    FireLog($"Checking availability of Summary", LogLevel.Debug);
 
-                    SummaryEnabled = await connection.InvokeAsync<bool>(nameof(IGeoChatterHub.IsSummaryEnabled));
-                    if (options != null)
+                FireLog($"Retrieving troll list", LogLevel.Debug);
+                Trolls = await InvokeAsync<IEnumerable<string>>(nameof(IGeoChatterHub.GetCgTrollIds)) as List<string>;
+                FireLog($"No of Trolls received: {Trolls.Count}", LogLevel.Debug);
+                FireLog($"Retrieving ApiKeys", LogLevel.Debug);
+                Keys = await InvokeAsync<Dictionary<string, string>>(nameof(IGeoChatterHub.GetApiKeys));
+                if (Keys != null)
+                {
+                    FireLog($"No of ApiKeysReceived: {Keys.Count}", LogLevel.Debug);
+                    foreach (KeyValuePair<string, string> apikey in Keys)
                     {
-                        FireLog($"Sending MapOptions to server", LogLevel.Debug);
-                        options.MapIdentifier = client.MapIdentifier;
-
-                        await connection.SendAsync(nameof(IGeoChatterHub.UpdateMapOptions), options);
+                        FireLog($"key: '{apikey.Key}', value: '{apikey.Value[..8]}'", LogLevel.Debug);
                     }
+                    mainForm?.InitializeGlobalSecrets();
+                }
+                else
+                {
+                    FireLog($"could not retrieve apikeys", LogLevel.Debug);
+                }
+                FireLog($"Retrieval successful", LogLevel.Debug);
+                FireLog($"Checking availability of Summary", LogLevel.Debug);
+
+                SummaryEnabled = await InvokeAsync<bool>(nameof(IGeoChatterHub.IsSummaryEnabled));
+                if (options != null)
+                {
+                    FireLog($"Sending MapOptions to server", LogLevel.Debug);
+                    options.MapIdentifier = client.MapIdentifier;
+
+                    await SendAsync(nameof(IGeoChatterHub.UpdateMapOptions), options);
+                }
                 watch.Stop();
                 TimeSpan t = TimeSpan.FromMilliseconds(watch.ElapsedMilliseconds);
                 string answer = string.Format(CultureInfo.InvariantCulture, "{0:D2}h:{1:D2}m:{2:D2}s:{3:D3}ms",
@@ -708,7 +714,7 @@ namespace GeoChatter.Web
                                         t.Seconds,
                                         t.Milliseconds);
                 FireLog("Established GuessServerConnection in " + answer, LogLevel.Debug);
-                FireConnected(MapIdentifier,answer);
+                FireConnected(MapIdentifier, answer);
             }
             catch (Exception ex)
             {
@@ -722,7 +728,7 @@ namespace GeoChatter.Web
 
         }
 
-      
+
 
         /// <summary>
         /// Send <paramref name="guess"/> to server
@@ -733,8 +739,8 @@ namespace GeoChatter.Web
         {
             try
             {
-                    await connection.SendAsync(nameof(IGeoChatterHub.SaveGuess), guess);
-                
+                await SendAsync(nameof(IGeoChatterHub.SaveGuess), guess);
+
             }
             catch (Exception ex)
             {
@@ -752,8 +758,8 @@ namespace GeoChatter.Web
             try
             {
                 FireLog($"Saving game (ggID: {game?.GeoGuessrId}) to api", LogLevel.Debug);
-                    await connection.SendAsync(nameof(IGeoChatterHub.SaveGame), game);
-                    FireLog($"Game saved to api successfully", LogLevel.Debug);
+                await SendAsync(nameof(IGeoChatterHub.SaveGame), game);
+                FireLog($"Game saved to api successfully", LogLevel.Debug);
             }
             catch (Exception ex)
             {
@@ -771,9 +777,9 @@ namespace GeoChatter.Web
         {
             try
             {
-              
-                    await connection.SendAsync(nameof(IGeoChatterHub.ReportGuessState), id, state);
-                
+
+                await SendAsync(nameof(IGeoChatterHub.ReportGuessState), id, state);
+
             }
             catch (Exception ex)
             {
@@ -790,7 +796,7 @@ namespace GeoChatter.Web
         {
             try
             {
-                    await connection.SendAsync(nameof(IGeoChatterHub.SavePlayer), player);
+                await SendAsync(nameof(IGeoChatterHub.SavePlayer), player);
             }
             catch (Exception ex)
             {
@@ -808,12 +814,12 @@ namespace GeoChatter.Web
             try
             {
 
-                    if (options != null)
-                    {
-                        if(string.IsNullOrEmpty(options.MapIdentifier))
-                            options.MapIdentifier = MapIdentifier;
-                        await connection.SendAsync(nameof(IGeoChatterHub.UpdateMapOptions), options);
-                    }
+                if (options != null)
+                {
+                    if (string.IsNullOrEmpty(options.MapIdentifier))
+                        options.MapIdentifier = MapIdentifier;
+                    await SendAsync(nameof(IGeoChatterHub.UpdateMapOptions), options);
+                }
             }
             catch (Exception ex)
             {
@@ -824,7 +830,7 @@ namespace GeoChatter.Web
         /// <summary>
         /// Disconnect from the server
         /// </summary>
-        public async Task Disconnect(bool notifyUser=false, string disconnectMsg="")
+        public async Task Disconnect(bool notifyUser = false, string disconnectMsg = "")
         {
             FireLog("Stopping connection...", LogLevel.Debug);
             try
@@ -840,19 +846,19 @@ namespace GeoChatter.Web
                         FireLog("Uploaded debug log successfully", LogLevel.Information);
                     }
                 }
-                await connection.InvokeAsync<string>(nameof(IGeoChatterHub.Logoff), client);
-
-                await connection.StopAsync();
+                await InvokeAsync<string>(nameof(IGeoChatterHub.Logoff), client);
+                if(connection != null)
+                    await connection.StopAsync();
                 MapIdentifier = "";
                 mainForm?.UpdateMapInTitle();
-                if(notifyUser)
+                if (notifyUser)
                     FireDisconnected("User logged in on another client!", disconnectMsg, LogLevel.Information);
             }
             catch (Exception ex)
             {
                 FireLog(ex.Summarize(), LogLevel.Error);
             }
-            
+
             FireLog("Connection terminated.", LogLevel.Debug);
 
         }
@@ -883,7 +889,7 @@ namespace GeoChatter.Web
                     FileName = outputName,
                     UploadDate = DateTime.Now
                 };
-                connection.InvokeAsync<bool>(nameof(IGeoChatterHub.UploadLog), logFile);
+                InvokeAsync<bool>(nameof(IGeoChatterHub.UploadLog), logFile);
 
                 return true;
             }
@@ -909,11 +915,11 @@ namespace GeoChatter.Web
             try
             {
 
-                    if (gameSettings != null)
-                    {
-                        await connection.SendAsync(nameof(IGeoChatterHub.StartGame), gameSettings);
-                    }
-                
+                if (gameSettings != null)
+                {
+                    await SendAsync(nameof(IGeoChatterHub.StartGame), gameSettings);
+                }
+
             }
             catch (Exception ex)
             {
@@ -925,25 +931,25 @@ namespace GeoChatter.Web
             try
             {
 
-                    if (roundSettings != null)
-                    {
-                        await connection.SendAsync(nameof(IGeoChatterHub.StartRound), roundSettings);
-                    }
-                
+                if (roundSettings != null)
+                {
+                    await SendAsync(nameof(IGeoChatterHub.StartRound), roundSettings);
+                }
+
             }
             catch (Exception ex)
             {
                 FireLog(ex.Summarize(), LogLevel.Error);
             }
         }
-        
+
         public async void SendEndRoundToMaps(List<MapResult> results)
         {
             try
             {
 
-                        await connection.SendAsync(nameof(IGeoChatterHub.EndRound), results);
-                
+                await SendAsync(nameof(IGeoChatterHub.EndRound), results);
+
             }
             catch (Exception ex)
             {
@@ -955,8 +961,8 @@ namespace GeoChatter.Web
             try
             {
 
-                        await connection.SendAsync(nameof(IGeoChatterHub.EndGame), results);
-                
+                await SendAsync(nameof(IGeoChatterHub.EndGame), results);
+
             }
             catch (Exception ex)
             {
@@ -968,11 +974,11 @@ namespace GeoChatter.Web
             try
             {
 
-                
-                
-                        await connection.SendAsync(nameof(IGeoChatterHub.ExitGame));
-                   
-                
+
+
+                await SendAsync(nameof(IGeoChatterHub.ExitGame));
+
+
             }
             catch (Exception ex)
             {
@@ -982,19 +988,58 @@ namespace GeoChatter.Web
 
         public async Task<string> GetServerLog()
         {
-            return await connection.InvokeAsync<string>(nameof(IGeoChatterHub.GetServerLog));
+            return await InvokeAsync<string>(nameof(IGeoChatterHub.GetServerLog));
         }
         public async Task<LogFile> GetLogFile(int id)
         {
-            return await connection.InvokeAsync<LogFile>(nameof(IGeoChatterHub.GetLogFile), id);
+            return await InvokeAsync<LogFile>(nameof(IGeoChatterHub.GetLogFile), id);
         }
         public async Task<List<LogFile>> GetLogFiles()
         {
-            return await connection.InvokeAsync<List<LogFile>>(nameof(IGeoChatterHub.GetLogFiles));
+            return await InvokeAsync<List<LogFile>>(nameof(IGeoChatterHub.GetLogFiles));
         }
-    }
+        public async Task<TResult> InvokeAsync<TResult>(string methodName, object arg1 = null, object arg2 = null)
+        {
+            if (connection != null)
+            {
+                await ensureConnection();
+                if(arg1 == null && arg2 == null)
+                    return await connection.InvokeAsync<TResult>(methodName);
+                else if(arg1 != null && arg2 == null)
+                    return await connection.InvokeAsync<TResult>(methodName, arg1);
+                else
+                    return await connection.InvokeAsync<TResult>(methodName, arg1, arg2);
+            }
+            return default(TResult);
+        }
 
-    public class GCTokenResponse
+        private async Task ensureConnection()
+        {
+            if (connection.State != HubConnectionState.Connected)
+            {
+                if(await Initialize(apiUrl, mainForm, gcClientId, uploadLog, forcedReconnect))
+                    await Connect(client, mapOptions, true, true);
+            }
+        }
+
+        public async Task SendAsync(string methodname, object arg1 = null, object arg2 = null, object arg3 = null)
+        {
+            if (connection != null)
+            {
+                await ensureConnection();
+                if (arg1 == null && arg2 == null && arg3 == null)
+                    await connection.SendAsync(methodname);
+                else if (arg1 != null && arg2 == null && arg3 == null)
+                    await connection.SendAsync(methodname, arg1);
+                else if (arg1 != null && arg2 != null && arg3 == null)
+                    await connection.SendAsync(methodname, arg1, arg2);
+                else if (arg1 != null && arg2 != null && arg3 != null)
+                    await connection.SendAsync(methodname, arg1, arg2, arg3);
+            }
+        }
+    }        
+
+        public class GCTokenResponse
     {
         /// <summary>
         /// Gets the access token.
@@ -1036,6 +1081,8 @@ namespace GeoChatter.Web
         {
             return $"Access_Token: {Access_Token}, Scope: {Scope}, Duel: {DuelId}, Result: {VerificationResult}";
         }
+        
 
     }
+
 }

@@ -29,6 +29,25 @@ export namespace Visual
         ".dropdown-content button"
     ] as const;
 
+    export function PlatformCSSFromPlatform(platform: PlayerPlatform): string
+    {
+        switch (platform)
+        {
+            case Enum.Platform.Twitch:
+                {
+                    return "platform-twitch";
+                }
+            case Enum.Platform.Youtube:
+                {
+                    return "platform-youtube";
+                }
+            default:
+                {
+                    return "platform-other";
+                }
+        }
+    }
+
     export function ApplyCssTo(jqelement: JQuery, fontsize: string, color: string, bgcolor: string)
     {
         jqelement.css("font-size", fontsize)

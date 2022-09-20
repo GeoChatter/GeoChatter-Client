@@ -145,9 +145,6 @@
     <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="GeoChatter.Security.Client">
-      <HintPath>..\..\References\GeoChatter.Security.Client.dll</HintPath>
-    </Reference>
     <Reference Include="TwitchLib.Client">
       <HintPath>..\..\References\TwitchLib.Client.dll</HintPath>
     </Reference>
