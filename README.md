@@ -12,6 +12,8 @@
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=GeoChatter_GeoChatter-Client&metric=bugs)](https://sonarcloud.io/summary/new_code?id=GeoChatter_GeoChatter-Client)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=GeoChatter_GeoChatter-Client&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=GeoChatter_GeoChatter-Client)
 
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FGeoChatter%2FGeoChatter-Client.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FGeoChatter%2FGeoChatter-Client?ref=badge_large)
+
 # Notes
 - After cloning, make sure to run **sync_submodules.sh** to initialize the submodules. 
 - **sync_submodules.sh** script is also used for updating the reference head of the submodule.
