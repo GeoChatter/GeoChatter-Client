@@ -1,10 +1,13 @@
 ﻿using log4net;
+using Newtonsoft.Json.Linq;
 using OBSWebsocketDotNet;
+using OBSWebsocketDotNet.Communication;
 using OBSWebsocketDotNet.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace GeoChatter.Integrations
 {
@@ -18,9 +21,9 @@ namespace GeoChatter.Integrations
         /// </summary>
         protected OBSWebsocket obs { get; init; }
         private static readonly ILog logger = LogManager.GetLogger(typeof(OBSClient));
-        private List<OBSScene> scenes = new List<OBSScene>();
+        private List<MyOBSScene> scenes = new List<MyOBSScene>();
 
-        public List<OBSScene> Scenes { get { return scenes; } }
+        public List<MyOBSScene> Scenes { get { return scenes; } }
         /// <summary>
         /// 
         /// </summary>
@@ -35,20 +38,26 @@ namespace GeoChatter.Integrations
         /// <summary>
         /// Current scene
         /// </summary>
-        public OBSScene CurrentScene => !obs.IsConnected ? null : obs.GetCurrentScene();
+        public MyOBSScene CurrentScene => (!obs.IsConnected || !scenes.Any()) ? null :  scenes.FirstOrDefault(s => s.Name == obs.GetCurrentProgramScene());
         /// <summary>
         /// Get a list of sources
         /// </summary>
         /// <returns></returns>
-        public List<OBSScene> GetScenes()
+        public List<MyOBSScene> GetScenes()
         {
             logger.Debug($"Getting Scenes");
             if (!obs.IsConnected)
             {
-                return new List<OBSScene>();
+                return new List<MyOBSScene>();
             }
-
-            scenes = obs.ListScenes();
+            if (scenes.Any())
+                return scenes;
+            scenes = obs.ListScenes().ConvertAll(s => new MyOBSScene(s));
+            foreach (MyOBSScene scene in scenes)
+            {
+                List<SceneItemDetails> items = GetSources(scene.DisplayName);
+                scene.Items = items.ConvertAll(i =>  new MySceneItem(i) );
+            }
             logger.Debug($"Received {scenes.Count} sources");
             return scenes;
         }
@@ -56,45 +65,61 @@ namespace GeoChatter.Integrations
         /// Get a list of sources
         /// </summary>
         /// <returns></returns>
-        public List<SourceInfo> GetSources()
+        public List<SceneItemDetails> GetSources(string sceneName)
         {
             logger.Debug($"Getting sources");
             if (!obs.IsConnected)
             {
-                return new List<SourceInfo>();
+                return new List<SceneItemDetails>();
             }
 
-            List<SourceInfo> sources = obs.GetSourcesList();
+            List<SceneItemDetails> sources = obs.GetSceneItemList(sceneName);
             logger.Debug($"Received {sources.Count} sources");
             return sources;
         }
+
+        //public List<SceneItemDetails> GetSceneItemList(string sceneName)
+        //{
+        //    JObject request = null;
+        //    if (!string.IsNullOrEmpty(sceneName))
+        //    {
+        //        request = new JObject
+        //        {
+        //            { nameof(sceneName), sceneName }
+        //        };
+        //    }
+
+        //    var response = obs.SendRequest(nameof(GetSceneItemList), request);
+        //    return response["sceneItems"].Select(m => new SceneItemDetails((JObject)m)).ToList();
+        //}
+
         /// <summary>
         /// Hide given item in given scene
         /// </summary>
         /// <param name="sceneName"></param>
         /// <param name="itemName"></param>
-        public void HideItem(string sceneName, string itemName)
+        public void HideItem(string sceneName, int itemId)
         {
             if (!obs.IsConnected)
             {
                 return;
             }
-            logger.Debug($"Hiding {itemName}");
-            obs.SetSourceRender(itemName, false);
+            //logger.Debug($"Hiding {itemName}");
+            obs.SetSceneItemEnabled(sceneName, itemId, false);
         }
         /// <summary>
         /// Show given item in given scene
         /// </summary>
         /// <param name="sceneName"></param>
         /// <param name="itemName"></param>
-        public void ShowItem(string sceneName, string itemName)
+        public void ShowItem(string sceneName, int itemId)
         {
             if (!obs.IsConnected)
             {
                 return;
             }
-            logger.Debug($"Showing {itemName}");
-            obs.SetSourceRender(itemName, true);
+            
+            obs.SetSceneItemEnabled(sceneName, itemId, true);
         }
 
         /// <summary>
@@ -103,31 +128,26 @@ namespace GeoChatter.Integrations
         /// <param name="sceneName"></param>
         /// <param name="sourceName"></param>
         /// <param name="action"></param>
-        public void ModifySource(string sceneName, string sourceName, string action)
+        public void ModifySource(string sceneName, int itemId, string action)
         {
             if (!obs.IsConnected)
             {
                 return;
             }
-            logger.Debug($"Modifing source {sourceName} in scene {sceneName}. Action: {action}");
-            OBSScene scene = obs.ListScenes().FirstOrDefault(s => s.Name == sceneName);
-            SceneItem item = scene?.Items.FirstOrDefault(i => i.SourceName == sourceName);
-            if (item != null)
-            {
+            logger.Debug($"Modifing source {itemId} in scene {sceneName}. Action: {action}");
                 switch (action?.ToLowerInvariant())
                 {
                     case "show":
-                        obs.SetSourceRender(sourceName, true, sceneName);
+                        obs.SetSceneItemEnabled(sceneName, itemId, true);
                         break;
                     case "hide":
-                        obs.SetSourceRender(sourceName, false, sceneName);
+                        obs.SetSceneItemEnabled(sceneName, itemId, false);
                         break;
                     default:
-                        bool isActive = obs.GetSourceActive(sourceName);
-                        obs.SetSourceRender(sourceName, !isActive, sceneName);
+                        bool isActive = obs.GetSceneItemEnabled(sceneName, itemId);
+                        obs.SetSceneItemEnabled(sceneName, itemId, !isActive);
                         break;
                 }
-            }
         }
 
         /// <summary>
@@ -141,7 +161,7 @@ namespace GeoChatter.Integrations
                 return;
             }
             logger.Debug($"Switching scene to {sceneName}");
-            obs.SetCurrentScene(sceneName);
+            obs.SetCurrentProgramScene(sceneName);
         }
 
 
@@ -150,7 +170,7 @@ namespace GeoChatter.Integrations
         {
         }
 
-        private void Obs_Disconnected(object sender, EventArgs e)
+        private void Obs_Disconnected(object sender, ObsDisconnectionInfo e)
         {
         }
 
@@ -167,7 +187,15 @@ namespace GeoChatter.Integrations
             {
                 try
                 {
-                    obs.Connect(ip, password);
+                    int counter = 1;
+                    obs.ConnectAsync(ip, password);
+                    while (!obs.IsConnected)
+                    {
+                        if (counter > 100)
+                            return false;
+                        Thread.Sleep(50);
+                        counter++;
+                    }
                     logger.Debug($"OBS Connected successfuly");
                 }
                 catch (AuthFailureException e)
@@ -260,61 +288,46 @@ namespace OBSWebsocketDotNet.Types
     /// Scene item model
     /// <para>Source information returned by GetSourcesList</para>
     /// </summary>
-    public class MySceneItem : SceneItem
+    public class MySceneItem : SceneItemDetails
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="item"></param>
-        public MySceneItem(SceneItem item)
+        public MySceneItem(SceneItemDetails item)
         {
-            if (item != null)
-            {
-                AudioVolume = item.AudioVolume;
-                GroupChildren = item.GroupChildren;
-                Height = item.Height;
-                ID = item.ID;
-                InternalType = item.InternalType;
-                Locked = item.Locked;
-                ParentGroupName = item.ParentGroupName;
-                Render = item.Render;
-                SourceHeight = item.SourceHeight;
-                SourceName = item.SourceName;
-                SourceWidth = item.SourceWidth;
-                Width = item.Width;
-                XPos = item.XPos;
-                YPos = item.YPos;
-            }
+            Name = item.SourceName;
+            Id = item.ItemId;
         }
         /// <summary>
         /// Source name
         /// </summary>
-        public string Name => SourceName;
+        public string Name { get; set; }
+
+        public int Id { get; set; }
 
     }
 
     /// <summary>
     /// OBS Scene model
     /// </summary>
-    public class MyOBSScene : OBSScene
+    public class MyOBSScene : SceneBasicInfo
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="item"></param>
-        public MyOBSScene(OBSScene item)
+        public MyOBSScene(SceneBasicInfo item)
         {
-            if (item != null)
-            {
-                Name = item.Name;
-                Items = item.Items;
-            }
+            DisplayName = item.Name;
+         
         }
+        public List<MySceneItem> Items = new List<MySceneItem>();
 
         /// <summary>
         /// Name
         /// </summary>
-        public string DisplayName => Name;
+        public string DisplayName { get; set; }
 
     }
 
