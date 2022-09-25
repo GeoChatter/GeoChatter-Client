@@ -180,7 +180,7 @@ namespace GeoChatter.Forms
             Settings.Default.ScoreboardFGA = (byte)ScoreboardFGAnumericUpDown2.Value;
 
             Settings.Default.ScrollSpeed = (int)ScoreboardScrollSpeednumericUpDown1.Value;
-            if (chkStreamerBotConnectAtStartup.Checked && streamerbotClient.IsAlive())
+            if (chkStreamerBotConnectAtStartup.Checked && streamerbotClient.IsRunning())
             {
                 Settings.Default.SpecialDistanceAction = checkBoxSpecialDistanceAction.Checked;
                 Settings.Default.SpecialDistanceActionID = ((StreamerbotAction)comboBoxSpecialDistanceActions.SelectedItem)?.id;
@@ -216,27 +216,27 @@ namespace GeoChatter.Forms
             {
                 Settings.Default.ObsRoundStartExecute = chkRoundTimerOBS.Checked;
                 Settings.Default.ObsRoundStartScene = comboRoundTimerObsScene.SelectedValue?.ToStringDefault();
-                Settings.Default.ObsRoundStartSource = comboRoundTimerObsSource.SelectedValue?.ToStringDefault();
+                Settings.Default.ObsRoundStartSource = (comboRoundTimerObsSource.SelectedValue == null) ? 0 : comboRoundTimerObsSource.SelectedValue.ToStringDefault().ParseAsInt();
                 Settings.Default.ObsRoundStartAction = comboRoundTimerObsAction.SelectedItem?.ToStringDefault();
 
                 Settings.Default.ObsRoundEndExecute = chkOBSRoundEndExecute.Checked;
                 Settings.Default.ObsRoundEndScene = comboOBSRoundEndScene.SelectedValue?.ToStringDefault();
-                Settings.Default.ObsRoundEndSource = comboOBSRoundEndSource.SelectedValue?.ToStringDefault();
+                Settings.Default.ObsRoundEndSource = (comboOBSRoundEndSource.SelectedValue == null) ? 0 : comboOBSRoundEndSource.SelectedValue.ToStringDefault().ParseAsInt();
                 Settings.Default.ObsRoundEndAction = comboOBSRoundEndAction.SelectedItem?.ToStringDefault();
 
                 Settings.Default.ObsGameEndExecute = chkOBSGameEndExecute.Checked;
                 Settings.Default.ObsGameEndScene = comboOBSGameEndScene.SelectedValue?.ToStringDefault();
-                Settings.Default.ObsGameEndSource = comboOBSGameEndSource.SelectedValue?.ToStringDefault();
+                Settings.Default.ObsGameEndSource = (comboOBSGameEndSource.SelectedValue == null) ? 0 : comboOBSGameEndSource.SelectedValue.ToStringDefault().ParseAsInt();
                 Settings.Default.ObsGameEndAction = comboOBSGameEndAction.SelectedItem?.ToStringDefault();
 
 
                 Settings.Default.ObsSpecialDistanceExecute = chkSpecialDistanceObs.Checked;
                 Settings.Default.ObsSpecialDistanceScene = comboSpecialDistanceObsScene.SelectedValue?.ToStringDefault();
-                Settings.Default.ObsSpecialDistanceSource = comboSpecialDistanceObsSource.SelectedValue?.ToStringDefault();
+                Settings.Default.ObsSpecialDistanceSource = (comboSpecialDistanceObsSource.SelectedValue == null) ? 0 : comboSpecialDistanceObsSource.SelectedValue.ToStringDefault().ParseAsInt();
                 Settings.Default.ObsSpecialDistanceAction = comboSpecialDistanceObsAction.SelectedItem?.ToStringDefault();
                 Settings.Default.ObsSpecialScoreExecute = chkSpecialScoreObs.Checked;
                 Settings.Default.ObsSpecialScoreScene = comboSpecialScoreObsScene.SelectedValue?.ToStringDefault();
-                Settings.Default.ObsSpecialScoreSource = comboSpecialScoreObsSource.SelectedValue?.ToStringDefault();
+                Settings.Default.ObsSpecialScoreSource = (comboSpecialScoreObsSource.SelectedValue == null) ? 0 : comboSpecialScoreObsSource.SelectedValue.ToStringDefault().ParseAsInt();
                 Settings.Default.ObsSpecialScoreAction = comboSpecialScoreObsAction.SelectedItem?.ToStringDefault();
             }
             var player = ClientDbCache.Instance.Streamer;
@@ -562,7 +562,7 @@ namespace GeoChatter.Forms
                 logger.Error(ex.Summarize());
             }
             logger.Debug("setting up streamer.bot");
-            if (chkStreamerBotConnectAtStartup.Checked && streamerbotClient.IsAlive())
+            if (chkStreamerBotConnectAtStartup.Checked && streamerbotClient.IsRunning())
             {
             //    btnSave.Enabled = btnApply.Enabled = false;
               //  streamerbotClient.GetActions();
@@ -815,7 +815,7 @@ namespace GeoChatter.Forms
         List<StreamerbotAction> roundStartList, scoreList,distanceList, roundendList, gameendList;
         private void SetStreamerBotActions()
         {
-            if(streamerbotClient.IsAlive() && !streamerbotClient.Actions.Any())
+            if(streamerbotClient.IsRunning() && !streamerbotClient.Actions.Any())
             {
                 streamerbotClient.GetActions();
                 Thread.Sleep(10);
@@ -938,7 +938,7 @@ namespace GeoChatter.Forms
             buttonConnectStreamerBot.Enabled = txtStreamerBotIP.Text.Length > 0 && txtStreamerBotPort.Text.Length > 0;
         }
 
-        private void buttonConnectStreamerBot_Click(object sender, EventArgs e)
+        private async void buttonConnectStreamerBot_Click(object sender, EventArgs e)
         {
             logger.Debug("connecting to streamer bot");
             buttonConnectStreamerBot.Enabled = false;
@@ -948,16 +948,14 @@ namespace GeoChatter.Forms
             if (chkStreamerBotConnectAtStartup.Checked)
             {
                 logger.Debug("connection because at startup");
-                if (!streamerbotClient.IsAlive())
+                if (!streamerbotClient.IsRunning())
                 {
                     logger.Debug("disconnected, connect needed");
                     try
                     {
-                        if (streamerbotClient.Connect(txtStreamerBotIP.Text, txtStreamerBotPort.Text))
+                        if (streamerbotClient.Connect(txtStreamerBotIP.Text, txtStreamerBotPort.Text).Result)
                         {
                             logger.Debug("connection succeeded");
-                            buttonConnectStreamerBot.Text = "Disconnect";
-                          //  btnSave.Enabled = btnApply.Enabled = false;
                             streamerbotClient.GetActions();
                             SetStreamerBotActions();
                         }
@@ -973,13 +971,10 @@ namespace GeoChatter.Forms
                     logger.Debug("already connected");
                     if (sender == buttonConnectStreamerBot)
                     {
-                        buttonConnectStreamerBot.Text = "Connect";
-                        streamerbotClient.CloseConnection();
+                        var closed = await streamerbotClient.CloseConnection();
                     }
                     else
                     {
-                        buttonConnectStreamerBot.Text = "Disconnect";
-                      //  btnSave.Enabled = btnApply.Enabled = false;
                         streamerbotClient.GetActions();
                         SetStreamerBotActions();
                     }
@@ -1007,10 +1002,6 @@ namespace GeoChatter.Forms
                     catch (Exception ex) { logger.Error(ex.Summarize()); }
                 }
 
-                buttonConnectStreamerBot.Enabled = true;
-                txtStreamerBotIP.Enabled = true;
-                chkStreamerBotConnectAtStartup.Enabled = true;
-                txtStreamerBotPort.Enabled = true;
             }
             SetUpStreambotInputs();
             
@@ -1028,7 +1019,7 @@ namespace GeoChatter.Forms
         {
             if (chkStreamerBotConnectAtStartup.Checked)
             {
-                if (streamerbotClient.IsAlive())
+                if (streamerbotClient.IsRunning())
                 {
                     buttonConnectStreamerBot.Text = "Disconnect";
                     txtStreamerBotIP.Enabled =
@@ -1060,7 +1051,7 @@ namespace GeoChatter.Forms
                comboBoxRoundEndAction.Enabled =
                checkBoxRoundTimerExecuteStreamerBotAction.Enabled =
                comboBoxRoundStartAction.Enabled =
-               comboBoxSpecialScoreActions.Enabled = chkStreamerBotConnectAtStartup.Checked && streamerbotClient.IsAlive();
+               comboBoxSpecialScoreActions.Enabled = chkStreamerBotConnectAtStartup.Checked && streamerbotClient.IsRunning();
         }
 
         private void tabPageOverlay_Click(object sender, EventArgs e)
@@ -1248,59 +1239,59 @@ namespace GeoChatter.Forms
             if (obsClient.Scenes.Any() && tabControl1.TabPages.Contains(tabPageEvents))
             {
                 logger.Debug("Getting round start scenes");
-                roundstartScenes = new(obsClient.Scenes.ConvertAll(o => new MyOBSScene(o)).ToList().OrderBy(o => o.Name));
+                roundstartScenes = new(obsClient.Scenes.OrderBy(o => o.Name));
                 comboRoundTimerObsScene.DataSource = roundstartScenes;
                 comboRoundTimerObsScene.DisplayMember = "DisplayName";
                 comboRoundTimerObsScene.ValueMember = "DisplayName";
 
                 logger.Debug("Round start set, getting round end");
-                roundendScenes = new(obsClient.Scenes.ConvertAll(o => new MyOBSScene(o)).ToList().OrderBy(o => o.Name));
+                roundendScenes = new(obsClient.Scenes.OrderBy(o => o.Name));
                 comboOBSRoundEndScene.DataSource = roundendScenes;
                 comboOBSRoundEndScene.DisplayMember = "DisplayName";
                 comboOBSRoundEndScene.ValueMember = "DisplayName";
 
                 logger.Debug("Round end set, getting game end");
-                gameendScenes = new(obsClient.Scenes.ConvertAll(o => new MyOBSScene(o)).ToList().OrderBy(o => o.Name));
+                gameendScenes = new(obsClient.Scenes.OrderBy(o => o.Name));
                 comboOBSGameEndScene.DataSource = gameendScenes;
                 comboOBSGameEndScene.DisplayMember = "DisplayName";
                 comboOBSGameEndScene.ValueMember = "DisplayName";
 
                 logger.Debug("game end set, getting distnace");
-                distanceScenes = new(obsClient.Scenes.ConvertAll(o => new MyOBSScene(o)).ToList().OrderBy(o => o.Name));
+                distanceScenes = new(obsClient.Scenes.OrderBy(o => o.Name));
                 comboSpecialDistanceObsScene.DataSource = distanceScenes;
                 comboSpecialDistanceObsScene.ValueMember = "DisplayName";
                 comboSpecialDistanceObsScene.DisplayMember = "DisplayName";
 
                 logger.Debug("distance set, getting score");
-                scoreScenes = new(obsClient.Scenes.ConvertAll(o => new MyOBSScene(o)).ToList().OrderBy(o => o.Name));
+                scoreScenes = new(obsClient.Scenes.OrderBy(o => o.Name));
                 comboSpecialScoreObsScene.DataSource = scoreScenes;
                 comboSpecialScoreObsScene.ValueMember = "DisplayName";
                 comboSpecialScoreObsScene.DisplayMember = "DisplayName";
 
                 if (!string.IsNullOrEmpty(Settings.Default.ObsRoundStartScene))
                 {
-                    comboRoundTimerObsScene.SelectedText = Settings.Default.ObsRoundStartScene;
+                    comboRoundTimerObsScene.SelectedValue = Settings.Default.ObsRoundStartScene;
                 }
 
                 if (!string.IsNullOrEmpty(Settings.Default.ObsRoundEndScene))
                 {
-                    comboOBSRoundEndScene.SelectedText = Settings.Default.ObsRoundEndScene; 
+                    comboOBSRoundEndScene.SelectedValue = Settings.Default.ObsRoundEndScene; 
                 }
 
                 if (!string.IsNullOrEmpty(Settings.Default.ObsGameEndScene))
                 {
-                    comboOBSGameEndScene.SelectedText = Settings.Default.ObsGameEndScene;
+                    comboOBSGameEndScene.SelectedValue = Settings.Default.ObsGameEndScene;
                 }
 
                 if (!string.IsNullOrEmpty(Settings.Default.ObsSpecialDistanceScene))
                 {
-                    comboSpecialDistanceObsScene.SelectedText = Settings.Default.ObsSpecialDistanceScene;
+                    comboSpecialDistanceObsScene.SelectedValue = Settings.Default.ObsSpecialDistanceScene;
 
                 }
 
                 if (!string.IsNullOrEmpty(Settings.Default.ObsSpecialScoreScene))
                 {
-                    comboSpecialScoreObsScene.SelectedText = Settings.Default.ObsSpecialScoreScene;
+                    comboSpecialScoreObsScene.SelectedValue = Settings.Default.ObsSpecialScoreScene;
 
                 }
 
@@ -1386,44 +1377,53 @@ namespace GeoChatter.Forms
 
         private void comboRoundTimerObsSource_SelectedIndexChanged(object sender, EventArgs e)
         {
-            logger.Debug("Setting round start source");
-            comboRoundTimerObsSource.DataSource = ((MyOBSScene)((ComboBox)sender).SelectedItem).Items.ConvertAll(o => new MySceneItem(o)).ToList(); ;
-            comboRoundTimerObsSource.DisplayMember = "Name";
-            comboRoundTimerObsSource.ValueMember = "Name";
-            if (!string.IsNullOrEmpty(Settings.Default.ObsRoundStartSource))
+            if (((ComboBox)sender).SelectedItem != null && ((MyOBSScene)((ComboBox)sender).SelectedItem).Items.Any())
             {
-                comboRoundTimerObsSource.SelectedValue = Settings.Default.ObsRoundStartSource;
-            }
+                logger.Debug("Setting round start source");
+                comboRoundTimerObsSource.DataSource = ((MyOBSScene)((ComboBox)sender).SelectedItem).Items;
+                comboRoundTimerObsSource.DisplayMember = "Name";
+                comboRoundTimerObsSource.ValueMember = "Id";
+                if (Settings.Default.ObsRoundStartSource != 0)
+                {
+                    comboRoundTimerObsSource.SelectedValue = Settings.Default.ObsRoundStartSource;
+                }
 
-            logger.Debug("Finished setting round start source");
+                logger.Debug("Finished setting round start source");
+            }
         }
 
         private void comboSpecialScoreObsScene_SelectedIndexChanged(object sender, EventArgs e)
         {
-            logger.Debug("Setting special score source");
-            comboSpecialScoreObsSource.DataSource = ((MyOBSScene)((ComboBox)sender).SelectedItem).Items.ConvertAll(o => new MySceneItem(o)).ToList(); ;
-            comboSpecialScoreObsSource.DisplayMember = "Name";
-            comboSpecialScoreObsSource.ValueMember = "Name";
-            if (!string.IsNullOrEmpty(Settings.Default.ObsSpecialScoreSource))
+            if (((ComboBox)sender).SelectedItem != null && ((MyOBSScene)((ComboBox)sender).SelectedItem).Items.Any())
             {
-                comboSpecialScoreObsSource.SelectedValue = Settings.Default.ObsSpecialScoreSource;
-            }
+                logger.Debug("Setting special score source");
+                comboSpecialScoreObsSource.DataSource = ((MyOBSScene)((ComboBox)sender).SelectedItem).Items;
+                comboSpecialScoreObsSource.DisplayMember = "Name";
+                comboSpecialScoreObsSource.ValueMember = "Id";
+                if (Settings.Default.ObsSpecialScoreSource != 0)
+                {
+                    comboSpecialScoreObsSource.SelectedValue = Settings.Default.ObsSpecialScoreSource;
+                }
 
-            logger.Debug("Finished setting special score source");
+                logger.Debug("Finished setting special score source");
+            }
         }
 
         private void comboSpecialDistanceObsScene_SelectedIndexChanged(object sender, EventArgs e)
         {
-            logger.Debug("Setting special distance source");
-            comboSpecialDistanceObsSource.DataSource = ((MyOBSScene)((ComboBox)sender).SelectedItem).Items.ConvertAll(o => new MySceneItem(o)).ToList(); ;
-            comboSpecialDistanceObsSource.DisplayMember = "Name";
-            comboSpecialDistanceObsSource.ValueMember = "Name";
-            if (!string.IsNullOrEmpty(Settings.Default.ObsSpecialDistanceSource))
+            if (((ComboBox)sender).SelectedItem != null && ((MyOBSScene)((ComboBox)sender).SelectedItem).Items.Any())
             {
-                comboSpecialDistanceObsSource.SelectedValue = Settings.Default.ObsSpecialDistanceSource;
-            }
+                logger.Debug("Setting special distance source");
+                comboSpecialDistanceObsSource.DataSource = ((MyOBSScene)((ComboBox)sender).SelectedItem).Items;
+                comboSpecialDistanceObsSource.DisplayMember = "Name";
+                comboSpecialDistanceObsSource.ValueMember = "Id";
+                if (Settings.Default.ObsSpecialDistanceSource != 0)
+                {
+                    comboSpecialDistanceObsSource.SelectedValue = Settings.Default.ObsSpecialDistanceSource;
+                }
 
-            logger.Debug("Finished setting special distance source");
+                logger.Debug("Finished setting special distance source");
+            }
         }
 
         private void linkLabel6_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -1433,30 +1433,36 @@ namespace GeoChatter.Forms
 
         private void comboOBSGameEndScene_SelectedIndexChanged(object sender, EventArgs e)
         {
-            logger.Debug("Setting game end source");
-            comboOBSGameEndSource.DataSource = ((MyOBSScene)((ComboBox)sender).SelectedItem).Items.ConvertAll(o => new MySceneItem(o)).ToList(); ;
-            comboOBSGameEndSource.DisplayMember = "Name";
-            comboOBSGameEndSource.ValueMember = "Name";
-            if (!string.IsNullOrEmpty(Settings.Default.ObsGameEndSource))
+            if (((ComboBox)sender).SelectedItem != null && ((MyOBSScene)((ComboBox)sender).SelectedItem).Items.Any())
             {
-                comboOBSGameEndSource.SelectedValue = Settings.Default.ObsGameEndSource;
-            }
+                logger.Debug("Setting game end source");
+                comboOBSGameEndSource.DataSource = ((MyOBSScene)((ComboBox)sender).SelectedItem).Items;
+                comboOBSGameEndSource.DisplayMember = "Name";
+                comboOBSGameEndSource.ValueMember = "Id";
+                if (Settings.Default.ObsGameEndSource != 0)
+                {
+                    comboOBSGameEndSource.SelectedValue = Settings.Default.ObsGameEndSource;
+                }
 
-            logger.Debug("Finished setting game end source");
+                logger.Debug("Finished setting game end source");
+            }
         }
 
         private void comboOBSRoundEndScene_SelectedIndexChanged(object sender, EventArgs e)
         {
-            logger.Debug("Setting round end source");
-            comboOBSRoundEndSource.DataSource = ((MyOBSScene)((ComboBox)sender).SelectedItem).Items.ConvertAll(o => new MySceneItem(o)).ToList(); ;
-            comboOBSRoundEndSource.DisplayMember = "Name";
-            comboOBSRoundEndSource.ValueMember = "Name";
-            if (!string.IsNullOrEmpty(Settings.Default.ObsRoundEndSource))
+            if (((ComboBox)sender).SelectedItem != null && ((MyOBSScene)((ComboBox)sender).SelectedItem).Items.Any())
             {
-                comboOBSRoundEndSource.SelectedValue = Settings.Default.ObsRoundEndSource;
-            }
+                logger.Debug("Setting round end source");
+                comboOBSRoundEndSource.DataSource = ((MyOBSScene)((ComboBox)sender).SelectedItem).Items;
+                comboOBSRoundEndSource.DisplayMember = "Name";
+                comboOBSRoundEndSource.ValueMember = "Id";
+                if (Settings.Default.ObsRoundEndSource != 0)
+                {
+                    comboOBSRoundEndSource.SelectedValue = Settings.Default.ObsRoundEndSource;
+                }
 
-            logger.Debug("Finished setting round end source");
+                logger.Debug("Finished setting round end source");
+            }
         }
 
         private void reconnectTwitchBotButton_Click(object sender, EventArgs e)

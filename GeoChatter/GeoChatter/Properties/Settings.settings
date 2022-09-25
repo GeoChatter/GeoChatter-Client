@@ -164,8 +164,8 @@
     <Setting Name="ObsRoundTimerScene" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="ObsRoundTimerSource" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="ObsRoundTimerSource" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="ObsRoundTimerAction" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -176,8 +176,8 @@
     <Setting Name="ObsSpecialDistanceScene" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="ObsSpecialDistanceSource" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="ObsSpecialDistanceSource" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="ObsSpecialDistanceAction" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -188,8 +188,8 @@
     <Setting Name="ObsSpecialScoreScene" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="ObsSpecialScoreSource" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="ObsSpecialScoreSource" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="ObsSpecialScoreAction" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -200,8 +200,8 @@
     <Setting Name="autoUpdate" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ObsRoundStartSource" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="ObsRoundStartSource" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="RoundStartAction" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -245,8 +245,8 @@
     <Setting Name="ObsRoundEndScene" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="ObsRoundEndSource" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="ObsRoundEndSource" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="ObsRoundEndAction" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -254,8 +254,8 @@
     <Setting Name="ObsGameEndScene" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="ObsGameEndSource" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="ObsGameEndSource" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="ObsGameEndAction" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
