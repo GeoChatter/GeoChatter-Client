@@ -5,7 +5,10 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using WebSocketSharp;
+using System.Security.Policy;
+using System.Threading;
+using System.Threading.Tasks;
+using Websocket.Client;
 
 namespace GeoChatter.Integrations
 {
@@ -19,12 +22,14 @@ namespace GeoChatter.Integrations
         /// </summary>
         public event EventHandler<ActionsReceivedEventArgs> ActionsReceived;
         private static readonly ILog logger = LogManager.GetLogger(typeof(StreamerbotClient));
-        private WebSocket ws;
+        private WebsocketClient ws;
         private List<StreamerbotAction> actions = new List<StreamerbotAction>();
         /// <summary>
         /// Returns a list of StreamerbotActions
         /// </summary>
         public List<StreamerbotAction> Actions { get { return actions; } }
+        private static readonly ManualResetEvent ExitEvent = new ManualResetEvent(false);
+        private Uri adress;
 
         /// <summary>
         /// Connect to <paramref name="ip"/>:<paramref name="port"/>
@@ -32,7 +37,7 @@ namespace GeoChatter.Integrations
         /// <param name="ip"></param>
         /// <param name="port"></param>
         /// <returns></returns>
-        public bool Connect(string ip, string port)
+        public async Task<bool> Connect(string ip, string port)
         {
 
             if (ws == null)
@@ -42,26 +47,30 @@ namespace GeoChatter.Integrations
                     return false;
                 }
 
-                ws = new WebSocket($"ws://{ip}:{port}/");
+                adress = new Uri($"ws://{ip}:{port}/");
+                ws = new WebsocketClient(adress);
             }
             bool success = true;
+            
+            if (!ws.IsRunning)
+            {
+               ws.Start();
 
-            if (!ws.IsAlive)
-            {
-                ws.Connect();
+                //ExitEvent.WaitOne();
             }
-            success = ws.IsAlive;
-            ws.OnMessage += (sender, e) =>
+            success = ws.IsStarted;
+            ws.MessageReceived.Subscribe(msg =>
             {
-                if (e.IsText)
+                
+                if (msg.MessageType == System.Net.WebSockets.WebSocketMessageType.Text)
                 {
                     ActionsReceivedEventArgs args = new();
-                    StreamerbotActionList list = JsonConvert.DeserializeObject<StreamerbotActionList>(e.Data);
+                    StreamerbotActionList list = JsonConvert.DeserializeObject<StreamerbotActionList>(msg.Text);
                     args.Actions.AddRange(list.actions);
                     OnActionsReceived(args);
                     return;
                 }
-            };
+            });
             return success;
         }
 
@@ -86,11 +95,11 @@ namespace GeoChatter.Integrations
         public void GetActions()
         {
             logger.Debug($"Getting actions");
-            if (ws != null && !ws.IsAlive)
+            if (ws != null && !ws.IsRunning)
             {
-                ws.Connect();
+                ws.Start();
             }
-            if (ws != null && ws.IsAlive)
+            if (ws != null && ws.IsRunning)
             {
                 ws.Send("{\"request\":\"GetActions\",\"id\":\"123\"}");
             }
@@ -104,11 +113,11 @@ namespace GeoChatter.Integrations
         /// <param name="args"></param>
         public void ExecuteAction(string guid, string name, Dictionary<string, string> args)
         {
-            if (ws != null && !ws.IsAlive)
+            if (ws != null && !ws.IsRunning)
             {
-                ws.Connect();
+                ws.Start();
             }
-            if (ws != null && ws.IsAlive)
+            if (ws != null && ws.IsRunning)
             {
                 string argsString = JsonConvert.SerializeObject(args);
                 string reqString = @"{""request"": ""DoAction"",""action"": { ""id"": """ + guid + @""", ""name"": """ + name + @""" }, ""args"":  " + argsString + @" , ""id"": ""1402""}";
@@ -128,21 +137,21 @@ namespace GeoChatter.Integrations
             logger.Debug($"Testing Streamerbot connection");
             if (ws == null)
             {
-                ws = new WebSocket($"ws://{ip}:{port}/");
+                ws = new WebsocketClient(new Uri($"ws://{ip}:{port}/"));
             }
 
             bool success;
 
-            if (!ws.IsAlive)
+            if (!ws.IsRunning)
             {
-                ws.Connect();
+                ws.Start();
             }
 
-            success = ws.IsAlive;
+            success = ws.IsRunning;
             logger.Debug($"SB connection is {success}");
-            if (ws.IsAlive)
+            if (ws.IsRunning)
             {
-                ws.Close();
+                ws.Stop(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, "");
             }
 
             return success;
@@ -151,15 +160,18 @@ namespace GeoChatter.Integrations
         /// <summary>
         /// Close web socket connection
         /// </summary>
-        public void CloseConnection()
+        public async Task<bool> CloseConnection()
         {
             logger.Debug($"Closing Streamer.Bot connection");
             if (ws != null)
             {
-                ws.Close();
+                var success = await ws.Stop(System.Net.WebSockets.WebSocketCloseStatus.Empty,"");
+                if (!success && adress != null)
+                    ws = new WebsocketClient(adress);
+                return ws.IsRunning;
             }
 
-            return;
+            return true;
         }
 
         /// <summary>
@@ -176,9 +188,9 @@ namespace GeoChatter.Integrations
         /// Wheter connection is still alive
         /// </summary>
         /// <returns></returns>
-        public bool IsAlive()
+        public bool IsRunning()
         {
-            return ws != null && ws.IsAlive;
+            return ws != null && ws.IsRunning;
         }
     }
 }
