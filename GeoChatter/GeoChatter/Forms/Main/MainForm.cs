@@ -1073,5 +1073,10 @@ namespace GeoChatter.Forms
                     hasFocus = !(Form.ActiveForm == null);
             }));
         }
+
+        public bool IsDebugEnabled()
+        {
+            return Settings.Default.EnableDebugLogging;
+        }
     }
 }

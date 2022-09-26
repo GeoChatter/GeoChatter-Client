@@ -29,6 +29,8 @@ namespace GeoChatter.Core.Interfaces
         /// </summary>
         public string Version { get; set; }
 
+
+        public bool IsDebugEnabled();
         /// <summary>
         /// Labels path in settings
         /// </summary>

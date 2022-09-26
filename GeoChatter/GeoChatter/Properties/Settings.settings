@@ -396,7 +396,7 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="EnableDebugLogging" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="MOShowBorders" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
