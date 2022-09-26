@@ -58,7 +58,8 @@ namespace GeoChatter.Forms
         private static readonly OBSClient obsClient = new();
         public GuessApiClient guessApiClient;
 
-        internal bool guessesOpen = true;
+        internal bool guessesOpen { get; set; } = true;
+
         private const int WM_SYSCOMMAND = 0x112;
         private const int MF_STRING = 0x0;
         private const int MF_SEPARATOR = 0x800;
