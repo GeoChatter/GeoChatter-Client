@@ -45,7 +45,7 @@ namespace GeoChatter.Web.YouTube
             string username = chat.AuthorDetails.DisplayName;
             string userid = chat.AuthorDetails.ChannelId;
 
-            bot.FireRandomGuessRecieved(new(userid, username, bot, command) { Arguments = string.Join(' ', args), ProfilePicture = img });
+            bot.FireRandomGuessRecieved(new(userid, username, bot, command) { Arguments = string.Join(' ', args.Skip(1)), ProfilePicture = img });
         }
 
         #endregion
