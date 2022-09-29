@@ -47,7 +47,7 @@ namespace GeoChatter.Forms
             SetRefreshMenuItemsEnabledState(true);
             SendStartRoundToMaps(firstRound);
             SendStartRoundToJS(firstRound);
-
+            ToggleGuesses(true);
             TriggerRoundStartActions();
         }
 
@@ -407,7 +407,7 @@ namespace GeoChatter.Forms
             SetRefreshMenuItemsEnabledState(true);
             SendStartRoundToJS(round);
             SendStartRoundToMaps(round);
-
+            ToggleGuesses(true);
             TriggerRoundStartActions();
         }
     }

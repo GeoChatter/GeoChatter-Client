@@ -61,6 +61,7 @@ namespace GeoChatter.Forms
             // tabControl1.TabPages.Remove(tabGeneral);
             //propertyGrid1.SetLabelColumnWidth1(3);
             this.parent.ResetJSCTRLCheck();
+            this.tabControl1.TabPages.Remove(tabDevelopment);
         }
 
 
@@ -98,8 +99,11 @@ namespace GeoChatter.Forms
 
             Settings.Default.ShortcutsFullscreenModifiers = scrFullscreen.Modifiers;
             Settings.Default.ShortcutsFullscreenKey = scrFullscreen.KeyCode;
-
-
+            if (tabControl1.TabPages.Contains(tabDevelopment))
+            {
+                Settings.Default.UseDevApi = chckUseDevApi.Checked;
+                parent.ConnectToGuessApi(true, true);
+            }
 
 
             Settings.Default.TwitchChannel = txtGeneralChannelName.Text;
@@ -801,7 +805,7 @@ namespace GeoChatter.Forms
             chkOBSRoundEndExecute.Checked = Settings.Default.ObsRoundEndExecute;
             comboOBSGameEndAction.SelectedItem = Settings.Default.ObsSpecialScoreAction;
             chkOBSGameEndExecute.Checked = Settings.Default.ObsGameEndExecute;
-
+            
             chkSendDoubleGuessMsg.Checked = Settings.Default.SendDoubleGuessMsg;
             chkSendSameGuessMessage.Checked = Settings.Default.SendSameGuessMessage;
             chkAllowSameLocationGuess.Checked = Settings.Default.AllowSameLocationGuess;
@@ -1366,6 +1370,8 @@ namespace GeoChatter.Forms
             {
                 link = "mailto:" + link;
             }
+            else
+                link = "https://geochatter.tv";
             // Navigate to a URL.
             GeneralPurposeUtils.OpenURL(link);
         }
@@ -1623,6 +1629,31 @@ namespace GeoChatter.Forms
                 btnForgetTwitch.Enabled = true;
             }
             reconnectTwitchBotButton_Click(reconnectTwitchBotButton, new EventArgs());
+        }
+
+        private void linkLabel36_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            GeneralPurposeUtils.OpenURL("https://github.com/GeoChatter");
+        }
+        int clickCounter = 0;
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            
+                
+
+            if (clickCounter == 5)
+            {
+                clickCounter = 0;
+                if (Control.ModifierKeys == (Keys.Shift | Keys.Control))
+                {
+                    this.tabControl1.TabPages.Add(tabDevelopment);
+                    chckUseDevApi.Checked = Settings.Default.UseDevApi;
+                }
+            }
+            if (clickCounter < 5)
+                clickCounter++;
+
+
         }
 
         private async void button2_Click(object sender, EventArgs e)

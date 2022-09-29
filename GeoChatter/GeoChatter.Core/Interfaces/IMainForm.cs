@@ -223,5 +223,7 @@ namespace GeoChatter.Core.Interfaces
         void ReconnectToGuessApi();
         void InitializeGlobalSecrets();
         void UpdateMapInTitle();
+
+        Task ConnectToGuessApi(bool forceReconnect = false, bool login = true, bool isGGLogon = false);
     }
 }

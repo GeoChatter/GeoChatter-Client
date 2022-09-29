@@ -368,6 +368,11 @@ namespace GeoChatter.Web
             await Disconnect(true, "This user connected on another client!");
         }
 
+        public void ResetToken()
+        {
+            token = String.Empty;
+        }
+
         private async Task<string> ValidateToken(bool isGGLogon)
         {
             if (isGGLogon)

@@ -585,7 +585,7 @@ namespace GeoChatter.Forms
             this.InvokeDefault(f => {
                 string[] titleParts = f.Text.Split(':');
                 string currentMapName = titleParts[titleParts.Length - 1].Trim();
-                f.Text = f.Text.ReplaceDefault(currentMapName, guessApiClient.MapIdentifier ?? "Disconnected"); 
+                f.Text = f.Text.ReplaceDefault(currentMapName, string.IsNullOrEmpty(guessApiClient.MapIdentifier)? "Disconnected": guessApiClient.MapIdentifier); 
             
             });
         }
@@ -1017,7 +1017,8 @@ namespace GeoChatter.Forms
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            
+            Settings.Default.UseDevApi = false;
+            Settings.Default.Save();
         }
 
         private void extensionsToolStripMenuItem_Click(object sender, EventArgs e)
