@@ -734,17 +734,13 @@ namespace GeoChatter.Forms
             guessesOpen = open;
             if (open)
             {
-                if(Settings.Default.EnableTwitchChatMsgs)
+                if(Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
                     CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_GuessesOpenedMessage"));
-                if(Settings.Default.SendChatMsgsViaStreamerBot)
-                    streamerbotClient.SendMessage(LanguageStrings.Get("Chat_Msg_GuessesOpenedMessage"));
             }
             else
             {
-                if (Settings.Default.EnableTwitchChatMsgs)
+                if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
                     CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_GuessesClosedMessage"));
-                if (Settings.Default.SendChatMsgsViaStreamerBot)
-                    streamerbotClient.SendMessage(LanguageStrings.Get("Chat_Msg_GuessesClosedMessage"));
                 
             }
         }

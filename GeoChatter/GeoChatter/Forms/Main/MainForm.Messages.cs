@@ -88,12 +88,10 @@ namespace GeoChatter.Forms
         {
             if (Settings.Default.SendGameStartMsg && (!game.IsPartOfInfiniteGame || game.Previous == null))
             {
-                if (Settings.Default.EnableTwitchChatMsgs)
+                if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
                 {
                     CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_gameStart"));
                 }
-                if (Settings.Default.SendChatMsgsViaStreamerBot)
-                    streamerbotClient.SendMessage(LanguageStrings.Get("Chat_Msg_gameStart"));
             }
         }
         private void SendRoundEndMessage(Game game)
@@ -120,17 +118,13 @@ namespace GeoChatter.Forms
                         ? ClientDbCache.RunningGame.Rounds.Count
                         : ClientDbCache.RunningGame.CurrentRound - 1;
                     ;
-                   if(Settings.Default.EnableTwitchChatMsgs)
+                   if(Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
                         CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_EndStreakRound", new Dictionary<string, string>() { { "roundNumber", roundn.ToStringDefault() }, { "winnerName", (playerName ?? "<unknown>") } }));
-                    if (Settings.Default.SendChatMsgsViaStreamerBot)
-                        streamerbotClient.SendMessage(LanguageStrings.Get("Chat_Msg_EndStreakRound", new Dictionary<string, string>() { { "roundNumber", roundn.ToStringDefault() }, { "winnerName", (playerName ?? "<unknown>") } }));
                 }
                 else
                 {
-                    if (Settings.Default.EnableTwitchChatMsgs)
+                    if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
                         CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_roundEnd", new Dictionary<string, string>() { { "winner", playerName ?? "<unknown>" } }));
-                    if (Settings.Default.SendChatMsgsViaStreamerBot)
-                        streamerbotClient.SendMessage(LanguageStrings.Get("Chat_Msg_roundEnd", new Dictionary<string, string>() { { "winner", playerName ?? "<unknown>" } }));
                 }
             }
         }
@@ -152,12 +146,10 @@ namespace GeoChatter.Forms
 
             if (send)
             {
-                if (Settings.Default.EnableTwitchChatMsgs)
+                if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
                 {
-                    bot.SendMessage(message);
+                    bot?.SendMessage(message);
                 }
-                if (Settings.Default.SendChatMsgsViaStreamerBot)
-                    streamerbotClient.SendMessage(message);
             }
         }
         private void SendStartRoundMessage(Round round)
@@ -166,11 +158,8 @@ namespace GeoChatter.Forms
             {
                 string roundNumber = round.RealRoundNumber().ToStringDefault();
                 string msg = LanguageStrings.Get("Chat_Msg_roundStart", new Dictionary<string, string>() { { "roundNumber", roundNumber } });
-                if (Settings.Default.EnableTwitchChatMsgs)
+                if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
                     CurrentBot?.SendMessage(msg);
-                if (Settings.Default.SendChatMsgsViaStreamerBot)
-                    streamerbotClient.SendMessage(msg);
-
             }
         }
 
