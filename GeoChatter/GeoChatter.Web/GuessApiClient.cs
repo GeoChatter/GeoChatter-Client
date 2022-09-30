@@ -323,7 +323,10 @@ namespace GeoChatter.Web
                                logging.AddDebug();
                                logging.AddLog4Net();
                                // This will set ALL logging to Debug level
-                               logging.SetMinimumLevel((Microsoft.Extensions.Logging.LogLevel)LogLevel.Information);
+                               if(mainForm.IsDebugEnabled())
+                                    logging.SetMinimumLevel((Microsoft.Extensions.Logging.LogLevel)LogLevel.Debug);
+                               else
+                                   logging.SetMinimumLevel((Microsoft.Extensions.Logging.LogLevel)LogLevel.Information);
                            }).WithAutomaticReconnect().Build();
                     connection.Reconnecting += Connection_Reconnecting;
                     connection.Reconnected += Connection_Reconnected;
@@ -363,6 +366,11 @@ namespace GeoChatter.Web
         private async Task OnInitiateDisconnect()
         {
             await Disconnect(true, "This user connected on another client!");
+        }
+
+        public void ResetToken()
+        {
+            token = String.Empty;
         }
 
         private async Task<string> ValidateToken(bool isGGLogon)

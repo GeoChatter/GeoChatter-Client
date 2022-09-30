@@ -244,9 +244,11 @@ namespace GeoChatter.Forms
                         ScoreFormulator.LastCompiledScript,
                         game.Rounds.Where(r => r.RoundNumber < ClientDbCache.RunningGame.CurrentRound).ToList()
                     );
-
-                TriggerSpecialScoreActions(player, existant.Score);
-                TriggerSpecialDistanceActions(player, existant.Distance);
+                if (!round.IsMultiGuess)
+                {
+                    TriggerSpecialScoreActions(player, existant.Score);
+                    TriggerSpecialDistanceActions(player, existant.Distance);
+                }
                 logger.Debug("Actions executed");
 
                 SendGuessToJS(existant);

@@ -58,7 +58,8 @@ namespace GeoChatter.Forms
         private static readonly OBSClient obsClient = new();
         public GuessApiClient guessApiClient;
 
-        internal bool guessesOpen = true;
+        internal bool guessesOpen { get; set; } = true;
+
         private const int WM_SYSCOMMAND = 0x112;
         private const int MF_STRING = 0x0;
         private const int MF_SEPARATOR = 0x800;
@@ -584,7 +585,7 @@ namespace GeoChatter.Forms
             this.InvokeDefault(f => {
                 string[] titleParts = f.Text.Split(':');
                 string currentMapName = titleParts[titleParts.Length - 1].Trim();
-                f.Text = f.Text.ReplaceDefault(currentMapName, guessApiClient.MapIdentifier ?? "Disconnected"); 
+                f.Text = f.Text.ReplaceDefault(currentMapName, string.IsNullOrEmpty(guessApiClient.MapIdentifier)? "Disconnected": guessApiClient.MapIdentifier); 
             
             });
         }
@@ -1026,7 +1027,8 @@ namespace GeoChatter.Forms
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            
+            Settings.Default.UseDevApi = false;
+            Settings.Default.Save();
         }
 
         private void extensionsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1082,6 +1084,11 @@ namespace GeoChatter.Forms
             {
                     hasFocus = !(Form.ActiveForm == null);
             }));
+        }
+
+        public bool IsDebugEnabled()
+        {
+            return Settings.Default.EnableDebugLogging;
         }
     }
 }

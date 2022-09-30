@@ -474,6 +474,20 @@ namespace GeoChatter.Core.Helpers
         }
 
         /// <summary>
+        /// Get GeoJson of given country code or name
+        /// </summary>
+        /// <returns></returns>
+        public static GeoJson GetGeoJSONOf(string codeOrName)
+        {
+            codeOrName = codeOrName?.Trim().ToUpperInvariant();
+            return BorderData
+                .FirstOrDefault(b => b.features
+                    .Any(f => f.properties.shapeGroup == codeOrName 
+                        || f.properties.shapeISO == codeOrName 
+                        || f.properties.shapeName.ToUpperInvariant() == codeOrName));
+        }
+
+        /// <summary>
         /// Get a random feature from given country
         /// </summary>
         /// <param name="geo">Country GeoJson object</param>
@@ -503,6 +517,124 @@ namespace GeoChatter.Core.Helpers
         {
             feature = GetRandomFeature(GetRandomCountry());
             return GetRandomPointWithinBoundBox(feature);
+        }
+
+        /// <summary>
+        /// Get a random point within given country polygon's bounding box present in current border set
+        /// <para>WARNING: This DOES NOT guarantee that the point will be within a polygon</para>
+        /// </summary>
+        /// <param name="codeOrName">Randomly picked feature</param>
+        /// <param name="feature">Randomly picked feature</param>
+        /// <returns></returns>
+        public static Coordinates GetRandomPointCloseOrWithin(string codeOrName, out Feature feature)
+        {
+            feature = GetRandomFeature(GetGeoJSONOf(codeOrName));
+            return GetRandomPointWithinBoundBox(feature);
+        }
+
+        /// <summary>
+        /// Get alpha3 code from alpha2 code or name
+        /// </summary>
+        /// <param name="codeOrName"></param>
+        /// <returns></returns>
+        public static string GetAlpha3FromCodeOrName(string codeOrName)
+        {
+            if (string.IsNullOrWhiteSpace(codeOrName))
+            {
+                return string.Empty;
+            }
+
+            string match = codeOrName.ToUpperInvariant();
+            if (match.Length == 2)
+                match = ISO3166Helper.FromAlpha2(match)?.Alpha3;
+            else
+                match = ISO3166Helper.Collection.FirstOrDefault(c => c.Name.ToUpperInvariant() == match)?.Alpha3;
+
+            return match ?? codeOrName;
+        }
+
+        /// <summary>
+        /// Get random coordinates around given areas
+        /// </summary>
+        /// <param name="randomGuessQuery"><code>targetCountryNameOrCode</code> OR <code>target1:relativeProbability1 target2:relativeProbability2 ...</code></param>
+        /// <returns></returns>
+        public static Coordinates GetRandomCoordinateFromRandomGuessQuery(string randomGuessQuery)
+        {
+            Coordinates rand = null;
+            try
+            {
+                if (string.IsNullOrWhiteSpace(randomGuessQuery))
+                {
+                    return rand;
+                }
+
+                // TODO: Refactor
+                string[] countryArgs = randomGuessQuery.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if (countryArgs.Length > 0)
+                {
+
+                    if (countryArgs.Length == 1)
+                    {
+                        string match = GetAlpha3FromCodeOrName(countryArgs[0].Split(':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[0]);
+                        rand = GetRandomPointCloseOrWithin(match, out Feature _);
+                    }
+                    else
+                    {
+                        List<string> matches = countryArgs
+                            .Select(c => c.Split(':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[0])
+                            .ToList();
+
+                        List<double> probs = countryArgs
+                            .Select(c =>
+                            {
+                                string[] splt = c.Split(':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                                if (splt.Length == 1)
+                                {
+                                    return 1;
+                                }
+                                return splt[1].ParseAsDouble(1);
+                            })
+                            .ToList();
+
+                        double totalProb = probs.Sum();
+
+                        int i = matches.Count - 1;
+                        double r = random.NextDouble() * totalProb;
+                        while (r > 0 && i >= 0)
+                        {
+                            Coordinates old = rand;
+                            string match = GetAlpha3FromCodeOrName(matches[i]);
+                            rand = GetRandomPointCloseOrWithin(match, out Feature _);
+
+                            if (rand == null)
+                            {
+                                rand = old;
+                            }
+
+                            r -= probs[i--];
+                        }
+
+                        if (rand == null)
+                        {
+                            foreach (string m in matches)
+                            {
+                                string match = GetAlpha3FromCodeOrName(m);
+                                rand = GetRandomPointCloseOrWithin(match, out Feature _);
+                                if (rand != null)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                return rand;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Summarize());
+                return rand;
+            }
         }
 
         /// <summary>

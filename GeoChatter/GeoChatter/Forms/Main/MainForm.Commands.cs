@@ -356,7 +356,21 @@ namespace GeoChatter.Forms
                     return;
                 }
 
-                Coordinates rand = BorderHelper.GetRandomPointCloseOrWithinAPolygon();
+                Coordinates rand = null;
+
+                if (string.IsNullOrWhiteSpace(args.Arguments))
+                {
+                    rand = BorderHelper.GetRandomPointCloseOrWithinAPolygon();
+                }
+                else
+                {
+                    rand = BorderHelper.GetRandomCoordinateFromRandomGuessQuery(args.Arguments);
+                }
+
+                if (rand == null)
+                {
+                    rand = BorderHelper.GetRandomPointCloseOrWithinAPolygon();
+                }
 
                 GuessReceivedEventArgs g = new(args.UserId, args.Username, args.UserPlatform, args.Bot, args.Command)
                 {

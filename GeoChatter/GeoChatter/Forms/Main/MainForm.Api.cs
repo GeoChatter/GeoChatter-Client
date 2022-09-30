@@ -6,6 +6,7 @@ using GeoChatter.Model;
 using GeoChatter.Model.Enums;
 using GeoChatter.Properties;
 using GeoChatter.Web;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -46,7 +47,7 @@ namespace GeoChatter.Forms
         {
             await guessApiClient.SendMapOptionsToMaps(options);
         }
-        private async Task ConnectToGuessApi(bool forceReconnect = false, bool login = true, bool isGGLogon = false)
+        public async Task ConnectToGuessApi(bool forceReconnect = false, bool login = true, bool isGGLogon = false)
         {
             if (guessApiClient == null)
             {
@@ -61,6 +62,7 @@ namespace GeoChatter.Forms
                 if (guessApiClient.IsConnected)
                 {
                     await guessApiClient.Disconnect();
+                    guessApiClient.ResetToken();
 
                 }
 
@@ -72,8 +74,11 @@ namespace GeoChatter.Forms
             string version = fvi.FileVersion;
 
             string huburl = Settings.Default.GuessServer;
+            if(Settings.Default.UseDevApi)
+                huburl = Settings.Default.AlternateGuessApiUrl;
+
 #if DEBUG
-            huburl = Settings.Default.AlternateGuessApiUrl;
+            //huburl = Settings.Default.AlternateGuessApiUrl;
            //huburl = "https://localhost:44350/geoChatterHub";
 #endif
 
@@ -199,6 +204,8 @@ namespace GeoChatter.Forms
                 roundResult.UserName = result.Player.PlayerName;
                 roundResult.ProfilePicUrl = result.Player.ProfilePictureUrl;
                 roundResult.PlayerFlagName = result.Player.PlayerFlagName;
+                roundResult.PlayerColor = result.Player.Color;
+                roundResult.SourcePlatform = result.Player.SourcePlatform.ToString();
                 roundResult.PlayerFlag = result.Player.PlayerFlag;
                 roundResult.WasRandom = guess.WasRandom;
                 roundResult.Score = result.Score;
@@ -210,6 +217,7 @@ namespace GeoChatter.Forms
                 roundResult.GuessCount = guess.GuessCounter;
                 roundResult.IsStreamerResult = guess.IsStreamerGuess;
                 roundResult.GuessedBefore = guess.GuessedBefore;
+                roundResult.GameId = finishedRound.Game.Source?.token;
                 response.Add(roundResult);
 
             }
@@ -228,6 +236,8 @@ namespace GeoChatter.Forms
                 gameResult.ProfilePicUrl = result.Player.ProfilePictureUrl;
                 gameResult.PlayerFlagName = result.Player.PlayerFlagName;
                 gameResult.PlayerFlag = result.Player.PlayerFlag;
+                gameResult.PlayerColor = result.Player.Color;
+                gameResult.SourcePlatform = result.Player.SourcePlatform.ToString();
                 gameResult.Score = result.Score;
                 gameResult.Distance = result.Distance;
                 gameResult.TimeTaken = result.TimeTaken;

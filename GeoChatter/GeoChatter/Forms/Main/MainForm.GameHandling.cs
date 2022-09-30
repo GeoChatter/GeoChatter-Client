@@ -14,6 +14,7 @@ using GeoChatter.Core.Common.Extensions;
 using GeoChatter.Properties;
 using GeoChatter.Core.Helpers;
 using GeoChatter.Helpers;
+using GeoChatter.Core.Interfaces;
 
 namespace GeoChatter.Forms
 {
@@ -46,8 +47,7 @@ namespace GeoChatter.Forms
             SetRefreshMenuItemsEnabledState(true);
             SendStartRoundToMaps(firstRound);
             SendStartRoundToJS(firstRound);
-            guessesOpen = true;
-
+            ToggleGuesses(true);
             TriggerRoundStartActions();
         }
 
@@ -124,6 +124,7 @@ namespace GeoChatter.Forms
             {
                 logger.Info("Verifying game start for " + id);
                 GameStartFires.Remove(id);
+                ToggleGuesses(true);
             }
             else
             {
@@ -214,6 +215,7 @@ namespace GeoChatter.Forms
         private async Task SaveAndExit(bool instantexit = false)
         {
             logger.Info("Exiting current game: " + instantexit);
+            guessesOpen = false;
             try
             {
                 bool status = await ClientDbCache.SaveGame(ClientDbCache.RunningGame);
@@ -236,7 +238,6 @@ namespace GeoChatter.Forms
             finally
             {
                 ClientDbCache.RunningGame = null;
-                guessesOpen = false;
             }
         } /// <inheritdoc/>
         public void OverwriteRoundData(int round, double lat, double lng, string panoid)
@@ -439,8 +440,7 @@ namespace GeoChatter.Forms
             SetRefreshMenuItemsEnabledState(true);
             SendStartRoundToJS(round);
             SendStartRoundToMaps(round);
-            guessesOpen = true;
-
+            ToggleGuesses(true);
             TriggerRoundStartActions();
         }
     }
