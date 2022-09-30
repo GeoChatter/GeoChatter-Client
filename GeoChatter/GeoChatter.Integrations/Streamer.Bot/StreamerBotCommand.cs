@@ -1,18 +1,20 @@
 ﻿using GeoChatter.Core;
 using GeoChatter.Core.Attributes;
 using GeoChatter.Core.Interfaces;
+using GeoChatter.Integrations;
+using GeoChatter.Integrations.Classes;
 using GeoChatter.Model.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TwitchLib.Client.Models;
+using Websocket.Client;
 
-namespace GeoChatter.Web.Twitch
+namespace GeoChatter.Integrations.StreamerBot
 {
     /// <summary>
     /// Twitch command for the bot
     /// </summary>
-    public class TwitchCommand : ICommand<TwitchBot>
+    public class StreamerBotCommand : ICommand<StreamerbotClient>
     {
         /// <summary>
         /// <inheritdoc/>
@@ -62,7 +64,7 @@ namespace GeoChatter.Web.Twitch
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public ICommand<TwitchBot>.CommandDef Command { get; set; }
+        public ICommand<StreamerbotClient>.CommandDef Command { get; set; }
 
         /// <summary>
         /// <inheritdoc/>
@@ -85,14 +87,14 @@ namespace GeoChatter.Web.Twitch
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public bool CanBeTriggeredWith(TwitchBot bot, object eventArgs)
+        public bool CanBeTriggeredWith(StreamerbotClient bot, object eventArgs)
         {
-            if (bot == null || !bot.GetEventArgObject(eventArgs, out TwitchLibMessage message, out Type type))
+            if (bot == null || !bot.GetEventArgObject(eventArgs, out StreamerBotCommandMessagePart message, out Type type))
             {
                 return false;
             }
 
-            string msg = ICommandBase.GetCommandFromMessage(message.Message);
+            string msg = ICommandBase.GetCommandFromMessage(message.completeMessage);
 
             if (!msg.StartsWith(TriggerChar))
             {
@@ -140,11 +142,11 @@ namespace GeoChatter.Web.Twitch
         /// </summary>
         /// <param name="bot">Parent bot</param>
         /// <param name="eventArgs">Event arguments object</param>
-        public void CallCommand(TwitchBot bot, object eventArgs)
+        public void CallCommand(StreamerbotClient bot, object eventArgs)
         {
             if (bot == null
-                || !bot.GetUserInfo(eventArgs, out string userid, out string _, out int userlevel, out _)
-                || !bot.GetEventArgObject(eventArgs, out TwitchLibMessage msg, out Type _)
+                || !bot.GetUserInfo(eventArgs, out string userid, out string _, out int userlevel, out Platforms userPlatform)
+                || !bot.GetEventArgObject(eventArgs, out StreamerBotCommandMessagePart msg, out Type _)
                 || (Restrictions.AllowedState != AppGameState.ANYTIME && (bot.Parent.CurrentState & Restrictions.AllowedState) == 0))
             {
                 return;
@@ -166,7 +168,7 @@ namespace GeoChatter.Web.Twitch
 
             LastGlobalCall = DateTime.Now;
 
-            string message = msg.Message;
+            string message = msg.completeMessage;
 
             if (string.IsNullOrWhiteSpace(message))
             {

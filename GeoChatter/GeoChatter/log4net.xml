@@ -16,7 +16,7 @@
 		<maxSizeRollBackups value="10"/>
 		<threshold value="DEBUG" />
 		<layout type="log4net.Layout.PatternLayout">
-			<conversionPattern value="%date [%2thread] %-5level - %message%newline" />
+			<conversionPattern value="%date [%2thread] - [%type{1}]: %-5level - %message%newline" />
 		</layout>
 		<lockingModel type="log4net.Appender.FileAppender+MinimalLock" />
 	</appender>

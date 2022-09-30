@@ -110,7 +110,7 @@ namespace GeoChatter.Web.YouTube
         /// </summary>
         public bool CommandCooldownAvailablity(IBotBase bot, object eventArgs)
         {
-            if (bot == null || !bot.GetUserInfo(eventArgs, out string userid, out string _, out int _))
+            if (bot == null || !bot.GetUserInfo(eventArgs, out string userid, out string _, out int _, out _))
             {
                 return false;
             }
@@ -144,7 +144,7 @@ namespace GeoChatter.Web.YouTube
         {
             if (bot == null
                 || eventArgs == null
-                || !bot.GetUserInfo(eventArgs, out string userid, out string _, out int _)
+                || !bot.GetUserInfo(eventArgs, out string userid, out string _, out int _, out _)
                 || !bot.GetEventArgObject(eventArgs, out LiveChatMessage chat, out Type _)
                 || (Restrictions.AllowedState != AppGameState.ANYTIME && (bot.Parent.CurrentState & Restrictions.AllowedState) == 0)
                 || ((!Restrictions.CanDeveloperBypass || !ICommandBase.DeveloperIDs.Contains(userid)) && !CommandCooldownAvailablity(bot, eventArgs)))

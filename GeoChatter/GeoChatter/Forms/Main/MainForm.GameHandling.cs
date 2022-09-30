@@ -356,15 +356,30 @@ namespace GeoChatter.Forms
                         TriggerSpecialScoreActions(result.Player, result.Score);
                     }
                 }
-                if (ClientDbCache.RunningGame.Mode == GameMode.STREAK && Settings.Default.EnableTwitchChatMsgs)
+                if (ClientDbCache.RunningGame.Mode == GameMode.STREAK)
                 {
 
                     Game g = ClientDbCache.RunningGame;
-                    if (!guessApiClient.SummaryEnabled)
-                        CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_EndStreak", new Dictionary<string, string>() { { "endRoundNumber", (ClientDbCache.RunningGame.Rounds.Count - 1).ToStringDefault() } }));
-                    else
-                        CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_EndStreakSummary", new Dictionary<string, string>() { { "winner", player.FullDisplayName }, { "gameId", g.GeoGuessrId }, { "endRoundNumber", (ClientDbCache.RunningGame.Rounds.Count - 1).ToStringDefault() } }));
-
+                    if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot) 
+                    {
+                        if (!guessApiClient.SummaryEnabled)
+                        {
+                            string msg = LanguageStrings.Get("Chat_Msg_EndStreak", new Dictionary<string, string>() { { "winner", player.FullDisplayName }, { "gameId", g.GeoGuessrId }, { "endRoundNumber", (ClientDbCache.RunningGame.Rounds.Count - 1).ToStringDefault() } });
+#if DEBUG
+                            msg = msg.ReplaceDefault("results", "testing_results");
+#endif                            
+                            CurrentBot?.SendMessage(msg);
+                        }
+                        else
+                        {
+                            string msg = LanguageStrings.Get("Chat_Msg_EndStreakSummary", new Dictionary<string, string>() { { "winner", player.FullDisplayName }, { "gameId", g.GeoGuessrId }, { "endRoundNumber", (ClientDbCache.RunningGame.Rounds.Count - 1).ToStringDefault() } });
+#if DEBUG
+                            msg = msg.ReplaceDefault("results", "testing_results");
+#endif                            
+                            CurrentBot?.SendMessage(msg);
+                        }
+                        
+                    }
                 }
                 else
                 {
@@ -374,11 +389,29 @@ namespace GeoChatter.Forms
                     {
                         g = g.Previous;
                     }
-                    if (Settings.Default.EnableTwitchChatMsgs)
-                        if (guessApiClient.SummaryEnabled)
-                            CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_gameEnd", new Dictionary<string, string>() { { "winner", player.FullDisplayName }, { "gameId", g.GeoGuessrId } }));
+                    if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                    {
+                        if (!guessApiClient.SummaryEnabled)
+                        {
+                            string msg = LanguageStrings.Get("Chat_Msg_gameEndNoSummary", new Dictionary<string, string>() { { "winner", player.FullDisplayName }, { "gameId", g.GeoGuessrId }, { "endRoundNumber", (ClientDbCache.RunningGame.Rounds.Count - 1).ToStringDefault() } });
+#if DEBUG
+                            msg = msg.ReplaceDefault("results", "testing_results");
+#endif
+                            CurrentBot?.SendMessage(msg);
+
+                        }
                         else
-                            CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_gameEndNoSummary", new Dictionary<string, string>() { { "winner", player.FullDisplayName } }));
+                        {
+                            string msg = LanguageStrings.Get("Chat_Msg_gameEnd", new Dictionary<string, string>() { { "winner", player.FullDisplayName }, { "gameId", g.GeoGuessrId }, { "endRoundNumber", (ClientDbCache.RunningGame.Rounds.Count - 1).ToStringDefault() } });
+#if DEBUG
+                            msg = msg.ReplaceDefault("results", "testing_results");
+#endif
+                            CurrentBot?.SendMessage(msg);
+
+                        }
+                    }
+                    
+
                 }
                 SendEndGameToMaps(ClientDbCache.RunningGame);
                 if (ClientDbCache.RunningGame.IsPartOfInfiniteGame)

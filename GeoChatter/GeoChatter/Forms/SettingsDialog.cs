@@ -194,6 +194,11 @@ namespace GeoChatter.Forms
                 Settings.Default.RoundStartActionID = ((StreamerbotAction)comboBoxRoundStartAction.SelectedItem)?.id;
                 Settings.Default.RoundStartActionName = ((StreamerbotAction)comboBoxRoundStartAction.SelectedItem)?.name;
 
+
+                Settings.Default.SendChatMsgsViaStreamerBot = checkBoxSendChatMsgsViaStreamerBot.Checked;
+                Settings.Default.SendChatActionId = ((StreamerbotAction)comboBoxStreamerBotChatAction.SelectedItem)?.id;
+                Settings.Default.SendChatActionName = ((StreamerbotAction)comboBoxStreamerBotChatAction.SelectedItem)?.name;
+
                 Settings.Default.RoundEndAction = chkBotRoundEndExecute.Checked;
                 Settings.Default.RoundEndActionID = ((StreamerbotAction)comboBoxRoundEndAction.SelectedItem)?.id;
                 Settings.Default.RoundEndActionName = ((StreamerbotAction)comboBoxRoundEndAction.SelectedItem)?.name;
@@ -662,8 +667,6 @@ namespace GeoChatter.Forms
 
             propertyGrid1.SelectedObject = new DictionaryPropertyGridAdapter(settings);
             checkBoxEnableChatMsgs.Checked = Settings.Default.EnableTwitchChatMsgs && !string.IsNullOrEmpty(Settings.Default.oauthToken);
-            if (!checkBoxEnableChatMsgs.Checked)
-                groupBoxChatMessages.Enabled = false;
             btnForgetTwitch.Enabled = !string.IsNullOrEmpty(Settings.Default.oauthToken);
             btnAuthorizeAutomatically.Enabled = btnAuthorizeManually.Enabled = string.IsNullOrEmpty(Settings.Default.oauthToken);
 
@@ -802,6 +805,9 @@ namespace GeoChatter.Forms
             comboOBSGameEndAction.SelectedItem = Settings.Default.ObsSpecialScoreAction;
             chkOBSGameEndExecute.Checked = Settings.Default.ObsGameEndExecute;
 
+            checkBoxSendChatMsgsViaStreamerBot.Checked = Settings.Default.SendChatMsgsViaStreamerBot;
+            
+
             chkSendDoubleGuessMsg.Checked = Settings.Default.SendDoubleGuessMsg;
             chkSendSameGuessMessage.Checked = Settings.Default.SendSameGuessMessage;
             chkAllowSameLocationGuess.Checked = Settings.Default.AllowSameLocationGuess;
@@ -811,8 +817,13 @@ namespace GeoChatter.Forms
             scrSettings.SetShortcut(Settings.Default.ShortcutsSettingsKeycode, Settings.Default.ShortcutsSettingsModifiers);
             scrMenu.SetShortcut(Settings.Default.ShortcutsMenuKey, Settings.Default.ShortcutsMenuModifiers);
             scrFullscreen.SetShortcut(Settings.Default.ShortcutsFullscreenKey, Settings.Default.ShortcutsFullscreenModifiers);
+            SetTwitchInputs();
         }
-        List<StreamerbotAction> roundStartList, scoreList,distanceList, roundendList, gameendList;
+        List<StreamerbotAction> roundStartList, scoreList,distanceList, roundendList, gameendList, chatList;
+       
+        
+        
+        
         private void SetStreamerBotActions()
         {
             if(streamerbotClient.IsRunning() && !streamerbotClient.Actions.Any())
@@ -820,78 +831,95 @@ namespace GeoChatter.Forms
                 streamerbotClient.GetActions();
                 Thread.Sleep(10);
             }
-            if (streamerbotClient.Actions.Any() && tabControl1.TabPages.Contains(tabPageEvents))
+            if (streamerbotClient.Actions.Any())
             {
+                chatList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+                comboBoxStreamerBotChatAction.DataSource = chatList;
+                comboBoxStreamerBotChatAction.DisplayMember = "name";
+                comboBoxStreamerBotChatAction.ValueMember = "id";
+                logger.Debug("setting chat msgs actions");
 
-
-                logger.Debug("Actions from streamer bot received");
-
-                logger.Debug("setting distance actions");
-                if (!streamerbotClient.Actions.Any(a => a.name == "[none]"))
-                    streamerbotClient.Actions.Add(new StreamerbotAction() { name = "[none]", id = string.Empty });
-
-                distanceList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
-                comboBoxSpecialDistanceActions.DataSource = distanceList;
-                comboBoxSpecialDistanceActions.DisplayMember = "name";
-                comboBoxSpecialDistanceActions.ValueMember = "id";
-
-                scoreList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
-                comboBoxSpecialScoreActions.DataSource = scoreList;
-                comboBoxSpecialScoreActions.DisplayMember = "name";
-                comboBoxSpecialScoreActions.ValueMember = "id";
-
-                roundStartList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
-                comboBoxRoundStartAction.DataSource = roundStartList;
-                comboBoxRoundStartAction.DisplayMember = "name";
-                comboBoxRoundStartAction.ValueMember = "id";
-
-                roundendList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
-                comboBoxRoundEndAction.DataSource = roundendList;
-                comboBoxRoundEndAction.DisplayMember = "name";
-                comboBoxRoundEndAction.ValueMember = "id";
-
-                gameendList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
-                comboBoxGameEndAction.DataSource = gameendList;
-                comboBoxGameEndAction.DisplayMember = "name";
-                comboBoxGameEndAction.ValueMember = "id";
-
-                if (!string.IsNullOrEmpty(Settings.Default.SpecialDistanceActionID))
+                if (!string.IsNullOrEmpty(Settings.Default.SendChatActionId))
                 {
 
-                    comboBoxSpecialDistanceActions.SelectedValue = Settings.Default.SpecialDistanceActionID;
+                    comboBoxStreamerBotChatAction.SelectedValue = Settings.Default.SendChatActionId;
                 }
-
-                logger.Debug("Setting score actions");
-
-                if (!string.IsNullOrEmpty(Settings.Default.SpecialScoreActionID))
-                {
-                    comboBoxSpecialScoreActions.SelectedValue = Settings.Default.SpecialScoreActionID;
-                }
-                logger.Debug("setting round start actions");
-
-                if (!string.IsNullOrEmpty(Settings.Default.RoundStartActionID))
+                if (tabControl1.TabPages.Contains(tabPageEvents))
                 {
 
-                    comboBoxRoundStartAction.SelectedValue = Settings.Default.RoundStartActionID;
-                }
-                logger.Debug("setting round end actions");
 
-                if (!string.IsNullOrEmpty(Settings.Default.RoundEndActionID))
-                {
-                    comboBoxRoundEndAction.SelectedValue = Settings.Default.RoundEndActionID;
+                    logger.Debug("Actions from streamer bot received");
 
-                }
-                logger.Debug("setting game end actions");
+                    logger.Debug("setting distance actions");
+                    if (!streamerbotClient.Actions.Any(a => a.name == "[none]"))
+                        streamerbotClient.Actions.Add(new StreamerbotAction() { name = "[none]", id = string.Empty });
 
-                if (!string.IsNullOrEmpty(Settings.Default.GameEndActionID))
-                {
-                    comboBoxGameEndAction.SelectedValue = Settings.Default.GameEndActionID;
-                }
+                    distanceList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+                    comboBoxSpecialDistanceActions.DataSource = distanceList;
+                    comboBoxSpecialDistanceActions.DisplayMember = "name";
+                    comboBoxSpecialDistanceActions.ValueMember = "id";
+
+                    scoreList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+                    comboBoxSpecialScoreActions.DataSource = scoreList;
+                    comboBoxSpecialScoreActions.DisplayMember = "name";
+                    comboBoxSpecialScoreActions.ValueMember = "id";
+
+                    roundStartList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+                    comboBoxRoundStartAction.DataSource = roundStartList;
+                    comboBoxRoundStartAction.DisplayMember = "name";
+                    comboBoxRoundStartAction.ValueMember = "id";
 
 
-                if (chkStreamerBotConnectAtStartup.Checked)
-                {
-                    buttonConnectStreamerBot.Enabled = true;
+
+                    roundendList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+                    comboBoxRoundEndAction.DataSource = roundendList;
+                    comboBoxRoundEndAction.DisplayMember = "name";
+                    comboBoxRoundEndAction.ValueMember = "id";
+
+                    gameendList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+                    comboBoxGameEndAction.DataSource = gameendList;
+                    comboBoxGameEndAction.DisplayMember = "name";
+                    comboBoxGameEndAction.ValueMember = "id";
+
+                    if (!string.IsNullOrEmpty(Settings.Default.SpecialDistanceActionID))
+                    {
+
+                        comboBoxSpecialDistanceActions.SelectedValue = Settings.Default.SpecialDistanceActionID;
+                    }
+
+                    logger.Debug("Setting score actions");
+
+                    if (!string.IsNullOrEmpty(Settings.Default.SpecialScoreActionID))
+                    {
+                        comboBoxSpecialScoreActions.SelectedValue = Settings.Default.SpecialScoreActionID;
+                    }
+                    logger.Debug("setting round start actions");
+
+                    if (!string.IsNullOrEmpty(Settings.Default.RoundStartActionID))
+                    {
+
+                        comboBoxRoundStartAction.SelectedValue = Settings.Default.RoundStartActionID;
+                    }
+
+                    logger.Debug("setting round end actions");
+
+                    if (!string.IsNullOrEmpty(Settings.Default.RoundEndActionID))
+                    {
+                        comboBoxRoundEndAction.SelectedValue = Settings.Default.RoundEndActionID;
+
+                    }
+                    logger.Debug("setting game end actions");
+
+                    if (!string.IsNullOrEmpty(Settings.Default.GameEndActionID))
+                    {
+                        comboBoxGameEndAction.SelectedValue = Settings.Default.GameEndActionID;
+                    }
+
+
+                    if (chkStreamerBotConnectAtStartup.Checked)
+                    {
+                        buttonConnectStreamerBot.Enabled = true;
+                    }
                 }
             }
         }
@@ -953,7 +981,7 @@ namespace GeoChatter.Forms
                     logger.Debug("disconnected, connect needed");
                     try
                     {
-                        if (streamerbotClient.Connect(txtStreamerBotIP.Text, txtStreamerBotPort.Text).Result)
+                        if (streamerbotClient.Connect(txtStreamerBotIP.Text, txtStreamerBotPort.Text, Settings.Default.SendChatActionId, Settings.Default.SendChatActionName, Settings.Default.SendChatMsgsViaStreamerBot, parent).Result)
                         {
                             logger.Debug("connection succeeded");
                             streamerbotClient.GetActions();
@@ -1051,6 +1079,8 @@ namespace GeoChatter.Forms
                comboBoxRoundEndAction.Enabled =
                checkBoxRoundTimerExecuteStreamerBotAction.Enabled =
                comboBoxRoundStartAction.Enabled =
+               checkBoxSendChatMsgsViaStreamerBot.Enabled =
+               comboBoxStreamerBotChatAction.Enabled =
                comboBoxSpecialScoreActions.Enabled = chkStreamerBotConnectAtStartup.Checked && streamerbotClient.IsRunning();
         }
 
@@ -1467,7 +1497,12 @@ namespace GeoChatter.Forms
 
         private void reconnectTwitchBotButton_Click(object sender, EventArgs e)
         {
-            
+
+            if (string.IsNullOrEmpty(txtGeneralChannelName.Text))
+            {
+                MessageBox.Show("You have to enter a channel name!", "Channel name is empty", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                return;
+            }
 
             if (Settings.Default.oauthToken != txtGeneralOauthToken.Text)
             {
@@ -1597,14 +1632,14 @@ namespace GeoChatter.Forms
             {
                 tabControl1.TabPages.Remove(tabPageEvents);
             }
-            if (showAdvancedSettings && !tabControl1.TabPages.Contains(tabPageConnections))
-            {
-                tabControl1.TabPages.Insert(3, tabPageConnections);
-            }
-            else if (!showAdvancedSettings && tabControl1.TabPages.Contains(tabPageConnections))
-            {
-                tabControl1.TabPages.Remove(tabPageConnections);
-            }
+            //if (showAdvancedSettings && !tabControl1.TabPages.Contains(tabPageConnections))
+            //{
+            //    tabControl1.TabPages.Insert(3, tabPageConnections);
+            //}
+            //else if (!showAdvancedSettings && tabControl1.TabPages.Contains(tabPageConnections))
+            //{
+            //    tabControl1.TabPages.Remove(tabPageConnections);
+            //}
 
             
                 tabControl1.TabPages.Remove(tabPageLabels);
@@ -1612,8 +1647,13 @@ namespace GeoChatter.Forms
             btnShowAdvanced.Enabled = !showAdvancedSettings;
         }
 
-        private async void button1_Click(object sender, EventArgs e)
+        private async void btnAuthorizeAutomatically_Click(object sender, EventArgs e)
         {
+            if(string.IsNullOrEmpty(txtGeneralChannelName.Text))
+            {
+                MessageBox.Show("You have to enter a channel name!", "Channel name is empty", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                return;
+            }
             TwitchOAuthHelper.SendRequestToBrowser();
             TwitchAuthenticationModel model = await TwitchOAuthHelper.GetAuthenticationValuesAsync();
             if (!string.IsNullOrEmpty(model.Token))
@@ -1625,8 +1665,14 @@ namespace GeoChatter.Forms
             reconnectTwitchBotButton_Click(reconnectTwitchBotButton, new EventArgs());
         }
 
-        private async void button2_Click(object sender, EventArgs e)
+        private async void btnAuthorizeManually_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(txtGeneralChannelName.Text))
+            {
+                MessageBox.Show("You have to enter a channel name!", "Channel name is empty", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                return;
+            }
+
             string url = TwitchOAuthHelper.SendRequestToBrowser(false);
             Thread thread = new(() => Clipboard.SetText(url));
             thread.SetApartmentState(ApartmentState.STA); //Set the thread to STA
@@ -1651,11 +1697,16 @@ namespace GeoChatter.Forms
 
         private void checkBoxEnableChatMsgs_CheckedChanged(object sender, EventArgs e)
         {
-            groupBoxChatMessages.Enabled = chkEnableMapOverlay.Enabled = chkAutoBan.Enabled = checkBoxEnableChatMsgs.Checked;
+            SetTwitchInputs();
+
+        }
+
+        private void SetTwitchInputs()
+        {
+            grpTwitchChatConnection.Enabled = chkEnableMapOverlay.Enabled = chkAutoBan.Enabled = checkBoxEnableChatMsgs.Checked;
 
             if (!checkBoxEnableChatMsgs.Checked)
                 chkEnableMapOverlay.Checked = chkAutoBan.Checked = false;
-
         }
 
         private void button1_Click_1(object sender, EventArgs e)

@@ -14,6 +14,8 @@ using GeoChatter.Helpers;
 using GeoChatter.Web.Twitch;
 using GeoChatter.Web.YouTube;
 using System.Windows.Forms;
+using Antlr4.Runtime.Misc;
+using GeoChatter.Integrations.StreamerBot;
 
 namespace GeoChatter.Forms
 {
@@ -24,6 +26,7 @@ namespace GeoChatter.Forms
         {
             TwitchCommands.Initialize();
             YoutubeCommands.Initialize();
+            StreamerBotCommands.Initialize();
         }
 
 
@@ -83,18 +86,20 @@ namespace GeoChatter.Forms
         }
         private void SendStartGameMessage(Game game)
         {
-            if (Settings.Default.SendGameStartMsg && (!game.IsPartOfInfiniteGame || game.Previous == null) && Settings.Default.EnableTwitchChatMsgs)
+            if (Settings.Default.SendGameStartMsg && (!game.IsPartOfInfiniteGame || game.Previous == null))
             {
-                CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_gameStart"));
+                if (Settings.Default.EnableTwitchChatMsgs)
+                {
+                    CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_gameStart"));
+                }
+                if (Settings.Default.SendChatMsgsViaStreamerBot)
+                    streamerbotClient.SendMessage(LanguageStrings.Get("Chat_Msg_gameStart"));
             }
         }
         private void SendRoundEndMessage(Game game)
         {
-            if (Settings.Default.SendRoundEndMsg && Settings.Default.EnableTwitchChatMsgs)
-            {
                 Round round = game.Rounds.FirstOrDefault(r => r.RoundNumber == game.Rounds.Count);
                 SendEndRoundMessage(round);
-            }
         }
         /// <summary>
         /// Sends the start round msg to chat
@@ -102,7 +107,7 @@ namespace GeoChatter.Forms
         /// <param name="round"></param>
         private void SendEndRoundMessage(Round round)
         {
-            if (Settings.Default.SendRoundEndMsg && Settings.Default.EnableTwitchChatMsgs)
+            if (Settings.Default.SendRoundEndMsg)
             {
                 //logger.Info(round.Results);
                 RoundResult result = round.Results
@@ -115,11 +120,17 @@ namespace GeoChatter.Forms
                         ? ClientDbCache.RunningGame.Rounds.Count
                         : ClientDbCache.RunningGame.CurrentRound - 1;
                     ;
-                    CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_EndStreakRound", new Dictionary<string, string>() { { "roundNumber", roundn.ToStringDefault() }, { "winnerName", (playerName ?? "<unknown>") } }));
+                   if(Settings.Default.EnableTwitchChatMsgs)
+                        CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_EndStreakRound", new Dictionary<string, string>() { { "roundNumber", roundn.ToStringDefault() }, { "winnerName", (playerName ?? "<unknown>") } }));
+                    if (Settings.Default.SendChatMsgsViaStreamerBot)
+                        streamerbotClient.SendMessage(LanguageStrings.Get("Chat_Msg_EndStreakRound", new Dictionary<string, string>() { { "roundNumber", roundn.ToStringDefault() }, { "winnerName", (playerName ?? "<unknown>") } }));
                 }
                 else
                 {
-                    CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_roundEnd", new Dictionary<string, string>() { { "winner", playerName ?? "<unknown>" } }));
+                    if (Settings.Default.EnableTwitchChatMsgs)
+                        CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_roundEnd", new Dictionary<string, string>() { { "winner", playerName ?? "<unknown>" } }));
+                    if (Settings.Default.SendChatMsgsViaStreamerBot)
+                        streamerbotClient.SendMessage(LanguageStrings.Get("Chat_Msg_roundEnd", new Dictionary<string, string>() { { "winner", playerName ?? "<unknown>" } }));
                 }
             }
         }
@@ -139,17 +150,27 @@ namespace GeoChatter.Forms
                 send = true;
             }
 
-            if (send && Settings.Default.EnableTwitchChatMsgs)
+            if (send)
             {
-                bot.SendMessage(message);
+                if (Settings.Default.EnableTwitchChatMsgs)
+                {
+                    bot.SendMessage(message);
+                }
+                if (Settings.Default.SendChatMsgsViaStreamerBot)
+                    streamerbotClient.SendMessage(message);
             }
         }
         private void SendStartRoundMessage(Round round)
         {
-            if (Settings.Default.SendRoundStartMsg && Settings.Default.EnableTwitchChatMsgs)
+            if (Settings.Default.SendRoundStartMsg)
             {
                 string roundNumber = round.RealRoundNumber().ToStringDefault();
-                CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_roundStart", new Dictionary<string, string>() { { "roundNumber", roundNumber } }));
+                string msg = LanguageStrings.Get("Chat_Msg_roundStart", new Dictionary<string, string>() { { "roundNumber", roundNumber } });
+                if (Settings.Default.EnableTwitchChatMsgs)
+                    CurrentBot?.SendMessage(msg);
+                if (Settings.Default.SendChatMsgsViaStreamerBot)
+                    streamerbotClient.SendMessage(msg);
+
             }
         }
 

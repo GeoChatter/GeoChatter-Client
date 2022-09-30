@@ -1,4 +1,5 @@
-﻿using GeoChatter.Core.Attributes;
+﻿using GeoChatter.Core;
+using GeoChatter.Core.Attributes;
 using GeoChatter.Core.Interfaces;
 using GeoChatter.Model.Enums;
 using Google.Apis.YouTube.v3.Data;
@@ -45,7 +46,7 @@ namespace GeoChatter.Web.YouTube
             string username = chat.AuthorDetails.DisplayName;
             string userid = chat.AuthorDetails.ChannelId;
 
-            bot.FireRandomGuessRecieved(new(userid, username, bot, command) { Arguments = string.Join(' ', args), ProfilePicture = img });
+            bot.FireRandomGuessRecieved(new(userid, username, Platforms.YouTube, bot, command) { Arguments = string.Join(' ', args), ProfilePicture = img });
         }
 
         #endregion

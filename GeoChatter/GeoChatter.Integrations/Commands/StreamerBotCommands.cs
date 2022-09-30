@@ -1,11 +1,10 @@
-﻿using GeoChatter.Core;
-using GeoChatter.Core.Attributes;
+﻿using GeoChatter.Core.Attributes;
 using GeoChatter.Core.Interfaces;
+using GeoChatter.Integrations;
 using GeoChatter.Model.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TwitchLib.Client.Models;
 
 namespace GeoChatter.Web.Twitch
 {
@@ -14,12 +13,12 @@ namespace GeoChatter.Web.Twitch
     /// </summary>
     public static class TwitchCommands
     {
-        private static List<TwitchCommand> _commands;
+        private static List<StreamerBotCommand> _commands;
 
         /// <summary>
         /// All commands with <see cref="CommandAttribute"/> and <see cref="CommandRestrictionAttribute"/> will be registered to this instance
         /// </summary>
-        public static List<TwitchCommand> Commands => _commands?.Where(c => c.IsEnabled).ToList() ?? (_commands = new List<TwitchCommand>());
+        public static List<StreamerBotCommand> Commands => _commands?.Where(c => c.IsEnabled).ToList() ?? (_commands = new List<TwitchCommand>());
 
         /// <summary>
         /// Initialize <see cref="Commands"/> list
@@ -27,8 +26,8 @@ namespace GeoChatter.Web.Twitch
         public static void Initialize()
         {
             _commands?.Clear();
-            _commands = ICommand<TwitchBot>.DiscoverMethods<TwitchCommand>(typeof(TwitchCommands));
-            _commands.AddRange(CommonCommands.Command<TwitchBot, TwitchCommand, TwitchLibMessage>());
+            _commands = ICommand<StreamerbotClient>.DiscoverMethods<StreamerBotCommand>(typeof(StreamerBotCommand));
+            _commands.AddRange(CommonCommands.Command<StreamerbotClient, StreamerBotCommand, TwitchLibMessage>());
         }
 
         #region COMMANDS
@@ -47,7 +46,7 @@ namespace GeoChatter.Web.Twitch
             string userid = message.UserId;
             string color = message.ColorHex;
 
-            bot.FireRandomGuessRecieved(new(userid, username, Platforms.Twitch, bot, command) { Arguments = string.Join(' ', args), Color = color });
+            bot.FireRandomGuessRecieved(new(userid, username, bot, command) { Arguments = string.Join(' ', args), Color = color });
         }
 
 

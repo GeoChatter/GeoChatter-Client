@@ -163,9 +163,19 @@ namespace GeoChatter.Integrations
             logger.Debug($"Switching scene to {sceneName}");
             obs.SetCurrentProgramScene(sceneName);
         }
+        System.Threading.Timer timer;
 
+        private void InitiateHeartBeat()
+        {
+            timer = new System.Threading.Timer(async (state) =>
+            {
+                if (obs.IsConnected)
+                    obs.GetCurrentProgramScene();
 
+            }, null, 15000, 30000);
+            //{ "request": "GetEvents", "id": "<message id>"}
 
+        }
         private void Obs_Connected(object sender, EventArgs e)
         {
         }
@@ -196,6 +206,7 @@ namespace GeoChatter.Integrations
                         Thread.Sleep(50);
                         counter++;
                     }
+                    InitiateHeartBeat();
                     logger.Debug($"OBS Connected successfuly");
                 }
                 catch (AuthFailureException e)

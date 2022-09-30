@@ -253,7 +253,7 @@ namespace GeoChatter.Forms
                 GameType = runningGame.Source.type,
                 IsInfinite = runningGame.IsPartOfInfiniteGame,
                 IsStreak = runningGame.Mode == GameMode.STREAK,
-                MapID = runningGame.Source.Id,
+                MapID = runningGame.Source.map,
                 MapName = runningGame.Source.mapName,
                 RoundCount = runningGame.Source.roundCount,
                 StreakType = runningGame.Source.streakType,
