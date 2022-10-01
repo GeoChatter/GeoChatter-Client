@@ -47,7 +47,7 @@ namespace GeoChatter.Core.Model
 /// <param name="username"></param>
 /// <param name="bot"></param>
 /// <param name="command"></param>
-        public BotEventArgs(string userid, string username, IBotBase bot, ICommandBase command,Platforms userPlatform = Platforms.Twitch, string displayName = "", string profilePicUrl = "")
+        public BotEventArgs(string userid, string username, IBotBase bot, ICommandBase command,Platforms userPlatform, string displayName = "", string profilePicUrl = "")
         {
             Username = username;
             UserId = userid;
@@ -89,8 +89,8 @@ namespace GeoChatter.Core.Model
         /// <param name="isSelf">Wheter target is caller itself</param>
         /// <param name="bot">Bot</param>
         /// <param name="command">Command</param>
-        public TargetBotEventArgs(string userid, string username, string targetName, bool isSelf, IBotBase bot, ICommandBase command)
-            : base(userid, username, bot, command)
+        public TargetBotEventArgs(string userid, string username, string targetName, bool isSelf, Platforms userPlatform, IBotBase bot, ICommandBase command)
+            : base(userid, username, bot, command, userPlatform)
         {
             Target = targetName;
             IsSelfReference = isSelf;

@@ -732,13 +732,16 @@ namespace GeoChatter.Forms
             if (!open)
                 ProcessTemporaryGuesses();
             guessesOpen = open;
-            if (open && Settings.Default.EnableTwitchChatMsgs)
+            if (open)
             {
-                CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_GuessesOpenedMessage"));
+                if(Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                    CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_GuessesOpenedMessage"));
             }
             else
             {
-                CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_GuessesClosedMessage"));
+                if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                    CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_GuessesClosedMessage"));
+                
             }
         }
 
@@ -829,19 +832,22 @@ namespace GeoChatter.Forms
             }
         }
 
-        private static void ConnectToStreamerbot()
+        private void ConnectToStreamerbot()
         {
             if (Settings.Default.StreamerBotConnectAtStartup && !string.IsNullOrEmpty(Settings.Default.StreamerBotIP) && !string.IsNullOrEmpty(Settings.Default.StreamerBotPort))
             {
                 try
                 {
                     logger.Debug("Connecting to Streamer.Bot");
-                    if (!streamerbotClient.Connect(Settings.Default.StreamerBotIP, Settings.Default.StreamerBotPort).Result)
+                    if (!streamerbotClient.Connect(Settings.Default.StreamerBotIP, Settings.Default.StreamerBotPort, Settings.Default.SendChatActionId, Settings.Default.SendChatActionName, Settings.Default.SendChatMsgsViaStreamerBot, this).Result)
                     {
                         MessageBox.Show("Could not connect to Streamer.Bot\r\nPlease make sure that IP and port are correct,\rthat Streamer.Bot and its websocket server are running!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                         return;
                     }
+                    AttributeDiscovery.AddEventHandlers(fromMethodSource: this, toTargetInstance: streamerbotClient);
                     streamerbotClient.GetActions();
+                    if (Settings.Default.SendChatMsgsViaStreamerBot)
+                        CurrentBot = streamerbotClient;
                 }
                 catch (Exception ex) { logger.Error(ex.Summarize()); }
             }

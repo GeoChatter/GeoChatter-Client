@@ -43,7 +43,7 @@ Name: {app}; Permissions: everyone-full
 Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\GeoChatter\GeoChatter\bin\Release\publish\*"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\GeoChatter\GeoChatter\bin\Release\publish\Styles\*"; DestDir: "{app}\Styles"; Flags: ignoreversion recursesubdirs
 Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\GeoChatter\GeoChatter\bin\Release\publish\Scripts\*"; DestDir: "{app}\Scripts"; Flags: ignoreversion recursesubdirs
-Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\Dependencies\Quickstart.pdf"; DestDir: "{app}\Scripts"; Flags: ignoreversion 
+Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\Dependencies\Quickstart.pdf"; DestDir: "{app}"; Flags: ignoreversion 
 Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\Dependencies\windowsdesktop-runtime-6.0.3-win-x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall dontcopy
 Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\Dependencies\aspnetcore-runtime-6.0.3-win-x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall dontcopy 
 Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\Dependencies\VC_redist.x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall dontcopy 

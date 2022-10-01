@@ -1,4 +1,5 @@
 ﻿using GeoChatter.Core.Model;
+using GeoChatter.Model.Enums;
 using System;
 using System.Diagnostics.CodeAnalysis;
 
@@ -21,7 +22,8 @@ namespace GeoChatter.Core.Interfaces
         /// <param name="userid"></param>
         /// <param name="username"></param>
         /// <param name="userlevel"></param>
-        public bool GetUserInfo(object eventargs, [NotNullWhen(true)] out string userid, [NotNullWhen(true)] out string username, out int userlevel);
+        /// <param name="userPlatform"></param>
+        public bool GetUserInfo(object eventargs, [NotNullWhen(true)] out string userid, [NotNullWhen(true)] out string username, out int userlevel, out Platforms userPlatform);
 
         /// <summary>
         /// Send a message using the bot

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
+using GeoChatter.Core;
 
 namespace GeoChatter.Forms
 {

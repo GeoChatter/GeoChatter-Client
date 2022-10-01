@@ -15,6 +15,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Windows.Interop;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace GeoChatter.Forms
 {
@@ -67,15 +69,24 @@ namespace GeoChatter.Forms
                 if (color == "remove")
                 {
                     player.Color = args.Color;
-                    if (Settings.Default.SendColorSelected && Settings.Default.EnableTwitchChatMsgs)
-                        args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_ColorRemovedMessage", new Dictionary<string, string>() { { "playerName", player.FullDisplayName } }));
+                    if (Settings.Default.SendColorSelected)
+                    {
+                        string msg = LanguageStrings.Get("Chat_Msg_ColorRemovedMessage", new Dictionary<string, string>() { { "playerName", player.FullDisplayName } });
+                        if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                            args.Bot?.SendMessage(msg);
+                    }
                 }
                 else if (color == "random")
                 {
                     player.Color = args.Color;
-                    if (Settings.Default.SendColorSelected && Settings.Default.EnableTwitchChatMsgs)
-                        args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_ColorRandomMessage", new Dictionary<string, string>() { { "playerName", player.FullDisplayName } }));
-                }
+                    if (Settings.Default.SendColorSelected)
+                    {
+                        string msg = LanguageStrings.Get("Chat_Msg_ColorRandomMessage", new Dictionary<string, string>() { { "playerName", player.FullDisplayName } });
+                        if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                            args.Bot?.SendMessage(msg);
+                    }
+
+               }
                 else
                 {
                     logger.Debug("ColorRequest received " + player.FullDisplayName + " selected color " + color_arg);
@@ -84,14 +95,22 @@ namespace GeoChatter.Forms
 
                     if (string.IsNullOrEmpty(cssColor))
                     {
-                        if (Settings.Default.SendColorSelected && Settings.Default.EnableTwitchChatMsgs)
-                            args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_ColorNotFoundMessage", new Dictionary<string, string>() { { "playerName", player.FullDisplayName }, { "color", colorRealName } }));
+                         if (Settings.Default.SendColorSelected)
+                        {
+                            string msg = LanguageStrings.Get("Chat_Msg_ColorNotFoundMessage", new Dictionary<string, string>() { { "playerName", player.FullDisplayName }, { "color", colorRealName } });
+                            if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                                args.Bot?.SendMessage(msg);
+                        }
                     }
                     else
                     {
                         player.Color = cssColor;
-                        if (Settings.Default.SendColorSelected && Settings.Default.EnableTwitchChatMsgs)
-                            args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_ColorAssignedMessage", new Dictionary<string, string>() { { "playerName", player.FullDisplayName }, { "color", colorRealName } }));
+                        if (Settings.Default.SendColorSelected)
+                        {
+                            string msg = LanguageStrings.Get("Chat_Msg_ColorAssignedMessage", new Dictionary<string, string>() { { "playerName", player.FullDisplayName }, { "color", colorRealName } });
+                            if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                                args.Bot?.SendMessage(msg);
+                        }
                     }
                 }
             }
@@ -121,8 +140,12 @@ namespace GeoChatter.Forms
                 {
                     player.PlayerFlag = "";
                     player.PlayerFlagName = "";
-                    if (Settings.Default.SendFlagSelected && Settings.Default.EnableTwitchChatMsgs)
-                        args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_FlagRemovedMessage", new Dictionary<string, string>() { { "playerName", player.FullDisplayName } }));
+                    if (Settings.Default.SendFlagSelected)
+                    {
+                        string msg = LanguageStrings.Get("Chat_Msg_FlagRemovedMessage", new Dictionary<string, string>() { { "playerName", player.FullDisplayName } });
+                        if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                            args.Bot?.SendMessage(msg);
+                    }
                 }
                 else if (CountryHelper.CheckFlagCode(ref flag, out string cname))
                 {
@@ -136,8 +159,12 @@ namespace GeoChatter.Forms
                         cname = result.Name == Country.UnknownCountryName ? player.PlayerFlag : result.Name;
                     }
                     player.PlayerFlagName = cname;
-                    if (Settings.Default.SendFlagSelected && Settings.Default.EnableTwitchChatMsgs)
-                        args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_FlagAssignedMessage", new Dictionary<string, string>() { { "playerName", player.FullDisplayName }, { "name", cname }, { "flag", flag } }));
+                    if (Settings.Default.SendFlagSelected)
+                    {
+                        string msg = LanguageStrings.Get("Chat_Msg_FlagAssignedMessage", new Dictionary<string, string>() { { "playerName", player.FullDisplayName }, { "name", cname }, { "flag", flag } });
+                        if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                            args.Bot?.SendMessage(msg);
+                    }
                 }
             }
             catch (Exception ex)
@@ -160,8 +187,9 @@ namespace GeoChatter.Forms
 
                 if (player.IsBanned)
                 {
-                    if (Settings.Default.EnableTwitchChatMsgs)
-                        args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_BannedStatsRequest", new Dictionary<string, string>() { { "playerName", player.FullDisplayName } }));
+                    string banmsg = LanguageStrings.Get("Chat_Msg_BannedStatsRequest", new Dictionary<string, string>() { { "playerName", player.FullDisplayName } });
+                        if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                            args.Bot?.SendMessage(banmsg);
                     return;
                 }
 
@@ -172,8 +200,13 @@ namespace GeoChatter.Forms
                 if (target == null)
                 {
 
-                    if (Settings.Default.EnableTwitchChatMsgs)
-                        args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_NoRecordsFound", new Dictionary<string, string>() { { "playerName", args.Username }, { "targetName", args.Target } }));
+                    
+                    if (Settings.Default.SendFlagSelected)
+                    {
+                        string targetmsg = LanguageStrings.Get("Chat_Msg_NoRecordsFound", new Dictionary<string, string>() { { "playerName", player.PlayerName }, { "targetName", args.Target } });
+                        if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                            args.Bot?.SendMessage(targetmsg);
+                    }
                     return;
                 }
                 else if (string.IsNullOrWhiteSpace(target.Color))
@@ -181,13 +214,14 @@ namespace GeoChatter.Forms
                     if (args.IsSelfReference)
                     {
 
-                        if (Settings.Default.EnableTwitchChatMsgs)
-                            args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_NoColor", new Dictionary<string, string>() { { "playerName", args.Username } }));
+                            string noselfmsg = LanguageStrings.Get("Chat_Msg_NoColor", new Dictionary<string, string>() { { "playerName", player.PlayerName } });
+                            if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                                args.Bot?.SendMessage(noselfmsg);
                         return;
                     }
-
-                    if (Settings.Default.EnableTwitchChatMsgs)
-                        args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_NoTargetColor", new Dictionary<string, string>() { { "playerName", args.Username }, { "targetName", args.Target } }));
+                        string notargetmsg = LanguageStrings.Get("Chat_Msg_NoTargetColor", new Dictionary<string, string>() { { "playerName", player.PlayerName }, { "targetName", args.Target } });
+                        if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                            args.Bot?.SendMessage(notargetmsg);
                     return;
                 }
 
@@ -195,13 +229,17 @@ namespace GeoChatter.Forms
                 if (args.IsSelfReference)
                 {
 
-                    if (Settings.Default.EnableTwitchChatMsgs)
-                        args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_CurrentColor", new Dictionary<string, string>() { { "playerName", args.Username }, { "color", color } }));
+                        string colormsg = LanguageStrings.Get("Chat_Msg_CurrentColor", new Dictionary<string, string>() { { "playerName", player.PlayerName }, { "color", color } });
+                        if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                            args.Bot?.SendMessage(colormsg);
                     return;
                 }
 
-                if (Settings.Default.EnableTwitchChatMsgs)
-                    args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_CurrentTargetColor", new Dictionary<string, string>() { { "playerName", args.Username }, { "targetName", args.Target }, { "color", color } }));
+                
+                    string msg = LanguageStrings.Get("Chat_Msg_CurrentTargetColor", new Dictionary<string, string>() { { "playerName", player.PlayerName }, { "targetName", args.Target }, { "color", color } });
+                    if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                        args.Bot?.SendMessage(msg);
+                
             }
             catch (Exception ex)
             {
@@ -228,8 +266,9 @@ namespace GeoChatter.Forms
                 if (target == null)
                 {
 
-                    if (Settings.Default.EnableTwitchChatMsgs)
-                        args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_NoRecordsFound", new Dictionary<string, string>() { { "playerName", args.Username }, { "targetName", args.Target } }));
+                        string notargetmsg = LanguageStrings.Get("Chat_Msg_NoRecordsFound", new Dictionary<string, string>() { { "playerName", player.PlayerName }, { "targetName", args.Target } });
+                        if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                            args.Bot?.SendMessage(notargetmsg);
                     return;
                 }
                 else if (string.IsNullOrWhiteSpace(target.PlayerFlagName))
@@ -237,24 +276,28 @@ namespace GeoChatter.Forms
                     if (args.IsSelfReference)
                     {
 
-                        if (Settings.Default.EnableTwitchChatMsgs)
-                            args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_NoFlag", new Dictionary<string, string>() { { "playerName", args.Username } }));
+                            string msg2 = LanguageStrings.Get("Chat_Msg_NoFlag", new Dictionary<string, string>() { { "playerName", player.PlayerName } });
+                            if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                                args.Bot?.SendMessage(msg2);
                         return;
                     }
-                    if (Settings.Default.EnableTwitchChatMsgs)
-                        args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_NoTargetFlag", new Dictionary<string, string>() { { "playerName", args.Username }, { "targetName", args.Target } }));
+                        string msg3 = LanguageStrings.Get("Chat_Msg_NoTargetFlag", new Dictionary<string, string>() { { "playerName", player.PlayerName }, { "targetName", args.Target } });
+                        if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                            args.Bot?.SendMessage(msg3);
                     return;
                 }
 
                 if (args.IsSelfReference)
                 {
 
-                    if (Settings.Default.EnableTwitchChatMsgs)
-                        args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_CurrentFlag", new Dictionary<string, string>() { { "playerName", args.Username }, { "flagName", target.PlayerFlagName }, { "flagCode", target.PlayerFlag.ToUpperInvariant() } }));
+                        string msg2 = LanguageStrings.Get("Chat_Msg_CurrentFlag", new Dictionary<string, string>() { { "playerName", player.PlayerName }, { "flagName", target.PlayerFlagName }, { "flagCode", target.PlayerFlag.ToUpperInvariant() } });
+                        if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                            args.Bot?.SendMessage(msg2);
                     return;
                 }
-                if (Settings.Default.EnableTwitchChatMsgs)
-                    args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_CurrentFlagTarget", new Dictionary<string, string>() { { "playerName", args.Username }, { "targetName", args.Target }, { "flagName", target.PlayerFlagName }, { "flagCode", target.PlayerFlag.ToUpperInvariant() } }));
+                    string msg = LanguageStrings.Get("Chat_Msg_CurrentFlagTarget", new Dictionary<string, string>() { { "playerName", player.PlayerName }, { "targetName", args.Target }, { "flagName", target.PlayerFlagName }, { "flagCode", target.PlayerFlag.ToUpperInvariant() } });
+                    if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                        args.Bot?.SendMessage(msg);
             }
             catch (Exception ex)
             {
@@ -295,7 +338,7 @@ namespace GeoChatter.Forms
                     rand = BorderHelper.GetRandomPointCloseOrWithinAPolygon();
                 }
 
-                GuessReceivedEventArgs g = new(args.UserId, args.Username, args.Bot, args.Command)
+                GuessReceivedEventArgs g = new(args.UserId, args.Username, args.UserPlatform, args.Bot, args.Command)
                 {
                     Lat = rand.Latitude.ToStringDefault(),
                     Lng = rand.Longitude.ToStringDefault(),
@@ -303,7 +346,7 @@ namespace GeoChatter.Forms
                     WasRandom = true
                 };
 
-                CurrentBot?.FireGuessReceived(g);
+                args.Bot?.FireGuessReceived(g);
             }
             catch (Exception ex)
             {
@@ -323,8 +366,10 @@ namespace GeoChatter.Forms
                     return;
                 }
                 player.ResetStats();
-                if (Settings.Default.EnableTwitchChatMsgs)
-                    args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_StatsReset", new Dictionary<string, string>() { { "playerName", args.Username } }));
+                    
+                string msg = LanguageStrings.Get("Chat_Msg_StatsReset", new Dictionary<string, string>() { { "playerName", player.PlayerName } });
+                if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                    args.Bot?.SendMessage(msg);
             }
             catch (Exception ex)
             {
@@ -344,14 +389,14 @@ namespace GeoChatter.Forms
                     return;
                 }
 
-                if (Settings.Default.EnableTwitchChatMsgs)
-                {
+              
                     string message = LanguageStrings.Get("Chat_Msg_linkMessage");
 #if DEBUG
                     message = message.Replace("/map/", "/testing_map/", StringComparison.InvariantCulture);
 #endif
-                    args.Bot?.SendMessage(message);
-                }
+                    if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                        args.Bot?.SendMessage(message);
+              
             }
             catch (Exception ex)
             {
@@ -371,8 +416,10 @@ namespace GeoChatter.Forms
                     return;
                 }
 
-                if (Settings.Default.EnableTwitchChatMsgs)
-                    args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_MapExplanationMessage", new Dictionary<string, string>() { { "playerName", args.Username } }));
+                string msg = LanguageStrings.Get("Chat_Msg_MapExplanationMessage", new Dictionary<string, string>() { { "playerName", player.PlayerName } });
+                if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                    args.Bot?.SendMessage(msg);
+              
             }
             catch (Exception ex)
             {
@@ -394,8 +441,10 @@ namespace GeoChatter.Forms
 
                 if (player.IsBanned)
                 {
-                    if (Settings.Default.EnableTwitchChatMsgs)
-                        args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_BannedStatsRequest", new Dictionary<string, string>() { { "playerName", player.FullDisplayName } }));
+                    string banmsg = LanguageStrings.Get("Chat_Msg_BannedStatsRequest", new Dictionary<string, string>() { { "playerName", player.FullDisplayName } });
+                    if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                        args.Bot?.SendMessage(banmsg);
+                   
                     return;
                 }
                 else
@@ -411,15 +460,18 @@ namespace GeoChatter.Forms
 
                     if (target.IsBanned)
                     {
-                        if (Settings.Default.EnableTwitchChatMsgs)
-                            args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_BannedStatsRequest", new Dictionary<string, string>() { { "playerName", target.FullDisplayName } }));
+                        
+                        string targetbanmsg = LanguageStrings.Get("Chat_Msg_BannedStatsRequest", new Dictionary<string, string>() { { "playerName", target.FullDisplayName } });
+                        if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                            args.Bot?.SendMessage(targetbanmsg);
+                       
                         return;
                     }
-                    if (Settings.Default.EnableTwitchChatMsgs)
-                    {
                         string msg = target.GetStatsMessage((Units)Settings.Default.OverlayUnit);
-                        args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_Stats", new Dictionary<string, string>() { { "targetName", target.FullDisplayName }, { "msg", msg } }));
-                    }
+                    
+                        string targetmsg = LanguageStrings.Get("Chat_Msg_Stats", new Dictionary<string, string>() { { "targetName", target.FullDisplayName }, { "msg", msg } });
+                        if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                            args.Bot?.SendMessage(targetmsg);
                 }
             }
             catch (Exception ex)
@@ -442,18 +494,17 @@ namespace GeoChatter.Forms
 
                 if (player.IsBanned)
                 {
-                    if (Settings.Default.EnableTwitchChatMsgs)
-                        args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_BannedStatsRequest", new Dictionary<string, string>() { { "playerName", player.FullDisplayName } }));
+                    string targetmsg = LanguageStrings.Get("Chat_Msg_BannedStatsRequest", new Dictionary<string, string>() { { "playerName", player.FullDisplayName } });
+                    if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                        args.Bot?.SendMessage(targetmsg);
                     return;
                 }
                 else
                 {
-
-                    if (Settings.Default.EnableTwitchChatMsgs)
-                    {
-                        string msg = player.GetStatsMessage((Units)Settings.Default.OverlayUnit);
-                        args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_Stats", new Dictionary<string, string>() { { "targetName", args.Username }, { "msg", msg } }));
-                    }
+                    string msg = player.GetStatsMessage((Units)Settings.Default.OverlayUnit);
+                    string targetmsg = LanguageStrings.Get("Chat_Msg_Stats", new Dictionary<string, string>() { { "targetName", player.PlayerName }, { "msg", msg } });
+                    if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                        args.Bot?.SendMessage(targetmsg);
                 }
             }
             catch (Exception ex)
@@ -491,8 +542,9 @@ namespace GeoChatter.Forms
                 msg = msg.TrimEnd();
                 msg = msg.TrimEnd('|');
                 msg = msg.TrimEnd();
-                if (Settings.Default.EnableTwitchChatMsgs)
+                if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
                     args.Bot?.SendMessage(msg);
+             
                 logger.Debug("BestMessage sent");
 
             }
@@ -522,9 +574,10 @@ namespace GeoChatter.Forms
                 return;
             }
 
-            if (Settings.Default.EnableTwitchChatMsgs)
-
-                args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_AvailableFlags", new Dictionary<string, string>() { { "flagUrl", Settings.Default.FlagsPageURL } }));
+            string msg = LanguageStrings.Get("Chat_Msg_AvailableFlags", new Dictionary<string, string>() { { "flagUrl", Settings.Default.FlagsPageURL } });
+            if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                args.Bot?.SendMessage(msg);
+            
 
         }
 
@@ -539,8 +592,10 @@ namespace GeoChatter.Forms
                 return;
             }
             IEnumerable<string> packs = FlagPackHelper.FlagPacks.Select(p => p.Name);
-            if (Settings.Default.EnableTwitchChatMsgs)
-                args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_FlagPacks", new Dictionary<string, string>() { { "packs", string.Join(", ", packs) } }));
+            
+            string msg = LanguageStrings.Get("Chat_Msg_FlagPacks", new Dictionary<string, string>() { { "packs", string.Join(", ", packs) } });
+            if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                args.Bot?.SendMessage(msg);
 
         }
 
@@ -553,8 +608,9 @@ namespace GeoChatter.Forms
             {
                 return;
             }
-            if (Settings.Default.EnableTwitchChatMsgs)
-                args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_AvailableFlagPacks", new Dictionary<string, string>() { { "flagUrl", Settings.Default.FlagpacksPageURL } }));
+            string msg = LanguageStrings.Get("Chat_Msg_AvailableFlagPacks", new Dictionary<string, string>() { { "flagUrl", Settings.Default.FlagpacksPageURL } });
+            if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                args.Bot?.SendMessage(msg);
 
         }
 
@@ -566,8 +622,9 @@ namespace GeoChatter.Forms
             {
                 return;
             }
-            if (Settings.Default.EnableTwitchChatMsgs)
-                args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_Commands", new Dictionary<string, string>() { { "commandUrl", Settings.Default.CommandsPageURL } }));
+            string msg = LanguageStrings.Get("Chat_Msg_Commands", new Dictionary<string, string>() { { "commandUrl", Settings.Default.CommandsPageURL } });
+            if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                args.Bot?.SendMessage(msg);
 
         }
 
@@ -579,9 +636,10 @@ namespace GeoChatter.Forms
             {
                 return;
             }
-            if (Settings.Default.EnableTwitchChatMsgs)
-                args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_CurrentVersion", new Dictionary<string, string>() { { "version", Version } }));
 
+            string msg = LanguageStrings.Get("Chat_Msg_CurrentVersion", new Dictionary<string, string>() { { "version", Version } });
+            if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                args.Bot?.SendMessage(msg);
         }
 
         [DiscoverableEvent]
@@ -592,9 +650,10 @@ namespace GeoChatter.Forms
             {
                 return;
             }
-            if (Settings.Default.EnableTwitchChatMsgs)
-                args.Bot?.SendMessage(LanguageStrings.Get("Chat_Msg_Colors", new Dictionary<string, string>() { }));
-
+            
+            string msg = LanguageStrings.Get("Chat_Msg_Colors", new Dictionary<string, string>() { });
+            if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                args.Bot?.SendMessage(msg);
         }
         /// <summary>
         /// Handles a viewers guess
