@@ -202,11 +202,12 @@ namespace GeoChatter.Forms
                 Settings.Default.SendChatMsgsViaStreamerBot = checkBoxSendChatMsgsViaStreamerBot.Checked;
                 Settings.Default.SendChatActionId = ((StreamerbotAction)comboBoxStreamerBotChatAction.SelectedItem)?.id;
                 Settings.Default.SendChatActionName = ((StreamerbotAction)comboBoxStreamerBotChatAction.SelectedItem)?.name;
+                streamerbotClient.SetChatAction(Settings.Default.SendChatActionId, Settings.Default.SendChatActionName);
 
                 Settings.Default.RoundEndAction = chkBotRoundEndExecute.Checked;
                 Settings.Default.RoundEndActionID = ((StreamerbotAction)comboBoxRoundEndAction.SelectedItem)?.id;
                 Settings.Default.RoundEndActionName = ((StreamerbotAction)comboBoxRoundEndAction.SelectedItem)?.name;
-
+                
                 Settings.Default.GameEndAction = chkBotGameEndExecute.Checked;
                 Settings.Default.GameEndActionID = ((StreamerbotAction)comboBoxGameEndAction.SelectedItem)?.id;
                 Settings.Default.GameEndActionName = ((StreamerbotAction)comboBoxGameEndAction.SelectedItem)?.name;

@@ -501,7 +501,8 @@ namespace GeoChatter.Forms
 
                 if (ClientDbCache.RunningGame.CurrentRound > -1)
                 {
-                    guessesOpen = false;
+                    if(guessesOpen)
+                        guessesOpen = false;
                     SetRefreshMenuItemsEnabledState(false);
                     SendEndRoundToJS(finishedRound);
                     SendEndRoundToMaps(finishedRound);
@@ -515,7 +516,8 @@ namespace GeoChatter.Forms
                 }
                 else if (ClientDbCache.RunningGame.CurrentRound > -2)
                 {
-                    guessesOpen = false;
+                    if (guessesOpen)
+                        guessesOpen = false;
                     SendEndGameToJS(ClientDbCache.RunningGame);
                     SendEndRoundToMaps(finishedRound);
                     SetRefreshMenuItemsEnabledState(false);
@@ -523,7 +525,8 @@ namespace GeoChatter.Forms
                 }
                 else
                 {
-                    guessesOpen = false;
+                    if (guessesOpen)
+                        guessesOpen = false;
                     SendEndRoundMessage(round);
 
                     FinalizeGame();

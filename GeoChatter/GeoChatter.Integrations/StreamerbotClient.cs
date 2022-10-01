@@ -20,6 +20,7 @@ using GuessServerApiInterfaces;
 using Microsoft.AspNetCore.SignalR;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using GeoChatter.Model.Enums;
+using GeoChatter.Core.Helpers;
 
 namespace GeoChatter.Integrations
 {
@@ -31,6 +32,7 @@ namespace GeoChatter.Integrations
         /// </summary>
         public IMainForm Parent { get { return parent; }  }
         private IMainForm parent;
+        private bool sendJoin;
         /// <summary>
         /// Returns the <see cref="TwitchCommands.Commands"/>
         /// </summary>
@@ -86,9 +88,10 @@ namespace GeoChatter.Integrations
         /// <param name="ip"></param>
         /// <param name="port"></param>
         /// <returns></returns>
-        public async Task<bool> Connect(string ip, string port, string sendMessageActionGuid, string sendMessageActionName, bool sendChatMessages, IMainForm mainForm)
+        public async Task<bool> Connect(string ip, string port, string sendMessageActionGuid, string sendMessageActionName, bool sendChatMessages, IMainForm mainForm, bool sendJoinMessage = true)
         {
             parent = mainForm;
+            sendJoin = sendJoinMessage;
             if (ws == null)
             {
                 if (string.IsNullOrEmpty(ip) && string.IsNullOrEmpty(port))
@@ -153,7 +156,7 @@ namespace GeoChatter.Integrations
                             logger.Debug("Custom Event received: " + @event.Data.Data);
                             if(@event.Data.Data == "TimerEnd")
                             {
-                                parent.ToggleGuesses(false);
+                                parent.ToggleGuesses();
                             }
                         }
                     }
@@ -174,6 +177,11 @@ namespace GeoChatter.Integrations
                 //Thread.Sleep(5000);
             });
             SubscribeToEvents();
+            if (success && sendJoin)
+            {
+                SendMessage(LanguageStrings.Get("Chat_Msg_joinMessage"));
+            }
+
             return success;
         }
 
@@ -362,6 +370,13 @@ namespace GeoChatter.Integrations
 
         public bool GetUserInfo(object eventargs, [NotNullWhen(true)] out string userid, [NotNullWhen(true)] out string username, out int userlevel, out Platforms userPlatform)
         {
+            if (eventargs == null)
+            {
+                userid = username = string.Empty;
+                userlevel = 0;
+                userPlatform = Platforms.Unknown;
+                return false;
+            }
             username = ((StreamerBotCommandMessage)eventargs).data.user.name;
             userid = ((StreamerBotCommandMessage)eventargs).data.user.id.ToStringDefault();
             userlevel = ((StreamerBotCommandMessage)eventargs).data.user.role;
@@ -385,6 +400,19 @@ namespace GeoChatter.Integrations
             if(sendChatMessages && !string.IsNullOrEmpty(sendMessageActionGuid) && !string.IsNullOrEmpty(sendMessageActionName))
                 ExecuteAction(sendMessageActionGuid, sendMessageActionName, new Dictionary<string, string>() { { "message", message } });
             
+        }
+
+        public void SetChatAction(string actionGuid, string actionName)
+        {
+            if (sendMessageActionGuid != actionGuid && sendMessageActionName != actionName)
+            {
+                sendMessageActionGuid = actionGuid;
+                sendMessageActionName = actionName;
+                if (sendJoin)
+                {
+                    SendMessage(LanguageStrings.Get("Chat_Msg_joinMessage"));
+                }
+            }
         }
 
         public void TriggerCommands(object eventArgs)

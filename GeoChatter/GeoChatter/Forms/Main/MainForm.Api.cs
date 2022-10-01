@@ -78,7 +78,7 @@ namespace GeoChatter.Forms
                 huburl = Settings.Default.AlternateGuessApiUrl;
 
 #if DEBUG
-            //huburl = Settings.Default.AlternateGuessApiUrl;
+            huburl = Settings.Default.AlternateGuessApiUrl;
            //huburl = "https://localhost:44350/geoChatterHub";
 #endif
 

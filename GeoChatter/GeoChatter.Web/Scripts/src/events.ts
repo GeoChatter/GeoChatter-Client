@@ -166,6 +166,12 @@ export namespace EventHandler
         await fetch("https://www.geoguessr.com/api/v3/accounts/signout", { method: "post", headers: { cookie: document.cookie } })
         Util.GoToPage(red)
     }
+    export async function ToggleGuessSlider(_el: Element, _e: EventArgs)
+    {
+
+        console.log("Toggling guess slider, current state: " + $('#guessToggleSlider').prop('checked'));
+        $('#guessToggleSlider').prop('checked', !$('#guessToggleSlider').prop('checked'));
+    }
 
     export function LoadingScreenRequest(_el: Element, e: EventArgs)
     {
@@ -875,6 +881,9 @@ export namespace CustomEvents
             // - GUESS BUTTON CLICK
             [Enum.EventName.SignOutEvent]: [
                 { Handler: EventHandler.SignOutFromBrowser, Condition: null, RetryInterval: 0 }
+            ],
+            [Enum.EventName.ToggleGuessSliderEvent]: [
+                { Handler: EventHandler.ToggleGuessSlider, Condition: null, RetryInterval: 0 }
             ],
             /**
                 * EVENTS FIRED FROM BROWSER
