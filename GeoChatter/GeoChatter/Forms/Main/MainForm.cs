@@ -58,7 +58,11 @@ namespace GeoChatter.Forms
         private static readonly OBSClient obsClient = new();
         public GuessApiClient guessApiClient;
 
-        internal bool guessesOpen { get; set; } = true;
+        internal bool guessesOpen 
+        { 
+            get; 
+            set; 
+        } = true;
 
         private const int WM_SYSCOMMAND = 0x112;
         private const int MF_STRING = 0x0;
@@ -727,19 +731,30 @@ namespace GeoChatter.Forms
         /// Toggle guesses opened/closed
         /// </summary>
         /// <param name="open"></param>
-        public void ToggleGuesses(bool open)
+        public void ToggleGuesses() 
+        {
+            ToggleGuesses(!guessesOpen);
+            ToggleGuessSlider();
+        }
+
+        /// <summary>
+        /// Toggle guesses opened/closed
+        /// </summary>
+        /// <param name="open"></param>
+        /// <param name="sendMessage"></param>
+        public void ToggleGuesses(bool open, bool sendMessage = true)
         {
             if (!open)
                 ProcessTemporaryGuesses();
             guessesOpen = open;
             if (open)
             {
-                if(Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                if(sendMessage && (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot))
                     CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_GuessesOpenedMessage"));
             }
             else
             {
-                if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                if (sendMessage && (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot))
                     CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_GuessesClosedMessage"));
                 
             }
@@ -832,18 +847,14 @@ namespace GeoChatter.Forms
             }
         }
 
-        private void ConnectToStreamerbot()
+        private async void ConnectToStreamerbot()
         {
             if (Settings.Default.StreamerBotConnectAtStartup && !string.IsNullOrEmpty(Settings.Default.StreamerBotIP) && !string.IsNullOrEmpty(Settings.Default.StreamerBotPort))
             {
                 try
                 {
                     logger.Debug("Connecting to Streamer.Bot");
-                    if (!streamerbotClient.Connect(Settings.Default.StreamerBotIP, Settings.Default.StreamerBotPort, Settings.Default.SendChatActionId, Settings.Default.SendChatActionName, Settings.Default.SendChatMsgsViaStreamerBot, this).Result)
-                    {
-                        MessageBox.Show("Could not connect to Streamer.Bot\r\nPlease make sure that IP and port are correct,\rthat Streamer.Bot and its websocket server are running!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-                        return;
-                    }
+                    await streamerbotClient.Connect(Settings.Default.StreamerBotIP, Settings.Default.StreamerBotPort, Settings.Default.SendChatActionId, Settings.Default.SendChatActionName, Settings.Default.SendChatMsgsViaStreamerBot, this);
                     AttributeDiscovery.AddEventHandlers(fromMethodSource: this, toTargetInstance: streamerbotClient);
                     streamerbotClient.GetActions();
                     if (Settings.Default.SendChatMsgsViaStreamerBot)

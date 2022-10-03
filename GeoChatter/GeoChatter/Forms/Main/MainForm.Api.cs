@@ -78,7 +78,7 @@ namespace GeoChatter.Forms
                 huburl = Settings.Default.AlternateGuessApiUrl;
 
 #if DEBUG
-            //huburl = Settings.Default.AlternateGuessApiUrl;
+            huburl = Settings.Default.AlternateGuessApiUrl;
            //huburl = "https://localhost:44350/geoChatterHub";
 #endif
 
@@ -163,7 +163,7 @@ namespace GeoChatter.Forms
         {
             logger.Error("Connection to GuessServer re-established: "+e?.ToString());
             LoadingScreen(false);
-            //MessageBox.Show("Connection to guess server re-established!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+          //  MessageBox.Show("Connection to guess server re-established!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void GuessApiClient_DisConnected(object sender, LogEventArgs e)
