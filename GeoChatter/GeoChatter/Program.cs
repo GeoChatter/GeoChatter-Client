@@ -17,6 +17,7 @@ using GeoChatter.Core.Common.Extensions;
 using System.Diagnostics;
 using static System.Net.WebRequestMethods;
 using GeoChatter.Model.Enums;
+using GeoChatter.Core.Helpers;
 
 namespace GeoChatter
 {
@@ -42,7 +43,7 @@ namespace GeoChatter
                 XmlConfigurator.ConfigureAndWatch(new FileInfo(log4netxml));
                 
                 logger.Info("Starting the app with arguments: " + string.Join(", ", args));
-
+                logger.Info("Running GC as admin: " + WindowsHelper.IsProcessElevated);
                 if (args.Length != 0)
                 {
                     //string id = args.FirstOrDefault(a => a.StartsWithDefault("--host-process-id="));
@@ -60,6 +61,7 @@ namespace GeoChatter
                     AppDomain.CurrentDomain.FirstChanceException +=
                     (object source, FirstChanceExceptionEventArgs e) =>
                     {
+                        
                         string msg = $"FirstChanceException({AppDomain.CurrentDomain.FriendlyName}): {e.Exception.Summarize(1)}";
                         logger.Error(msg);
 #if DEBUG
