@@ -847,18 +847,14 @@ namespace GeoChatter.Forms
             }
         }
 
-        private void ConnectToStreamerbot()
+        private async void ConnectToStreamerbot()
         {
             if (Settings.Default.StreamerBotConnectAtStartup && !string.IsNullOrEmpty(Settings.Default.StreamerBotIP) && !string.IsNullOrEmpty(Settings.Default.StreamerBotPort))
             {
                 try
                 {
                     logger.Debug("Connecting to Streamer.Bot");
-                    if (!streamerbotClient.Connect(Settings.Default.StreamerBotIP, Settings.Default.StreamerBotPort, Settings.Default.SendChatActionId, Settings.Default.SendChatActionName, Settings.Default.SendChatMsgsViaStreamerBot, this).Result)
-                    {
-                        MessageBox.Show("Could not connect to Streamer.Bot\r\nPlease make sure that IP and port are correct,\rthat Streamer.Bot and its websocket server are running!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-                        return;
-                    }
+                    await streamerbotClient.Connect(Settings.Default.StreamerBotIP, Settings.Default.StreamerBotPort, Settings.Default.SendChatActionId, Settings.Default.SendChatActionName, Settings.Default.SendChatMsgsViaStreamerBot, this);
                     AttributeDiscovery.AddEventHandlers(fromMethodSource: this, toTargetInstance: streamerbotClient);
                     streamerbotClient.GetActions();
                     if (Settings.Default.SendChatMsgsViaStreamerBot)

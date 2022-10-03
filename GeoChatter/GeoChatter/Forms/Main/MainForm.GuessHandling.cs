@@ -257,7 +257,7 @@ namespace GeoChatter.Forms
 
                 UpdatePlayerAndGuessInCache(player, existant);
 
-                if (Settings.Default.SendConfirmGuessMsg && Settings.Default.EnableTwitchChatMsgs)
+                if (Settings.Default.SendConfirmGuessMsg && (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot))
                 {
                     CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_guessReveived", new Dictionary<string, string>() { { "playerName", player.FullDisplayName } }));
                 }
