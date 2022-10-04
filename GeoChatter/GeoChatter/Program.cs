@@ -18,6 +18,7 @@ using System.Diagnostics;
 using static System.Net.WebRequestMethods;
 using GeoChatter.Model.Enums;
 using GeoChatter.Core.Helpers;
+using System.Linq;
 
 namespace GeoChatter
 {
@@ -117,7 +118,7 @@ namespace GeoChatter
 #pragma warning disable CA1416 // Validate platform compatibility
                 logger.Info("Initializing auto-updater");
                 AutoUpdaterInit();
-
+                CleanUpUploadedLogs();
                 logger.Info("Creating main form instance");
                 using MainForm form = new(Version);
 
@@ -145,6 +146,25 @@ namespace GeoChatter
                     Cef.Shutdown();
 
                 }
+            }
+        }
+
+        private static void CleanUpUploadedLogs()
+        {
+            string[] files = Directory.GetFiles(AssembyHelper.AssemblyDirectory, "GeoChatter*.zip", SearchOption.TopDirectoryOnly);
+            logger.Debug($"Cleaning up uploaded logs. {files.Length} to check.");
+            foreach (string file in files)
+            {
+                
+                FileInfo fileInfo = new FileInfo(file);
+                logger.Debug($"Checking {fileInfo.Name}"); 
+                logger.Debug($"Creation date: {fileInfo.CreationTime}");
+                if (fileInfo.CreationTime < DateTime.Now.AddDays(-7))
+                {
+                    logger.Debug($"Deleting {fileInfo.Name}");
+                    System.IO.File.Delete(file);
+                }else
+                    logger.Debug($"{fileInfo.Name} is not 7 days old");
             }
         }
 
