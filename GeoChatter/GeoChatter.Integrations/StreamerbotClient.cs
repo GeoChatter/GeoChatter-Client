@@ -20,6 +20,12 @@ using GuessServerApiInterfaces;
 using Microsoft.AspNetCore.SignalR;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using GeoChatter.Model.Enums;
+using GeoChatter.Core.Helpers;
+using System.Reactive.Linq;
+using System.Reactive.Concurrency;
+using System.Windows.Forms;
+using MessageBox = System.Windows.Forms.MessageBox;
+using MessageBoxOptions = System.Windows.Forms.MessageBoxOptions;
 
 namespace GeoChatter.Integrations
 {
@@ -31,6 +37,7 @@ namespace GeoChatter.Integrations
         /// </summary>
         public IMainForm Parent { get { return parent; }  }
         private IMainForm parent;
+        private bool sendJoin;
         /// <summary>
         /// Returns the <see cref="TwitchCommands.Commands"/>
         /// </summary>
@@ -78,7 +85,7 @@ namespace GeoChatter.Integrations
         private string sendMessageActionGuid;
         private string sendMessageActionName;
         private bool sendChatMessages;
-
+        private bool isInitialStart = false;
 
         /// <summary>
         /// Connect to <paramref name="ip"/>:<paramref name="port"/>
@@ -86,9 +93,11 @@ namespace GeoChatter.Integrations
         /// <param name="ip"></param>
         /// <param name="port"></param>
         /// <returns></returns>
-        public async Task<bool> Connect(string ip, string port, string sendMessageActionGuid, string sendMessageActionName, bool sendChatMessages, IMainForm mainForm)
+        public async Task<bool> Connect(string ip, string port, string sendMessageActionGuid, string sendMessageActionName, bool sendChatMessages, IMainForm mainForm, bool sendJoinMessage = true)
         {
+            isInitialStart = true;
             parent = mainForm;
+            sendJoin = sendJoinMessage;
             if (ws == null)
             {
                 if (string.IsNullOrEmpty(ip) && string.IsNullOrEmpty(port))
@@ -97,84 +106,129 @@ namespace GeoChatter.Integrations
                 }
 
                 adress = new Uri($"ws://{ip}:{port}/");
-                
+
                 ws = new WebsocketClient(adress);
             }
-            bool success = true;
+            bool success = false;
             this.sendMessageActionGuid = sendMessageActionGuid;
             this.sendMessageActionName = sendMessageActionName;
             this.sendChatMessages = sendChatMessages;
             AttributeDiscovery.AddEventHandlers(fromMethodSource: this, toTargetInstance: this);
+
+            SubscribeToWS();
+            ws.IsReconnectionEnabled = true;
+            ws.ReconnectTimeout = null;
+            ws.ErrorReconnectTimeout = new TimeSpan(0, 0, 10);
+            
             if (!ws.IsRunning)
             {
-                ws.Start();
-
-                //ExitEvent.WaitOne();
-            }
-            
-            success = ws.IsStarted;
-            ws.ReconnectionHappened.Subscribe(s => {
-                logger.Debug("Streamerbot disconnected, reconnected");
-            });
-            ws.MessageReceived.Subscribe(msg =>
-            {
-
-                if (msg.MessageType == System.Net.WebSockets.WebSocketMessageType.Text)
+                try
                 {
-                    if (!msg.Text.ToLowerInvariant().Contains("\"id\":\"0\",\"events\":", StringComparison.InvariantCulture))
-                    {
-                        if (msg.Text.ToLowerInvariant().Contains("\"source\":\"command\"", StringComparison.InvariantCulture))
-                        {
-                            StreamerBotCommandMessage command = JsonConvert.DeserializeObject<StreamerBotCommandMessage>(msg.Text);
-
-                            TriggerCommands(command);
-                        }
-                        else if (msg.Text.ToLowerInvariant().Contains("\"source\":\"raw\"", StringComparison.InvariantCulture))
-                        {
-                            StreamerBotActionMessage action = JsonConvert.DeserializeObject<StreamerBotActionMessage>(msg.Text);
-                            if (action.@event.type.ToLowerInvariant() == "subaction")
-                                logger.Debug("Subaction execution resceived: " + action.data.name);
-                            else
-                                logger.Debug("Action execution resceived: " + action.data.name);
-                        }
-
-                        else if (msg.Text.ToLowerInvariant().Contains("count", StringComparison.InvariantCulture) && msg.Text.ToLowerInvariant().Contains("actions", StringComparison.InvariantCulture))
-                        {
-
-                            // if(msg.Text.Contains())
-                            StreamerbotActionList list = JsonConvert.DeserializeObject<StreamerbotActionList>(msg.Text);
-                            ActionsReceivedEventArgs args = new();
-                            args.Actions.AddRange(list.actions);
-                            OnActionsReceived(args);
-                        }
-                        else if(msg.Text.ToLowerInvariant().Contains("custom", StringComparison.InvariantCulture))
-                        {
-                            StreamerBotCustomMessage @event = JsonConvert.DeserializeObject<StreamerBotCustomMessage>(msg.Text);
-                            logger.Debug("Custom Event received: " + @event.Data.Data);
-                            if(@event.Data.Data == "TimerEnd")
-                            {
-                                parent.ToggleGuesses(false);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        logger.Debug("Heartbeat successful");
-                    }
-                    return;
+                    ws.StartOrFail();
+                    ws.Send("ping");
+                    Thread.Sleep(1000);
 
                 }
-            });
+                catch (Exception e)
+                {
+                    string t = e.Message;
+                }
+                //ExitEvent.WaitOne();
+            }
             InitiateHeartBeat();
-            ws.DisconnectionHappened.Subscribe(async e => {
+
+            SubscribeToEvents();
+            isInitialStart = false;
+            return ws.IsRunning;
+
+        }
+        bool reconnectedAlready = false;
+        private void SubscribeToWS()
+        {
+            //success = ws.IsStarted;
+            ws.ReconnectionHappened.Subscribe(s =>
+            {
+                if (reconnectedAlready == false)
+                {
+                    if ((s.Type == ReconnectionType.Error))
+                    {
+                        logger.Debug("Streamerbot disconnected, reconnected");
+                        SubscribeToEvents();
+                        reconnectedAlready = true;
+                        MessageBox.Show("Reconnected to Streamer.Bot");
+                    }
+                    if (sendJoin)
+                    {
+                        SendMessage(LanguageStrings.Get("Chat_Msg_joinMessage"));
+                    }
+                }else
+                {
+                    reconnectedAlready = !reconnectedAlready;
+                }
+            });
+            ws.MessageReceived.Where(msg => msg.MessageType == System.Net.WebSockets.WebSocketMessageType.Text && !msg.Text.ToLowerInvariant().Contains("\"id\":\"0\",\"events\":", StringComparison.InvariantCulture)
+                && msg.Text.ToLowerInvariant().Contains("\"source\":\"command\"", StringComparison.InvariantCulture)).Subscribe(msg =>
+                {
+                    StreamerBotCommandMessage command = JsonConvert.DeserializeObject<StreamerBotCommandMessage>(msg.Text);
+
+                    TriggerCommands(command);
+                });
+            ws.MessageReceived.Where(msg => msg.MessageType == System.Net.WebSockets.WebSocketMessageType.Text && !msg.Text.ToLowerInvariant().Contains("\"id\":\"0\",\"events\":", StringComparison.InvariantCulture)
+                && msg.Text.ToLowerInvariant().Contains("\"source\":\"raw\"", StringComparison.InvariantCulture)).Subscribe(msg =>
+                {
+                    StreamerBotActionMessage action = JsonConvert.DeserializeObject<StreamerBotActionMessage>(msg.Text);
+                    if (action.@event.type.ToLowerInvariant() == "subaction")
+                        logger.Debug("Subaction execution resceived: " + action.data.name);
+                    else
+                        logger.Debug("Action execution resceived: " + action.data.name);
+                });
+            ws.MessageReceived.Where(msg => msg.MessageType == System.Net.WebSockets.WebSocketMessageType.Text && !msg.Text.ToLowerInvariant().Contains("\"id\":\"0\",\"events\":", StringComparison.InvariantCulture)
+                && msg.Text.ToLowerInvariant().Contains("count", StringComparison.InvariantCulture) && msg.Text.ToLowerInvariant().Contains("actions", StringComparison.InvariantCulture)).Subscribe(msg =>
+                {
+                    StreamerbotActionList list = JsonConvert.DeserializeObject<StreamerbotActionList>(msg.Text);
+                    ActionsReceivedEventArgs args = new();
+                    args.Actions.AddRange(list.actions);
+                    OnActionsReceived(args);
+                });
+            ws.MessageReceived.Where(msg => msg.MessageType == System.Net.WebSockets.WebSocketMessageType.Text && !msg.Text.ToLowerInvariant().Contains("\"id\":\"0\",\"events\":", StringComparison.InvariantCulture)
+                && msg.Text.ToLowerInvariant().Contains("custom", StringComparison.InvariantCulture)).Subscribe(msg =>
+                {
+                    StreamerBotCustomMessage @event = JsonConvert.DeserializeObject<StreamerBotCustomMessage>(msg.Text);
+                    logger.Debug("Custom Event received: " + @event.Data.Data);
+                    if (@event.Data.Data == "TimerEnd")
+                    {
+                        parent.ToggleGuesses();
+                    }
+                });
+            ws.MessageReceived.Where(msg => msg.MessageType == System.Net.WebSockets.WebSocketMessageType.Text && msg.Text.ToLowerInvariant().Contains("\"id\":\"0\",\"events\":", StringComparison.InvariantCulture))
+                .ObserveOn(TaskPoolScheduler.Default)
+                .Subscribe(msg =>
+                {
+                    logger.Debug("Heartbeat successful");
+                    
+                });
+            ws.DisconnectionHappened.Subscribe(async e =>
+            {
                 logger.Debug("Streamerbot disconnected, reconnecting....");
+
+                if ((e.Type == DisconnectionType.ByServer && e.CloseStatus == WebSocketCloseStatus.NormalClosure))
+                {
+                    MessageBox.Show("Connection closed by Streamer.Bot.\r\nTrying to reconnect...", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                }
+                if (e.Type == DisconnectionType.Lost && e.CloseStatus != WebSocketCloseStatus.NormalClosure)
+                {
+                    MessageBox.Show("Connection to Streamer.Bot lost.\r\nTrying to reconnect...", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                }
+                if (e.Type == DisconnectionType.Error && e.Exception.Message == "Unable to connect to the remote server")
+                {
+                    MessageBox.Show("Could not connect to Streamer.Bot\r\nPlease make sure that IP and port are correct,\rthat Streamer.Bot and its websocket server are running!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                }
                 //if(ws.IsRunning || ws.IsStarted)
                 //ws.Stop(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, "");
                 //ws.Reconnect();
                 //Thread.Sleep(5000);
             });
-            SubscribeToEvents();
-            return success;
+            
         }
 
         /// <summary>
@@ -195,10 +249,10 @@ namespace GeoChatter.Integrations
         {
             timer = new System.Threading.Timer(async (state) =>
             {
-                if (ws != null && ws.IsRunning)
+                if (ws != null && ws.IsStarted)
                     ws.Send("{\"request\":\"GetEvents\",\"id\":\"0\"}");
 
-            }, null, 15000, 30000);
+            }, null, 1000, 10000);
             //{ "request": "GetEvents", "id": "<message id>"}
             
         }
@@ -362,6 +416,13 @@ namespace GeoChatter.Integrations
 
         public bool GetUserInfo(object eventargs, [NotNullWhen(true)] out string userid, [NotNullWhen(true)] out string username, out int userlevel, out Platforms userPlatform)
         {
+            if (eventargs == null)
+            {
+                userid = username = string.Empty;
+                userlevel = 0;
+                userPlatform = Platforms.Unknown;
+                return false;
+            }
             username = ((StreamerBotCommandMessage)eventargs).data.user.name;
             userid = ((StreamerBotCommandMessage)eventargs).data.user.id.ToStringDefault();
             userlevel = ((StreamerBotCommandMessage)eventargs).data.user.role;
@@ -385,6 +446,19 @@ namespace GeoChatter.Integrations
             if(sendChatMessages && !string.IsNullOrEmpty(sendMessageActionGuid) && !string.IsNullOrEmpty(sendMessageActionName))
                 ExecuteAction(sendMessageActionGuid, sendMessageActionName, new Dictionary<string, string>() { { "message", message } });
             
+        }
+
+        public void SetChatAction(string actionGuid, string actionName)
+        {
+            if (sendMessageActionGuid != actionGuid && sendMessageActionName != actionName)
+            {
+                sendMessageActionGuid = actionGuid;
+                sendMessageActionName = actionName;
+                if (sendJoin)
+                {
+                    SendMessage(LanguageStrings.Get("Chat_Msg_joinMessage"));
+                }
+            }
         }
 
         public void TriggerCommands(object eventArgs)

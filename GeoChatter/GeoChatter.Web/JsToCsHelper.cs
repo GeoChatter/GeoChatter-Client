@@ -557,6 +557,10 @@ namespace GeoChatter.Web
             /// Sign out event
             /// </summary>
             SignOut,
+            /// <summary>
+            /// Sign out event
+            /// </summary>
+            ToggleGuessSlider,
         }
 
         /// <summary>
@@ -616,6 +620,10 @@ namespace GeoChatter.Web
         public static string DisableLoadingScreen()
         {
             return CreateDispatchScript(nameof(JSCustomEvent.LoadingScreen));
+        }
+        public static string ToggleGuessSlider()
+        {
+            return CreateDispatchScript(nameof(JSCustomEvent.ToggleGuessSlider));
         }
 
         /// <summary>

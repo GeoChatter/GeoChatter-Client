@@ -139,7 +139,9 @@
         /** Loading screen */
         LoadingScreenEvent = "LoadingScreenEvent",
         /** Sign out from GeoGuessr */
-        SignOutEvent = "SignOutEvent"
+        SignOutEvent = "SignOutEvent",
+        /*ToggleGuessSliderEvent*/
+        ToggleGuessSliderEvent = "ToggleGuessSliderEvent"
     }
 
     /** Marker and polyline set names */

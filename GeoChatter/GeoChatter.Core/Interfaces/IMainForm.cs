@@ -24,6 +24,7 @@ namespace GeoChatter.Core.Interfaces
         /// <param name="reuse"></param>
         void SendRandomGuess(int amount = 30, bool reuse = false);
 #endif
+        void ToggleGuessSlider();
         /// <summary>
         /// GeoChatter version
         /// </summary>
@@ -173,7 +174,11 @@ namespace GeoChatter.Core.Interfaces
         /// Toggle guess processing
         /// </summary>
         /// <param name="open"></param>
-        void ToggleGuesses(bool open);
+        void ToggleGuesses(bool open, bool sendMessage = true);
+        /// <summary>
+        /// Toggle guess processing
+        /// </summary>
+        void ToggleGuesses();
         /// <summary>
         /// Close previous round and start next
         /// </summary>
