@@ -81,6 +81,7 @@ namespace GeoChatter.Forms
             this.label2 = new System.Windows.Forms.Label();
             this.tabPageConnections = new System.Windows.Forms.TabPage();
             this.groupBoxOtherChatGateways = new System.Windows.Forms.GroupBox();
+            this.ctrlBotChatMessages = new GeoChatter.Controls.StreamerBotActionControl();
             this.checkBoxSendChatMsgsViaStreamerBot = new System.Windows.Forms.CheckBox();
             this.grpObsConnection = new System.Windows.Forms.GroupBox();
             this.chkShowPassword = new System.Windows.Forms.CheckBox();
@@ -242,6 +243,7 @@ namespace GeoChatter.Forms
             this.label35 = new System.Windows.Forms.Label();
             this.chkListBoxBannedPlayers = new System.Windows.Forms.CheckedListBox();
             this.tabPageAbout = new System.Windows.Forms.TabPage();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
             this.linkLabel5 = new System.Windows.Forms.LinkLabel();
             this.linkLabel8 = new System.Windows.Forms.LinkLabel();
@@ -291,7 +293,6 @@ namespace GeoChatter.Forms
             this.colorDialog2 = new System.Windows.Forms.ColorDialog();
             this.folderBrowserLabelPath = new System.Windows.Forms.FolderBrowserDialog();
             this.usernameColorDialog = new System.Windows.Forms.ColorDialog();
-            this.ctrlBotChatMessages = new GeoChatter.Controls.StreamerBotActionControl();
             this.tableLayoutPanel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabGeneral.SuspendLayout();
@@ -341,6 +342,7 @@ namespace GeoChatter.Forms
             this.contextMenuStrip1.SuspendLayout();
             this.tabUsers.SuspendLayout();
             this.tabPageAbout.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.flowLayoutPanel3.SuspendLayout();
             this.tabDevelopment.SuspendLayout();
             this.SuspendLayout();
@@ -934,6 +936,13 @@ namespace GeoChatter.Forms
             this.groupBoxOtherChatGateways.TabIndex = 13;
             this.groupBoxOtherChatGateways.TabStop = false;
             this.groupBoxOtherChatGateways.Text = "Other chat gateways";
+            // 
+            // ctrlBotChatMessages
+            // 
+            this.ctrlBotChatMessages.Location = new System.Drawing.Point(2, 49);
+            this.ctrlBotChatMessages.Name = "ctrlBotChatMessages";
+            this.ctrlBotChatMessages.Size = new System.Drawing.Size(233, 32);
+            this.ctrlBotChatMessages.TabIndex = 25;
             // 
             // checkBoxSendChatMsgsViaStreamerBot
             // 
@@ -2830,6 +2839,7 @@ namespace GeoChatter.Forms
             // 
             // tabPageAbout
             // 
+            this.tabPageAbout.Controls.Add(this.pictureBox1);
             this.tabPageAbout.Controls.Add(this.flowLayoutPanel3);
             this.tabPageAbout.Controls.Add(this.label40);
             this.tabPageAbout.Controls.Add(this.linkLabel7);
@@ -2848,6 +2858,17 @@ namespace GeoChatter.Forms
             this.tabPageAbout.TabIndex = 5;
             this.tabPageAbout.Text = "About GeoChatter";
             this.tabPageAbout.UseVisualStyleBackColor = true;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+            this.pictureBox1.Location = new System.Drawing.Point(19, 45);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(100, 100);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 40;
+            this.pictureBox1.TabStop = false;
+            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
             // flowLayoutPanel3
             // 
@@ -3260,7 +3281,7 @@ namespace GeoChatter.Forms
             // 
             this.linkLabel6.AutoSize = true;
             this.linkLabel6.Font = new System.Drawing.Font("Microsoft Sans Serif", 18.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.linkLabel6.Location = new System.Drawing.Point(57, 133);
+            this.linkLabel6.Location = new System.Drawing.Point(126, 141);
             this.linkLabel6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.linkLabel6.Name = "linkLabel6";
             this.linkLabel6.Size = new System.Drawing.Size(194, 29);
@@ -3323,7 +3344,7 @@ namespace GeoChatter.Forms
             // 
             this.linkLabel1.AutoSize = true;
             this.linkLabel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 18.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.linkLabel1.Location = new System.Drawing.Point(57, 95);
+            this.linkLabel1.Location = new System.Drawing.Point(126, 103);
             this.linkLabel1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(235, 29);
@@ -3336,12 +3357,12 @@ namespace GeoChatter.Forms
             // 
             this.label15.AutoSize = true;
             this.label15.Font = new System.Drawing.Font("Microsoft Sans Serif", 18.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label15.Location = new System.Drawing.Point(57, 37);
+            this.label15.Location = new System.Drawing.Point(126, 45);
             this.label15.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(535, 58);
+            this.label15.Size = new System.Drawing.Size(454, 58);
             this.label15.TabIndex = 0;
-            this.label15.Text = "GeoChatter\r\nA solution to play GeoGuessr with Twitch-Chat";
+            this.label15.Text = "GeoChatter\r\nA solution to play GeoGuessr with Chat";
             // 
             // tabDevelopment
             // 
@@ -3421,13 +3442,6 @@ namespace GeoChatter.Forms
             this.usernameColorDialog.AnyColor = true;
             this.usernameColorDialog.FullOpen = true;
             this.usernameColorDialog.SolidColorOnly = true;
-            // 
-            // ctrlBotChatMessages
-            // 
-            this.ctrlBotChatMessages.Location = new System.Drawing.Point(2, 49);
-            this.ctrlBotChatMessages.Name = "ctrlBotChatMessages";
-            this.ctrlBotChatMessages.Size = new System.Drawing.Size(233, 32);
-            this.ctrlBotChatMessages.TabIndex = 25;
             // 
             // SettingsDialog
             // 
@@ -3525,6 +3539,7 @@ namespace GeoChatter.Forms
             this.tabUsers.PerformLayout();
             this.tabPageAbout.ResumeLayout(false);
             this.tabPageAbout.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.flowLayoutPanel3.ResumeLayout(false);
             this.flowLayoutPanel3.PerformLayout();
             this.tabDevelopment.ResumeLayout(false);
@@ -3794,6 +3809,7 @@ namespace GeoChatter.Forms
         private Controls.StreamerBotActionControl ctrlBotSpecialDistance;
         private Controls.StreamerBotActionControl ctrlBotSpecialScore;
         private Controls.StreamerBotActionControl ctrlBotChatMessages;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
 
