@@ -368,17 +368,15 @@ namespace GeoChatter.Forms
                         if (!guessApiClient.SummaryEnabled)
                         {
                             string msg = LanguageStrings.Get("Chat_Msg_EndStreak", new Dictionary<string, string>() { { "winner", player.FullDisplayName }, { "gameId", g.GeoGuessrId }, { "endRoundNumber", (ClientDbCache.RunningGame.Rounds.Count - 1).ToStringDefault() } });
-#if DEBUG
-                            msg = msg.ReplaceDefault("results", "testing_results");
-#endif                            
+                            if (Settings.Default.DebugUseDevApi)
+                                msg = msg.ReplaceDefault("results", "testing_results");
                             CurrentBot?.SendMessage(msg);
                         }
                         else
                         {
                             string msg = LanguageStrings.Get("Chat_Msg_EndStreakSummary", new Dictionary<string, string>() { { "winner", player.FullDisplayName }, { "gameId", g.GeoGuessrId }, { "endRoundNumber", (ClientDbCache.RunningGame.Rounds.Count - 1).ToStringDefault() } });
-#if DEBUG
-                            msg = msg.ReplaceDefault("results", "testing_results");
-#endif                            
+                            if (Settings.Default.DebugUseDevApi)
+                                msg = msg.ReplaceDefault("results", "testing_results");
                             CurrentBot?.SendMessage(msg);
                         }
                         
@@ -397,18 +395,17 @@ namespace GeoChatter.Forms
                         if (!guessApiClient.SummaryEnabled)
                         {
                             string msg = LanguageStrings.Get("Chat_Msg_gameEndNoSummary", new Dictionary<string, string>() { { "winner", player.FullDisplayName }, { "gameId", g.GeoGuessrId }, { "endRoundNumber", (ClientDbCache.RunningGame.Rounds.Count - 1).ToStringDefault() } });
-#if DEBUG
-                            msg = msg.ReplaceDefault("results", "testing_results");
-#endif
+                            if (Settings.Default.DebugUseDevApi)
+
+                                msg = msg.ReplaceDefault("results", "testing_results");
                             CurrentBot?.SendMessage(msg);
 
                         }
                         else
                         {
                             string msg = LanguageStrings.Get("Chat_Msg_gameEnd", new Dictionary<string, string>() { { "winner", player.FullDisplayName }, { "gameId", g.GeoGuessrId }, { "endRoundNumber", (ClientDbCache.RunningGame.Rounds.Count - 1).ToStringDefault() } });
-#if DEBUG
-                            msg = msg.ReplaceDefault("results", "testing_results");
-#endif
+                            if (Settings.Default.DebugUseDevApi)
+                                msg = msg.ReplaceDefault("results", "testing_results");
                             CurrentBot?.SendMessage(msg);
 
                         }

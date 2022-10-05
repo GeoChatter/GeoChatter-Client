@@ -391,9 +391,9 @@ namespace GeoChatter.Forms
 
               
                     string message = LanguageStrings.Get("Chat_Msg_linkMessage");
-#if DEBUG
-                    message = message.Replace("/map/", "/testing_map/", StringComparison.InvariantCulture);
-#endif
+                    if(Settings.Default.DebugUseDevApi)
+                        message = message.Replace("/map/", "/testing_map/", StringComparison.InvariantCulture);
+
                     if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
                         args.Bot?.SendMessage(message);
               

@@ -102,8 +102,12 @@ namespace GeoChatter.Forms
             Settings.Default.ShortcutsFullscreenKey = scrFullscreen.KeyCode;
             if (tabControl1.TabPages.Contains(tabDevelopment))
             {
-                Settings.Default.UseDevApi = chckUseDevApi.Checked;
-                parent.ConnectToGuessApi(true, true);
+                bool reconnectNeeded = Settings.Default.DebugUseDevApi != chkDEVUseDevApi.Checked;
+                Settings.Default.DebugUseDevApi = chkDEVUseDevApi.Checked;
+                Settings.Default.DebugShowDevTools = chkDEVShowDevTools.Checked;
+                Settings.Default.DebugEnableRandomBotGuesses = chkDEVEnableRandomBotGuess.Checked;
+                if(reconnectNeeded)
+                    parent.ConnectToGuessApi(true, true);
             }
 
 
@@ -1675,7 +1679,9 @@ namespace GeoChatter.Forms
                 if (Control.ModifierKeys == (Keys.Shift | Keys.Control))
                 {
                     this.tabControl1.TabPages.Add(tabDevelopment);
-                    chckUseDevApi.Checked = Settings.Default.UseDevApi;
+                    chkDEVUseDevApi.Checked = Settings.Default.DebugUseDevApi;
+                    chkDEVShowDevTools.Checked = Settings.Default.DebugShowDevTools;
+                    chkDEVEnableRandomBotGuess.Checked = Settings.Default.DebugEnableRandomBotGuesses;
                 }
             }
             if (clickCounter < 5)

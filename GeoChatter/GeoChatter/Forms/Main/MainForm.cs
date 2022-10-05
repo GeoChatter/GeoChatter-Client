@@ -206,9 +206,9 @@ namespace GeoChatter.Forms
             SplashScreenHelper.SetPercentage(95, "Hiring useless managers...");
             InitializeManagers();
 
-#if DEBUG
-            devToolsToolStripMenuItem.Visible = true;
-#endif
+
+            devToolsToolStripMenuItem.Visible = Settings.Default.DebugShowDevTools;
+
             SplashScreenHelper.SetPercentage(100, "Connecting to guess server....");
           
 
@@ -447,16 +447,14 @@ namespace GeoChatter.Forms
         {
             
 
-#if DEBUG
-            new SetClipboardHelper(DataFormats.Text, $"https://geochatter.tv/testing_results/?id={ClientDbCache.RunningGame.GeoGuessrId}").Go();
-
-#else
-           new SetClipboardHelper(DataFormats.Text, $"https://geochatter.tv/results/?id={ClientDbCache.RunningGame.GeoGuessrId}").Go();;
+            if(Settings.Default.DebugUseDevApi)
+                new SetClipboardHelper(DataFormats.Text, $"https://geochatter.tv/testing_results/?id={ClientDbCache.RunningGame.GeoGuessrId}").Go();
+            else
+                new SetClipboardHelper(DataFormats.Text, $"https://geochatter.tv/results/?id={ClientDbCache.RunningGame.GeoGuessrId}").Go();;
            
-#endif
             return true;
         }
-        
+
 
         private bool CopyMapLinkToClipboard()
         {
@@ -465,13 +463,12 @@ namespace GeoChatter.Forms
                 MessageBox.Show("You are not curently connected to our guess server!\n\rPlease restart the application!", "Not connected", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return false;
             }
-#if DEBUG
-            new SetClipboardHelper(DataFormats.Text, $"https://geochatter.tv/testing_map/?{guessApiClient.MapIdentifier}").Go();
+            if (Settings.Default.DebugUseDevApi)
+                new SetClipboardHelper(DataFormats.Text, $"https://geochatter.tv/testing_map/?{guessApiClient.MapIdentifier}").Go();
 
-#else
-           new SetClipboardHelper(DataFormats.Text, $"https://geochatter.tv/map/?{guessApiClient.MapIdentifier}").Go();;
-           
-#endif
+            else
+                new SetClipboardHelper(DataFormats.Text, $"https://geochatter.tv/map/?{guessApiClient.MapIdentifier}").Go(); ;
+
             return true;
         }
 
@@ -939,9 +936,8 @@ namespace GeoChatter.Forms
 
         private void devToolsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-#if DEBUG
-            ShowDevTools();
-#endif
+            if (Settings.Default.DebugShowDevTools)
+                ShowDevTools();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed on work end.")]
@@ -985,9 +981,9 @@ namespace GeoChatter.Forms
                 SaveAndExit(true);
             }
             guessApiClient?.Disconnect();
-#if DEBUG
-            randomBotImageClient?.Dispose();
-#endif
+            if(Settings.Default.DebugEnableRandomBotGuesses)
+                randomBotImageClient?.Dispose();
+
             browser?.CloseDevTools();
         }
 

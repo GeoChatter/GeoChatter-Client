@@ -43,13 +43,13 @@ namespace GeoChatter.Forms
             return ProcessViewerGuess(userId, userName, userPlatform, latString, lngString, color, displayName, profilePicUrl?.OriginalString ?? string.Empty, wasRandom, isTemporary);
         }
 
-#if DEBUG
+
         [DiscoverableEvent]
         private void RandomBotGuessRecieved(object sender, RandomBotGuessRecievedEventArgs args)
         {
-            SendRandomGuess(args.Count, args.Reuse);
+            if(Settings.Default.DebugEnableRandomBotGuesses)
+                SendRandomGuess(args.Count, args.Reuse);
         }
-#endif
 
         /// <inheritdoc/>
         public GuessState ProcessViewerGuess(string userId, string userName, Platforms userPlatform, string latString, string lngString, string color = "", string displayName = "", string profilePicUrl = "", bool wasRandom = false, bool isTemporary = false)

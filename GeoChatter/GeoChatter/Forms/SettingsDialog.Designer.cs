@@ -284,7 +284,7 @@ namespace GeoChatter.Forms
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.label15 = new System.Windows.Forms.Label();
             this.tabDevelopment = new System.Windows.Forms.TabPage();
-            this.chckUseDevApi = new System.Windows.Forms.CheckBox();
+            this.chkDEVUseDevApi = new System.Windows.Forms.CheckBox();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnApply = new System.Windows.Forms.Button();
             this.btnShowAdvanced = new System.Windows.Forms.Button();
@@ -293,6 +293,8 @@ namespace GeoChatter.Forms
             this.colorDialog2 = new System.Windows.Forms.ColorDialog();
             this.folderBrowserLabelPath = new System.Windows.Forms.FolderBrowserDialog();
             this.usernameColorDialog = new System.Windows.Forms.ColorDialog();
+            this.chkDEVShowDevTools = new System.Windows.Forms.CheckBox();
+            this.chkDEVEnableRandomBotGuess = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabGeneral.SuspendLayout();
@@ -3366,7 +3368,9 @@ namespace GeoChatter.Forms
             // 
             // tabDevelopment
             // 
-            this.tabDevelopment.Controls.Add(this.chckUseDevApi);
+            this.tabDevelopment.Controls.Add(this.chkDEVEnableRandomBotGuess);
+            this.tabDevelopment.Controls.Add(this.chkDEVShowDevTools);
+            this.tabDevelopment.Controls.Add(this.chkDEVUseDevApi);
             this.tabDevelopment.Location = new System.Drawing.Point(4, 24);
             this.tabDevelopment.Name = "tabDevelopment";
             this.tabDevelopment.Padding = new System.Windows.Forms.Padding(3);
@@ -3375,15 +3379,15 @@ namespace GeoChatter.Forms
             this.tabDevelopment.Text = "DEV SETTINGS";
             this.tabDevelopment.UseVisualStyleBackColor = true;
             // 
-            // chckUseDevApi
+            // chkDEVUseDevApi
             // 
-            this.chckUseDevApi.AutoSize = true;
-            this.chckUseDevApi.Location = new System.Drawing.Point(60, 48);
-            this.chckUseDevApi.Name = "chckUseDevApi";
-            this.chckUseDevApi.Size = new System.Drawing.Size(86, 19);
-            this.chckUseDevApi.TabIndex = 0;
-            this.chckUseDevApi.Text = "Use dev api";
-            this.chckUseDevApi.UseVisualStyleBackColor = true;
+            this.chkDEVUseDevApi.AutoSize = true;
+            this.chkDEVUseDevApi.Location = new System.Drawing.Point(60, 48);
+            this.chkDEVUseDevApi.Name = "chkDEVUseDevApi";
+            this.chkDEVUseDevApi.Size = new System.Drawing.Size(86, 19);
+            this.chkDEVUseDevApi.TabIndex = 0;
+            this.chkDEVUseDevApi.Text = "Use dev api";
+            this.chkDEVUseDevApi.UseVisualStyleBackColor = true;
             // 
             // btnSave
             // 
@@ -3442,6 +3446,26 @@ namespace GeoChatter.Forms
             this.usernameColorDialog.AnyColor = true;
             this.usernameColorDialog.FullOpen = true;
             this.usernameColorDialog.SolidColorOnly = true;
+            // 
+            // chkDEVShowDevTools
+            // 
+            this.chkDEVShowDevTools.AutoSize = true;
+            this.chkDEVShowDevTools.Location = new System.Drawing.Point(60, 73);
+            this.chkDEVShowDevTools.Name = "chkDEVShowDevTools";
+            this.chkDEVShowDevTools.Size = new System.Drawing.Size(106, 19);
+            this.chkDEVShowDevTools.TabIndex = 1;
+            this.chkDEVShowDevTools.Text = "Show dev tools";
+            this.chkDEVShowDevTools.UseVisualStyleBackColor = true;
+            // 
+            // chkDEVEnableRandomBotGuess
+            // 
+            this.chkDEVEnableRandomBotGuess.AutoSize = true;
+            this.chkDEVEnableRandomBotGuess.Location = new System.Drawing.Point(60, 98);
+            this.chkDEVEnableRandomBotGuess.Name = "chkDEVEnableRandomBotGuess";
+            this.chkDEVEnableRandomBotGuess.Size = new System.Drawing.Size(158, 19);
+            this.chkDEVEnableRandomBotGuess.TabIndex = 2;
+            this.chkDEVEnableRandomBotGuess.Text = "Enable !randomBotGuess";
+            this.chkDEVEnableRandomBotGuess.UseVisualStyleBackColor = true;
             // 
             // SettingsDialog
             // 
@@ -3802,7 +3826,7 @@ namespace GeoChatter.Forms
         private System.Windows.Forms.CheckBox chkFlagMessages;
         private System.Windows.Forms.PropertyGrid propertyGrid1;
         private System.Windows.Forms.TabPage tabDevelopment;
-        private System.Windows.Forms.CheckBox chckUseDevApi;
+        private System.Windows.Forms.CheckBox chkDEVUseDevApi;
         private Controls.StreamerBotActionControl ctrlBotGameEnd;
         private Controls.StreamerBotActionControl ctrlBotRoundEnd;
         private Controls.StreamerBotActionControl ctrlBotRoundStart;
@@ -3810,6 +3834,8 @@ namespace GeoChatter.Forms
         private Controls.StreamerBotActionControl ctrlBotSpecialScore;
         private Controls.StreamerBotActionControl ctrlBotChatMessages;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.CheckBox chkDEVEnableRandomBotGuess;
+        private System.Windows.Forms.CheckBox chkDEVShowDevTools;
     }
 }
 
