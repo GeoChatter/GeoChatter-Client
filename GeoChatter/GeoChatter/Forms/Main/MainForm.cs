@@ -614,7 +614,11 @@ namespace GeoChatter.Forms
                                 settingsDialog = new(this, streamerbotClient, obsClient);
                                 settingsDialog.SettingsApplied += (object sender, EventArgs a) => { LoadLabelSettings(); };
                                 settingsDialog.TopMost = true;
-                                settingsDialog.Show(this);
+                        settingsDialog.FormClosed += (object sender, FormClosedEventArgs e) => {
+                            devToolsToolStripMenuItem.Visible = Settings.Default.DebugShowDevTools;
+                        };
+                                    settingsDialog.Show(this);
+                        
                             }
                             catch (Exception e)
                             {
@@ -628,6 +632,8 @@ namespace GeoChatter.Forms
             );
             LoadLabelSettings();
         }
+
+        
         /// <summary>
         /// Obvious, i think
         /// </summary>
@@ -1030,7 +1036,7 @@ namespace GeoChatter.Forms
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Settings.Default.UseDevApi = false;
+            Settings.Default.DebugUseDevApi = false;
             Settings.Default.Save();
         }
 

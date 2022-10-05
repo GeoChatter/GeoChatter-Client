@@ -74,7 +74,7 @@ namespace GeoChatter.Forms
             string version = fvi.FileVersion;
 
             string huburl = Settings.Default.GuessServer;
-            if(Settings.Default.UseDevApi)
+            if(Settings.Default.DebugUseDevApi)
                 huburl = Settings.Default.AlternateGuessApiUrl;
 
 #if DEBUG
