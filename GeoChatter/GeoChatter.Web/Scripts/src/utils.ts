@@ -295,7 +295,7 @@ export namespace Util
                     <div style="font-size:${Setting.Overlay.FontSize}${Setting.Overlay.FontSizeUnit}">
                         GUESSES AROUND AREA (${names.length})
                     </div>
-                    <div class="clusterInfoWindowRowContainer" style="display: flex; width: fit-content; flex-direction: row; justify-content: center;">
+                    <div class="clusterInfoWindowRowContainer" style="display: flex; width: fit-content; flex-direction: column; justify-content: flex-start;">
                     ${(names ? names.join(" ") : "")}
                     </div>
                 </div>`;
