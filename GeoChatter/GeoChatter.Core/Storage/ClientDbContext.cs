@@ -1,6 +1,7 @@
 ﻿using Antlr4.StringTemplate.Compiler;
 using CefSharp.DevTools.Browser;
 using GeoChatter.Core.Common.Extensions;
+using GeoChatter.Core.Model.Map;
 using GeoChatter.Helpers;
 using GeoChatter.Model;
 using Microsoft.EntityFrameworkCore;
@@ -215,6 +216,12 @@ namespace GeoChatter.Core.Storage
             modelBuilder.Entity<Game>()
                 .HasOne(f => f.Source);
             #endregion
+
+            modelBuilder.Entity<MapRoundSettings>()
+            .Property(e => e.Layers)
+            .HasConversion(
+                v => string.Join(',', v),
+                v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList());
         }
 
 

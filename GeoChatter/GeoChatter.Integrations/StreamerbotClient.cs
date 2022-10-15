@@ -139,7 +139,7 @@ namespace GeoChatter.Integrations
 
             SubscribeToEvents();
             isInitialStart = false;
-            return ws.IsRunning;
+            return true;// ws.IsRunning;
 
         }
         bool reconnectedAlready = false;

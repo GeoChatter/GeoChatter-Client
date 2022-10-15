@@ -278,7 +278,8 @@ namespace GeoChatter.Forms
             {
                 IsMultiGuess = round.IsMultiGuess,
                 RoundNumber = round.RealRoundNumber(),
-                StartTime = round.TimeStamp
+                StartTime = round.TimeStamp,
+                
             };
             guessApiClient.SendStartRoundToMaps(roundSettings);
         }

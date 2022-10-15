@@ -62,6 +62,7 @@ namespace GeoChatter.Forms
             this.chkEnableDebugLogging = new System.Windows.Forms.CheckBox();
             this.checkBoxAutoUpdate = new System.Windows.Forms.CheckBox();
             this.groupGameSettings = new System.Windows.Forms.GroupBox();
+            this.allowCustomRandomGuesses = new System.Windows.Forms.CheckBox();
             this.chkCheckStreamer = new System.Windows.Forms.CheckBox();
             this.chkAllowSameLocationGuess = new System.Windows.Forms.CheckBox();
             this.chkUseEnglishCountryNames = new System.Windows.Forms.CheckBox();
@@ -289,7 +290,6 @@ namespace GeoChatter.Forms
             this.colorDialog2 = new System.Windows.Forms.ColorDialog();
             this.folderBrowserLabelPath = new System.Windows.Forms.FolderBrowserDialog();
             this.usernameColorDialog = new System.Windows.Forms.ColorDialog();
-            this.allowCustomRandomGuesses = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabGeneral.SuspendLayout();
@@ -708,6 +708,20 @@ namespace GeoChatter.Forms
             this.groupGameSettings.TabStop = false;
             this.groupGameSettings.Text = "Game settings";
             this.groupGameSettings.Enter += new System.EventHandler(this.groupBox1_Enter);
+            // 
+            // allowCustomRandomGuesses
+            // 
+            this.allowCustomRandomGuesses.AutoSize = true;
+            this.allowCustomRandomGuesses.Location = new System.Drawing.Point(7, 145);
+            this.allowCustomRandomGuesses.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.allowCustomRandomGuesses.Name = "allowCustomRandomGuesses";
+            this.allowCustomRandomGuesses.Size = new System.Drawing.Size(254, 19);
+            this.allowCustomRandomGuesses.TabIndex = 12;
+            this.allowCustomRandomGuesses.Text = "Enable random guessing in specific regions";
+            this.toolTip1.SetToolTip(this.allowCustomRandomGuesses, "When enabled, players can use random guessing command and the map to make random " +
+        "guesses in their choice of regions with customized probabilities for each choice" +
+        "");
+            this.allowCustomRandomGuesses.UseVisualStyleBackColor = true;
             // 
             // chkCheckStreamer
             // 
@@ -1164,11 +1178,12 @@ namespace GeoChatter.Forms
             // label43
             // 
             this.label43.AutoSize = true;
-            this.label43.Location = new System.Drawing.Point(99, 22);
+            this.label43.Location = new System.Drawing.Point(6, 19);
             this.label43.Name = "label43";
-            this.label43.Size = new System.Drawing.Size(44, 15);
+            this.label43.Size = new System.Drawing.Size(359, 60);
             this.label43.TabIndex = 13;
-            this.label43.Text = "label43";
+            this.label43.Text = "Here you can choose which chat messages to send.\r\n\r\nYou can also modify the chat " +
+    "messages.\r\nPlease make sure to keep the variables names within the messages.\r\n";
             // 
             // flowLayoutPanel1
             // 
@@ -1182,7 +1197,7 @@ namespace GeoChatter.Forms
             this.flowLayoutPanel1.Controls.Add(this.chkMsgsGameEnded);
             this.flowLayoutPanel1.Controls.Add(this.chkColorMessage);
             this.flowLayoutPanel1.Controls.Add(this.chkFlagMessages);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(6, 74);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(6, 105);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(264, 287);
             this.flowLayoutPanel1.TabIndex = 12;
@@ -1302,7 +1317,7 @@ namespace GeoChatter.Forms
             this.propertyGrid1.CommandsVisibleIfAvailable = false;
             this.propertyGrid1.HelpVisible = false;
             this.propertyGrid1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.propertyGrid1.Location = new System.Drawing.Point(289, 74);
+            this.propertyGrid1.Location = new System.Drawing.Point(289, 105);
             this.propertyGrid1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.propertyGrid1.Name = "propertyGrid1";
             this.propertyGrid1.Size = new System.Drawing.Size(519, 284);
@@ -3414,20 +3429,6 @@ namespace GeoChatter.Forms
             this.usernameColorDialog.AnyColor = true;
             this.usernameColorDialog.FullOpen = true;
             this.usernameColorDialog.SolidColorOnly = true;
-            // 
-            // allowCustomRandomGuesses
-            // 
-            this.allowCustomRandomGuesses.AutoSize = true;
-            this.allowCustomRandomGuesses.Location = new System.Drawing.Point(7, 145);
-            this.allowCustomRandomGuesses.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.allowCustomRandomGuesses.Name = "allowCustomRandomGuesses";
-            this.allowCustomRandomGuesses.Size = new System.Drawing.Size(254, 19);
-            this.allowCustomRandomGuesses.TabIndex = 12;
-            this.allowCustomRandomGuesses.Text = "Enable random guessing in specific regions";
-            this.toolTip1.SetToolTip(this.allowCustomRandomGuesses, "When enabled, players can use random guessing command and the map to make random " +
-        "guesses in their choice of regions with customized probabilities for each choice" +
-        "");
-            this.allowCustomRandomGuesses.UseVisualStyleBackColor = true;
             // 
             // SettingsDialog
             // 
