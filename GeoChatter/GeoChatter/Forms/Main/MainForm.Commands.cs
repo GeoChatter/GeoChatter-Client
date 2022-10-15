@@ -346,7 +346,7 @@ namespace GeoChatter.Forms
                     WasRandom = true,
                     RandomGuessArgs = args.Arguments,
                     Layer = args.Layer,
-                    Source = args.Source 
+                    Source = args.Source
                 };
 
                 args.Bot?.FireGuessReceived(g);
