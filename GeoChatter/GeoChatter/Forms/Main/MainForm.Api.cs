@@ -274,14 +274,8 @@ namespace GeoChatter.Forms
 
         private void SendStartRoundToMaps(Round round)
         {
-            MapRoundSettings roundSettings = new MapRoundSettings()
-            {
-                IsMultiGuess = round.IsMultiGuess,
-                RoundNumber = round.RealRoundNumber(),
-                StartTime = round.TimeStamp,
-                
-            };
-            guessApiClient.SendStartRoundToMaps(roundSettings);
+            
+            guessApiClient.SendStartRoundToMaps(round.MapRoundSettings);
         }
 
     }

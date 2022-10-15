@@ -15,6 +15,7 @@ using GeoChatter.Properties;
 using GeoChatter.Core.Helpers;
 using GeoChatter.Helpers;
 using GeoChatter.Core.Interfaces;
+using GeoChatter.Core.Model.Map;
 
 namespace GeoChatter.Forms
 {
@@ -45,10 +46,24 @@ namespace GeoChatter.Forms
 
             SetCountry(firstRound);
             SetRefreshMenuItemsEnabledState(true);
-            SendStartRoundToMaps(firstRound);
+            CreateAndAssignMapRoundSettings(firstRound);
             SendStartRoundToJS(firstRound);
+            SendStartRoundToMaps(firstRound);
             //ToggleGuesses(true);
             TriggerRoundStartActions();
+        }
+
+        private static void CreateAndAssignMapRoundSettings(Round round)
+        {
+            MapRoundSettings roundSettings = new MapRoundSettings()
+            {
+                IsMultiGuess = round.IsMultiGuess,
+                RoundNumber = round.RealRoundNumber(),
+                StartTime = round.TimeStamp,
+                Layers = new List<string>()
+
+            };
+            round.MapRoundSettings = roundSettings;
         }
 
         public async Task<GameFoundStatus> SetupStartGame(GeoGuessrGame geoGame, bool retrigger)
@@ -437,6 +452,7 @@ namespace GeoChatter.Forms
             round.Flags = ClientDbCache.Instance.NextRoundRoundOptions;
             ClientDbCache.Instance.NextRoundRoundOptions = RoundOption.DEFAULT;
             SetRefreshMenuItemsEnabledState(true);
+            CreateAndAssignMapRoundSettings(round);
             SendStartRoundToJS(round);
             SendStartRoundToMaps(round);
             ToggleGuesses(true, false);

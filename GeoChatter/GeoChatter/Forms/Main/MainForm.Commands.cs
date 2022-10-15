@@ -670,7 +670,10 @@ namespace GeoChatter.Forms
             string latString = args.Lat;
             string lngString = args.Lng;
             string color = args.Color;
-            ProcessViewerGuess(userId, userName, args.UserPlatform, latString, lngString, color, wasRandom: args.WasRandom);
+            string arguments = args.RandomGuessArgs;
+            string source = args.Source;
+            string layer = args.Layer;
+            ProcessViewerGuess(userId, userName, args.UserPlatform, latString, lngString, color, wasRandom: args.WasRandom, randomArgs:arguments, layer: layer, source:source );
         }
 
         #endregion
