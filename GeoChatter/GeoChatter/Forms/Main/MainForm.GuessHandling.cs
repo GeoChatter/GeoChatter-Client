@@ -238,7 +238,7 @@ namespace GeoChatter.Forms
                     existant.TimeStamp = DateTime.Now;
                     existant.Layer = layer;
                     existant.Source = source;
-                    // TODO: existant.RandomGuessArgs = randomArgs;
+                    existant.RandomGuessArgs = randomArgs;
                     existant.GuessCounter++;
                 }
                 else
@@ -255,7 +255,7 @@ namespace GeoChatter.Forms
                         WasRandom = wasRandom,
                         Layer = layer,
                         Source = source,
-                        // TODO: RandomGuessArgs = randomArgs,
+                        RandomGuessArgs = randomArgs,
                     };
                 }
                 Round round = game.Rounds.First(r => r.RoundNumber == game.CurrentRound);

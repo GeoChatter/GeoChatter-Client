@@ -118,7 +118,7 @@ namespace GeoChatter.Forms
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.tabPageEvents = new System.Windows.Forms.TabPage();
             this.groupBoxGameEnd = new System.Windows.Forms.GroupBox();
-            this.ctrlBotRoundEnd = new GeoChatter.Controls.StreamerBotActionControl();
+            this.ctrlBotGameEnd = new GeoChatter.Controls.StreamerBotActionControl();
             this.label25 = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
             this.comboOBSGameEndSource = new System.Windows.Forms.ComboBox();
@@ -127,7 +127,7 @@ namespace GeoChatter.Forms
             this.chkOBSGameEndExecute = new System.Windows.Forms.CheckBox();
             this.chkBotGameEndExecute = new System.Windows.Forms.CheckBox();
             this.groupBoxRoundEnd = new System.Windows.Forms.GroupBox();
-            this.ctrlBotGameEnd = new GeoChatter.Controls.StreamerBotActionControl();
+            this.ctrlBotRoundEnd = new GeoChatter.Controls.StreamerBotActionControl();
             this.label19 = new System.Windows.Forms.Label();
             this.label24 = new System.Windows.Forms.Label();
             this.comboOBSRoundEndSource = new System.Windows.Forms.ComboBox();
@@ -154,12 +154,12 @@ namespace GeoChatter.Forms
             this.comboSpecialDistanceObsAction = new System.Windows.Forms.ComboBox();
             this.comboSpecialDistanceObsSource = new System.Windows.Forms.ComboBox();
             this.checkBoxSpecialDistanceAction = new System.Windows.Forms.CheckBox();
-            this.ctrlBotSpecialScore = new GeoChatter.Controls.StreamerBotActionControl();
             this.label7 = new System.Windows.Forms.Label();
             this.chkSpecialDistanceObs = new System.Windows.Forms.CheckBox();
             this.txtSpecialDistanceFrom = new System.Windows.Forms.TextBox();
             this.checkBoxSpecialDistanceLabel = new System.Windows.Forms.CheckBox();
             this.groupBoxEventSpecial = new System.Windows.Forms.GroupBox();
+            this.ctrlBotSpecialScore = new GeoChatter.Controls.StreamerBotActionControl();
             this.chkSpecialScoreRange = new System.Windows.Forms.CheckBox();
             this.txtSpecialScoreTo = new System.Windows.Forms.TextBox();
             this.label20 = new System.Windows.Forms.Label();
@@ -3287,7 +3287,7 @@ namespace GeoChatter.Forms
             // 
             this.linkLabel7.AutoSize = true;
             this.linkLabel7.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.linkLabel7.Location = new System.Drawing.Point(167, 408);
+            this.linkLabel7.Location = new System.Drawing.Point(168, 428);
             this.linkLabel7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.linkLabel7.Name = "linkLabel7";
             this.linkLabel7.Size = new System.Drawing.Size(145, 20);
@@ -3313,7 +3313,7 @@ namespace GeoChatter.Forms
             // 
             this.linkLabel4.AutoSize = true;
             this.linkLabel4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.linkLabel4.Location = new System.Drawing.Point(140, 346);
+            this.linkLabel4.Location = new System.Drawing.Point(126, 367);
             this.linkLabel4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.linkLabel4.Name = "linkLabel4";
             this.linkLabel4.Size = new System.Drawing.Size(212, 20);

@@ -333,9 +333,10 @@ namespace GeoChatter.Forms
                     rand = BorderHelper.GetRandomCoordinateFromRandomGuessQuery(args.Arguments);
                 }
 
-                if (rand == null)
+                if (rand == null || (rand.Latitude == 0 && rand.Longitude == 0))
                 {
                     rand = BorderHelper.GetRandomPointCloseOrWithinAPolygon();
+                    args.Arguments = String.Empty;
                 }
 
                 GuessReceivedEventArgs g = new(args.UserId, args.Username, args.UserPlatform, args.Bot, args.Command)
