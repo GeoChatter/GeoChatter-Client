@@ -196,22 +196,54 @@ namespace GeoChatter.Core.Interfaces
         /// <param name="displayName">Display name</param>
         /// <param name="profilePicUrl">Profile picture url</param>
         /// <param name="wasRandom">Wheter guess was random</param>
+        /// <param name="isTemporary">Wheter guess was temporary</param>
+        /// <param name="randomArgs">Random guess args</param>
+        /// <param name="source">Guess source (MAP, EXT, CHAT)</param>
+        /// <param name="layer">Guess map layer</param>
         /// <returns></returns>
-        GuessState ProcessViewerGuess(string userId, string userName, Platforms userPlatform, string latString, string lngString, string color, string displayName, string profilePicUrl, bool wasRandom = false, bool isTemporary = false);
+        GuessState ProcessViewerGuess(string userId,
+                                      string userName,
+                                      Platforms userPlatform,
+                                      string latString,
+                                      string lngString,
+                                      string color,
+                                      string displayName,
+                                      string profilePicUrl,
+                                      bool wasRandom = false,
+                                      bool isTemporary = false,
+                                      string randomArgs = "",
+                                      string source = "",
+                                      string layer = "");
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="userName"></param>
-        /// <param name="userPlatform"></param>
-        /// <param name="latString"></param>
-        /// <param name="lngString"></param>
-        /// <param name="color"></param>
-        /// <param name="displayName"></param>
-        /// <param name="profilePicUrl"></param>
-        /// <param name="wasRandom"></param>
+        /// <param name="userId">Player ID</param>
+        /// <param name="userName">Player name</param>
+        /// <param name="userPlatform">Player name</param>
+        /// <param name="latString">Latitude</param>
+        /// <param name="lngString">Longitude</param>
+        /// <param name="color">User name color</param>
+        /// <param name="displayName">Display name</param>
+        /// <param name="profilePicUrl">Profile picture url</param>
+        /// <param name="wasRandom">Wheter guess was random</param>
+        /// <param name="isTemporary">Wheter guess was temporary</param>
+        /// <param name="randomArgs">Random guess args</param>
+        /// <param name="source">Guess source (MAP, EXT, CHAT)</param>
+        /// <param name="layer">Guess map layer</param>
         /// <returns></returns>
-        GuessState ProcessViewerGuess(string userId, string userName, Platforms userPlatform, string latString, string lngString, string color, string displayName, Uri profilePicUrl, bool wasRandom, bool isTemporary);
+        GuessState ProcessViewerGuess(string userId,
+                                      string userName,
+                                      Platforms userPlatform,
+                                      string latString,
+                                      string lngString,
+                                      string color,
+                                      string displayName,
+                                      Uri profilePicUrl,
+                                      bool wasRandom,
+                                      bool isTemporary,
+                                      string randomArgs = "",
+                                      string source = "",
+                                      string layer = "");
 
         /// <summary>
         /// Try to trigger game start events manually

@@ -31,19 +31,12 @@ using System.Globalization;
 #if !DEBUG
 using System.IO;
 #endif
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GeoChatter.Core.Common.Extensions;
-using System.Windows.Documents;
 using TwitchLib.Client.Events;
-using Handlers;
-using GeoChatter.Core.Model.Map;
-using GeoChatter.Core.Model.Extensions;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 using System.Reflection;
 
 namespace GeoChatter.Forms

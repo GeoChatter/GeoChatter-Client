@@ -112,7 +112,7 @@ export namespace MapUtil
                     for (var i = 0; i < markers.length; i++)
                     {
                         let mg = markers[i]?.guess as Guess;
-                        if (mg) names.push(`#${mg.ResultFinalOrder} ${mg.GetPlayerNameDisplayHTML()}`);
+                        if (mg) names.push(`<div class="clusterInfoWindowRow">#${mg.ResultFinalOrder} ${mg.GetPlayerNameDisplayHTML()}</div>`);
                     }
                     let html = Util.GetInfoWindowHtmlForCluster(names);
                     infowindow.setContent(html);

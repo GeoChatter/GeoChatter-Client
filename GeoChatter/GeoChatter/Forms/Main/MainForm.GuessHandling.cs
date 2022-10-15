@@ -38,12 +38,23 @@ namespace GeoChatter.Forms
             browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync(JsToCsHelper.GetSendGuessObjToJsScript(guess));
         }
         /// <inheritdoc/>
-        public GuessState ProcessViewerGuess(string userId, string userName, Platforms userPlatform, string latString, string lngString, string color, string displayName, Uri profilePicUrl, bool wasRandom, bool isTemporary)
+        public GuessState ProcessViewerGuess(string userId,
+                                             string userName,
+                                             Platforms userPlatform,
+                                             string latString,
+                                             string lngString,
+                                             string color,
+                                             string displayName,
+                                             Uri profilePicUrl,
+                                             bool wasRandom,
+                                             bool isTemporary,
+                                             string randomArgs = "",
+                                             string source = "",
+                                             string layer = "")
         {
-            return ProcessViewerGuess(userId, userName, userPlatform, latString, lngString, color, displayName, profilePicUrl?.OriginalString ?? string.Empty, wasRandom, isTemporary);
+            return ProcessViewerGuess(userId, userName, userPlatform, latString, lngString, color, displayName, profilePicUrl?.OriginalString ?? string.Empty, wasRandom, isTemporary, randomArgs, source, layer);
         }
-
-
+        
         [DiscoverableEvent]
         private void RandomBotGuessRecieved(object sender, RandomBotGuessRecievedEventArgs args)
         {
@@ -52,7 +63,19 @@ namespace GeoChatter.Forms
         }
 
         /// <inheritdoc/>
-        public GuessState ProcessViewerGuess(string userId, string userName, Platforms userPlatform, string latString, string lngString, string color = "", string displayName = "", string profilePicUrl = "", bool wasRandom = false, bool isTemporary = false)
+        public GuessState ProcessViewerGuess(string userId,
+                                             string userName,
+                                             Platforms userPlatform,
+                                             string latString,
+                                             string lngString,
+                                             string color = "",
+                                             string displayName = "",
+                                             string profilePicUrl = "",
+                                             bool wasRandom = false,
+                                             bool isTemporary = false,
+                                             string randomArgs = "",
+                                             string source = "",
+                                             string layer = "")
         {
             try
             {
@@ -213,6 +236,9 @@ namespace GeoChatter.Forms
                     existant.GuessedBefore = true;
                     existant.WasRandom = wasRandom;
                     existant.TimeStamp = DateTime.Now;
+                    existant.Layer = layer;
+                    existant.Source = source;
+                    // TODO: existant.RandomGuessArgs = randomArgs;
                     existant.GuessCounter++;
                 }
                 else
@@ -226,7 +252,10 @@ namespace GeoChatter.Forms
                         TimeStamp = DateTime.Now,
                         GuessedBefore = false,
                         GuessCounter = 1,
-                        WasRandom = wasRandom
+                        WasRandom = wasRandom,
+                        Layer = layer,
+                        Source = source,
+                        // TODO: RandomGuessArgs = randomArgs,
                     };
                 }
                 Round round = game.Rounds.First(r => r.RoundNumber == game.CurrentRound);

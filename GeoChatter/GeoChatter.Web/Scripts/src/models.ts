@@ -846,6 +846,9 @@ export class Guess
         this.IsFirstGuess = !data.GuessedBefore;
         this.GuessNumber = data.GuessCount;
         this.IsRandom = data.WasRandom;
+        this.RandomGuessArgs = data.RandomGuessArgs;
+        this.Source = data.Source;
+        this.Layer = data.Layer;
 
         this.PlayerData.FlagDisplay = Util.FixFlagHTML(this.PlayerData.FlagCode, this.PlayerData.FlagName);
         if (!this.PlayerData.Color)
@@ -907,6 +910,12 @@ export class Guess
     GuessNumber: number;
 
     IsRandom: boolean;
+
+    RandomGuessArgs: string;
+
+    Source: GuessSource;
+
+    Layer: MapLayer;
 
     ResultFinalOrder: number = 0;
 
@@ -1006,7 +1015,7 @@ export class Guess
 
     GetPlayerNameDisplayHTML = function(this: Guess)
     {
-        return `${this.PlayerData.FlagDisplay}${(this.IsRandom ? Setting.Overlay.GetRandomGuessIndicator() : "")}${Color.ColorUsername(this.PlayerData.Color, this.PlayerData.Display)}`
+        return `${this.PlayerData.FlagDisplay}${(this.IsRandom ? Setting.Overlay.GetRandomGuessIndicator(this.RandomGuessArgs) : "")}${Color.ColorUsername(this.PlayerData.Color, this.PlayerData.Display)}`
     }
 
     GetGuessPoints = function(this: Guess)

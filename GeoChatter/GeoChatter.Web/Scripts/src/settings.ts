@@ -153,7 +153,7 @@ export namespace Setting
         /*
          * Maximum radius in meters to search for streetview for embeds
          */
-        StreetViewMaxRadius: 2000,
+        StreetViewMaxRadius: 3000,
 
         PopupShowCoordinates: true,
         PopupShowStreak: true,
@@ -171,10 +171,14 @@ export namespace Setting
         CreatePolylines: true,
 
         RandomGuessCharacter: "*",
+        CustomRandomGuessCharacter: "^",
 
-        GetRandomGuessIndicator()
+        CustomRandomGuessColor: "#52456b",
+
+        GetRandomGuessIndicator(args?: string)
         {
-            return `<span title='Used random guess'>${Color.ColorUsername(this.ScoreboardForeground, this.RandomGuessCharacter)}</span>`
+            let extra = args ? ` (${args})` : "";
+            return `<span data-tooltip='Random guess${extra}' title='Used random guess${extra}'>${extra ? Color.ColorUsername(this.CustomRandomGuessColor, this.CustomRandomGuessCharacter) : Color.ColorUsername(this.ScoreboardForeground, this.RandomGuessCharacter)}</span>`
         }
     };
 

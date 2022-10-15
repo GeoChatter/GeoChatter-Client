@@ -606,7 +606,7 @@ namespace GeoChatter.Core.Helpers
                 // TODO: Refactor
                 string[] countryArgs = randomGuessQuery
                     .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                    .OrderBy(s => GetWeightFromRandomGuessArg(s))
+                    .OrderBy(GetWeightFromRandomGuessArg)
                     .ToArray();
                 if (countryArgs.Length > 0)
                 {
@@ -619,11 +619,11 @@ namespace GeoChatter.Core.Helpers
                     else
                     {
                         List<string> matches = countryArgs
-                            .Select(c => GetNameFromRandomGuessArg(c))
+                            .Select(GetNameFromRandomGuessArg)
                             .ToList();
 
                         List<double> probs = countryArgs
-                            .Select(c => GetWeightFromRandomGuessArg(c))
+                            .Select(GetWeightFromRandomGuessArg)
                             .ToList();
 
                         double totalProb = probs.Sum();

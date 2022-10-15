@@ -343,7 +343,10 @@ namespace GeoChatter.Forms
                     Lat = rand.Latitude.ToStringDefault(),
                     Lng = rand.Longitude.ToStringDefault(),
                     Color = args.Color,
-                    WasRandom = true
+                    WasRandom = true,
+                    RandomGuessArgs = args.Arguments,
+                    Layer = args.Layer,
+                    Source = args.Source
                 };
 
                 args.Bot?.FireGuessReceived(g);

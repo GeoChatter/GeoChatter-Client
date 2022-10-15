@@ -210,10 +210,10 @@ declare export global
 
     /** Table row containing player data */
     export type TableRowPlayerData =
-    {
-        /** Player that this row belongs to */
-        Player: PlayerData
-    };
+        {
+            /** Player that this row belongs to */
+            Player: PlayerData
+        };
 
     /** Table row wrapper for each row in scoreboard */
     export type TableRow = {
@@ -307,9 +307,14 @@ declare export global
 
         /** Random guess indicator character */
         RandomGuessCharacter: string,
+        /** Custom random guess indicator */
+        CustomRandomGuessCharacter: string,
+
+        /** OverlaySettings.CustomRandomGuessCharacter foreground color */
+        CustomRandomGuessColor: string,
 
         /** Random guess indicator wrapper HTML */
-        GetRandomGuessIndicator(): string,
+        GetRandomGuessIndicator(args?: string): string,
     }
 
     /** Custom events from C# */
@@ -319,7 +324,7 @@ declare export global
 
     /** Event handlers for custom events from C# */
     export type CustomEventDetail = {
-        [target in EventName]?: Array<EventHandlerData> 
+        [target in EventName]?: Array<EventHandlerData>
     }
 
     /** Event handler targets */
@@ -409,6 +414,32 @@ declare export global
         Guesses: Array<NonNullable<GuessSummary>>,
     }
 
+    /** Round minimap settings for players */
+    export type MapRoundSettings = {
+        /** Round number */
+        roundNumber: number,
+        /** Wheter round is multiguess */
+        isMultiGuess: boolean,
+        /** Start datetime */
+        startTime: string,
+        /** Available layers */
+        layers: MapLayer[],
+        /** Wheter 3D is enabled*/
+        is3dEnabled: boolean,
+        /** Black & white effect*/
+        blackAndWhite: boolean,
+        /** Blur effect */
+        blurry: boolean,
+        /** Mirrored */
+        mirrored: boolean,
+        /** Upside down*/
+        upsideDown: boolean,
+        /** Sepia effect */
+        sepia: boolean,
+        /** Maximum zoom level */
+        maxZoomLevel: number
+    }
+
     /** Correct location */
     export type RoundCorrectLocationJson = LocationSource & Feature
 
@@ -496,7 +527,21 @@ declare export global
         IsStreamerGuess: boolean,
         /** Wheter the guess was random */
         WasRandom: boolean,
+        /** Random guess arguments */
+        RandomGuessArgs: string,
+        /** Map layer guess was made on */
+        Layer: MapLayer,
+        /** Map layer guess was made on */
+        Source: GuessSource,
     } & GameResult
+
+    /** Source of the guess */
+    export type GuessSource = "MAP" | "EXT" | "CHAT"
+
+    /** Available minimap layers for players */
+    export type MapLayer = "STREETS" | "SATELLITE" | "TERRAIN"
+        | "OSM" | "OPENTOPOMAP"
+        | "3D DEFAULT" | "3D SATELLITE" | "3D OUTDOORS" | "3D LIGHTMODE" | "3D DARKMODE" | "3D SATELLITE (NO LABELS)"
 
     /** Game results summary */
     export type GameSummary = {
