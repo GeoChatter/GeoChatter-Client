@@ -82,6 +82,7 @@ namespace GeoChatter.Forms
             this.label2 = new System.Windows.Forms.Label();
             this.tabPageConnections = new System.Windows.Forms.TabPage();
             this.groupBoxOtherChatGateways = new System.Windows.Forms.GroupBox();
+            this.ctrlBotChatMessages = new GeoChatter.Controls.StreamerBotActionControl();
             this.checkBoxSendChatMsgsViaStreamerBot = new System.Windows.Forms.CheckBox();
             this.grpObsConnection = new System.Windows.Forms.GroupBox();
             this.chkShowPassword = new System.Windows.Forms.CheckBox();
@@ -117,6 +118,7 @@ namespace GeoChatter.Forms
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.tabPageEvents = new System.Windows.Forms.TabPage();
             this.groupBoxGameEnd = new System.Windows.Forms.GroupBox();
+            this.ctrlBotRoundEnd = new GeoChatter.Controls.StreamerBotActionControl();
             this.label25 = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
             this.comboOBSGameEndSource = new System.Windows.Forms.ComboBox();
@@ -125,6 +127,7 @@ namespace GeoChatter.Forms
             this.chkOBSGameEndExecute = new System.Windows.Forms.CheckBox();
             this.chkBotGameEndExecute = new System.Windows.Forms.CheckBox();
             this.groupBoxRoundEnd = new System.Windows.Forms.GroupBox();
+            this.ctrlBotGameEnd = new GeoChatter.Controls.StreamerBotActionControl();
             this.label19 = new System.Windows.Forms.Label();
             this.label24 = new System.Windows.Forms.Label();
             this.comboOBSRoundEndSource = new System.Windows.Forms.ComboBox();
@@ -133,6 +136,7 @@ namespace GeoChatter.Forms
             this.chkOBSRoundEndExecute = new System.Windows.Forms.CheckBox();
             this.chkBotRoundEndExecute = new System.Windows.Forms.CheckBox();
             this.groupBoxRoundTimer = new System.Windows.Forms.GroupBox();
+            this.ctrlBotRoundStart = new GeoChatter.Controls.StreamerBotActionControl();
             this.label18 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
             this.comboRoundTimerObsSource = new System.Windows.Forms.ComboBox();
@@ -141,6 +145,7 @@ namespace GeoChatter.Forms
             this.chkRoundTimerOBS = new System.Windows.Forms.CheckBox();
             this.checkBoxRoundTimerExecuteStreamerBotAction = new System.Windows.Forms.CheckBox();
             this.groupBoxEventDistance = new System.Windows.Forms.GroupBox();
+            this.ctrlBotSpecialDistance = new GeoChatter.Controls.StreamerBotActionControl();
             this.chkSpecialDistanceRange = new System.Windows.Forms.CheckBox();
             this.label22 = new System.Windows.Forms.Label();
             this.txtSpecialDistanceTo = new System.Windows.Forms.TextBox();
@@ -149,6 +154,7 @@ namespace GeoChatter.Forms
             this.comboSpecialDistanceObsAction = new System.Windows.Forms.ComboBox();
             this.comboSpecialDistanceObsSource = new System.Windows.Forms.ComboBox();
             this.checkBoxSpecialDistanceAction = new System.Windows.Forms.CheckBox();
+            this.ctrlBotSpecialScore = new GeoChatter.Controls.StreamerBotActionControl();
             this.label7 = new System.Windows.Forms.Label();
             this.chkSpecialDistanceObs = new System.Windows.Forms.CheckBox();
             this.txtSpecialDistanceFrom = new System.Windows.Forms.TextBox();
@@ -940,6 +946,7 @@ namespace GeoChatter.Forms
             // 
             // groupBoxOtherChatGateways
             // 
+            this.groupBoxOtherChatGateways.Controls.Add(this.ctrlBotChatMessages);
             this.groupBoxOtherChatGateways.Controls.Add(this.checkBoxSendChatMsgsViaStreamerBot);
             this.groupBoxOtherChatGateways.Location = new System.Drawing.Point(8, 208);
             this.groupBoxOtherChatGateways.Name = "groupBoxOtherChatGateways";
@@ -947,6 +954,13 @@ namespace GeoChatter.Forms
             this.groupBoxOtherChatGateways.TabIndex = 13;
             this.groupBoxOtherChatGateways.TabStop = false;
             this.groupBoxOtherChatGateways.Text = "Other chat gateways";
+            // 
+            // ctrlBotChatMessages
+            // 
+            this.ctrlBotChatMessages.Location = new System.Drawing.Point(2, 49);
+            this.ctrlBotChatMessages.Name = "ctrlBotChatMessages";
+            this.ctrlBotChatMessages.Size = new System.Drawing.Size(233, 32);
+            this.ctrlBotChatMessages.TabIndex = 25;
             // 
             // checkBoxSendChatMsgsViaStreamerBot
             // 
@@ -1342,6 +1356,7 @@ namespace GeoChatter.Forms
             // 
             // groupBoxGameEnd
             // 
+            this.groupBoxGameEnd.Controls.Add(this.ctrlBotGameEnd);
             this.groupBoxGameEnd.Controls.Add(this.label25);
             this.groupBoxGameEnd.Controls.Add(this.label26);
             this.groupBoxGameEnd.Controls.Add(this.comboOBSGameEndSource);
@@ -1357,6 +1372,13 @@ namespace GeoChatter.Forms
             this.groupBoxGameEnd.TabIndex = 25;
             this.groupBoxGameEnd.TabStop = false;
             this.groupBoxGameEnd.Text = "Game End";
+            // 
+            // ctrlBotGameEnd
+            // 
+            this.ctrlBotGameEnd.Location = new System.Drawing.Point(208, 13);
+            this.ctrlBotGameEnd.Name = "ctrlBotGameEnd";
+            this.ctrlBotGameEnd.Size = new System.Drawing.Size(233, 32);
+            this.ctrlBotGameEnd.TabIndex = 24;
             // 
             // label25
             // 
@@ -1439,6 +1461,7 @@ namespace GeoChatter.Forms
             // 
             // groupBoxRoundEnd
             // 
+            this.groupBoxRoundEnd.Controls.Add(this.ctrlBotRoundEnd);
             this.groupBoxRoundEnd.Controls.Add(this.label19);
             this.groupBoxRoundEnd.Controls.Add(this.label24);
             this.groupBoxRoundEnd.Controls.Add(this.comboOBSRoundEndSource);
@@ -1454,6 +1477,13 @@ namespace GeoChatter.Forms
             this.groupBoxRoundEnd.TabIndex = 24;
             this.groupBoxRoundEnd.TabStop = false;
             this.groupBoxRoundEnd.Text = "Round End";
+            // 
+            // ctrlBotRoundEnd
+            // 
+            this.ctrlBotRoundEnd.Location = new System.Drawing.Point(208, 13);
+            this.ctrlBotRoundEnd.Name = "ctrlBotRoundEnd";
+            this.ctrlBotRoundEnd.Size = new System.Drawing.Size(233, 32);
+            this.ctrlBotRoundEnd.TabIndex = 24;
             // 
             // label19
             // 
@@ -1536,6 +1566,7 @@ namespace GeoChatter.Forms
             // 
             // groupBoxRoundTimer
             // 
+            this.groupBoxRoundTimer.Controls.Add(this.ctrlBotRoundStart);
             this.groupBoxRoundTimer.Controls.Add(this.label18);
             this.groupBoxRoundTimer.Controls.Add(this.label17);
             this.groupBoxRoundTimer.Controls.Add(this.comboRoundTimerObsSource);
@@ -1551,6 +1582,13 @@ namespace GeoChatter.Forms
             this.groupBoxRoundTimer.TabIndex = 10;
             this.groupBoxRoundTimer.TabStop = false;
             this.groupBoxRoundTimer.Text = "Round Start";
+            // 
+            // ctrlBotRoundStart
+            // 
+            this.ctrlBotRoundStart.Location = new System.Drawing.Point(208, 13);
+            this.ctrlBotRoundStart.Name = "ctrlBotRoundStart";
+            this.ctrlBotRoundStart.Size = new System.Drawing.Size(233, 32);
+            this.ctrlBotRoundStart.TabIndex = 24;
             // 
             // label18
             // 
@@ -1633,6 +1671,7 @@ namespace GeoChatter.Forms
             // 
             // groupBoxEventDistance
             // 
+            this.groupBoxEventDistance.Controls.Add(this.ctrlBotSpecialDistance);
             this.groupBoxEventDistance.Controls.Add(this.chkSpecialDistanceRange);
             this.groupBoxEventDistance.Controls.Add(this.label22);
             this.groupBoxEventDistance.Controls.Add(this.txtSpecialDistanceTo);
@@ -1653,6 +1692,13 @@ namespace GeoChatter.Forms
             this.groupBoxEventDistance.TabIndex = 3;
             this.groupBoxEventDistance.TabStop = false;
             this.groupBoxEventDistance.Text = "Special distance event";
+            // 
+            // ctrlBotSpecialDistance
+            // 
+            this.ctrlBotSpecialDistance.Location = new System.Drawing.Point(208, 50);
+            this.ctrlBotSpecialDistance.Name = "ctrlBotSpecialDistance";
+            this.ctrlBotSpecialDistance.Size = new System.Drawing.Size(233, 32);
+            this.ctrlBotSpecialDistance.TabIndex = 30;
             // 
             // chkSpecialDistanceRange
             // 
@@ -1787,6 +1833,7 @@ namespace GeoChatter.Forms
             // 
             // groupBoxEventSpecial
             // 
+            this.groupBoxEventSpecial.Controls.Add(this.ctrlBotSpecialScore);
             this.groupBoxEventSpecial.Controls.Add(this.chkSpecialScoreRange);
             this.groupBoxEventSpecial.Controls.Add(this.txtSpecialScoreTo);
             this.groupBoxEventSpecial.Controls.Add(this.label20);
@@ -1807,6 +1854,13 @@ namespace GeoChatter.Forms
             this.groupBoxEventSpecial.TabIndex = 1;
             this.groupBoxEventSpecial.TabStop = false;
             this.groupBoxEventSpecial.Text = "Special score event";
+            // 
+            // ctrlBotSpecialScore
+            // 
+            this.ctrlBotSpecialScore.Location = new System.Drawing.Point(208, 50);
+            this.ctrlBotSpecialScore.Name = "ctrlBotSpecialScore";
+            this.ctrlBotSpecialScore.Size = new System.Drawing.Size(233, 32);
+            this.ctrlBotSpecialScore.TabIndex = 28;
             // 
             // chkSpecialScoreRange
             // 
