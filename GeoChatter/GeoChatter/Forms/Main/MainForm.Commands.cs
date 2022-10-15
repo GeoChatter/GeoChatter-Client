@@ -324,7 +324,7 @@ namespace GeoChatter.Forms
 
                 Coordinates rand = null;
 
-                if (string.IsNullOrWhiteSpace(args.Arguments))
+                if (string.IsNullOrWhiteSpace(args.Arguments) || !Settings.Default.CustomRandomGuessingEnabled)
                 {
                     rand = BorderHelper.GetRandomPointCloseOrWithinAPolygon();
                 }

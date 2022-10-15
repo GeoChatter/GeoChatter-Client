@@ -111,6 +111,8 @@ namespace GeoChatter.Forms
             }
 
 
+            Settings.Default.CustomRandomGuessingEnabled = allowCustomRandomGuesses.Checked;
+
             Settings.Default.TwitchChannel = txtGeneralChannelName.Text;
             
             Settings.Default.oauthToken = txtGeneralOauthToken.Text;
@@ -710,6 +712,8 @@ namespace GeoChatter.Forms
                 }
             }
 
+
+            allowCustomRandomGuesses.Checked = Settings.Default.CustomRandomGuessingEnabled;
 
             txtGeneralChannelName.Text = Settings.Default.TwitchChannel;
             

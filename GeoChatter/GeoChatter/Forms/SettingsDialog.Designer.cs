@@ -81,7 +81,6 @@ namespace GeoChatter.Forms
             this.label2 = new System.Windows.Forms.Label();
             this.tabPageConnections = new System.Windows.Forms.TabPage();
             this.groupBoxOtherChatGateways = new System.Windows.Forms.GroupBox();
-            this.ctrlBotChatMessages = new GeoChatter.Controls.StreamerBotActionControl();
             this.checkBoxSendChatMsgsViaStreamerBot = new System.Windows.Forms.CheckBox();
             this.grpObsConnection = new System.Windows.Forms.GroupBox();
             this.chkShowPassword = new System.Windows.Forms.CheckBox();
@@ -117,7 +116,6 @@ namespace GeoChatter.Forms
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.tabPageEvents = new System.Windows.Forms.TabPage();
             this.groupBoxGameEnd = new System.Windows.Forms.GroupBox();
-            this.ctrlBotGameEnd = new GeoChatter.Controls.StreamerBotActionControl();
             this.label25 = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
             this.comboOBSGameEndSource = new System.Windows.Forms.ComboBox();
@@ -126,7 +124,6 @@ namespace GeoChatter.Forms
             this.chkOBSGameEndExecute = new System.Windows.Forms.CheckBox();
             this.chkBotGameEndExecute = new System.Windows.Forms.CheckBox();
             this.groupBoxRoundEnd = new System.Windows.Forms.GroupBox();
-            this.ctrlBotRoundEnd = new GeoChatter.Controls.StreamerBotActionControl();
             this.label19 = new System.Windows.Forms.Label();
             this.label24 = new System.Windows.Forms.Label();
             this.comboOBSRoundEndSource = new System.Windows.Forms.ComboBox();
@@ -135,7 +132,6 @@ namespace GeoChatter.Forms
             this.chkOBSRoundEndExecute = new System.Windows.Forms.CheckBox();
             this.chkBotRoundEndExecute = new System.Windows.Forms.CheckBox();
             this.groupBoxRoundTimer = new System.Windows.Forms.GroupBox();
-            this.ctrlBotRoundStart = new GeoChatter.Controls.StreamerBotActionControl();
             this.label18 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
             this.comboRoundTimerObsSource = new System.Windows.Forms.ComboBox();
@@ -144,7 +140,6 @@ namespace GeoChatter.Forms
             this.chkRoundTimerOBS = new System.Windows.Forms.CheckBox();
             this.checkBoxRoundTimerExecuteStreamerBotAction = new System.Windows.Forms.CheckBox();
             this.groupBoxEventDistance = new System.Windows.Forms.GroupBox();
-            this.ctrlBotSpecialDistance = new GeoChatter.Controls.StreamerBotActionControl();
             this.chkSpecialDistanceRange = new System.Windows.Forms.CheckBox();
             this.label22 = new System.Windows.Forms.Label();
             this.txtSpecialDistanceTo = new System.Windows.Forms.TextBox();
@@ -158,7 +153,6 @@ namespace GeoChatter.Forms
             this.txtSpecialDistanceFrom = new System.Windows.Forms.TextBox();
             this.checkBoxSpecialDistanceLabel = new System.Windows.Forms.CheckBox();
             this.groupBoxEventSpecial = new System.Windows.Forms.GroupBox();
-            this.ctrlBotSpecialScore = new GeoChatter.Controls.StreamerBotActionControl();
             this.chkSpecialScoreRange = new System.Windows.Forms.CheckBox();
             this.txtSpecialScoreTo = new System.Windows.Forms.TextBox();
             this.label20 = new System.Windows.Forms.Label();
@@ -284,6 +278,8 @@ namespace GeoChatter.Forms
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.label15 = new System.Windows.Forms.Label();
             this.tabDevelopment = new System.Windows.Forms.TabPage();
+            this.chkDEVEnableRandomBotGuess = new System.Windows.Forms.CheckBox();
+            this.chkDEVShowDevTools = new System.Windows.Forms.CheckBox();
             this.chkDEVUseDevApi = new System.Windows.Forms.CheckBox();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnApply = new System.Windows.Forms.Button();
@@ -293,8 +289,7 @@ namespace GeoChatter.Forms
             this.colorDialog2 = new System.Windows.Forms.ColorDialog();
             this.folderBrowserLabelPath = new System.Windows.Forms.FolderBrowserDialog();
             this.usernameColorDialog = new System.Windows.Forms.ColorDialog();
-            this.chkDEVShowDevTools = new System.Windows.Forms.CheckBox();
-            this.chkDEVEnableRandomBotGuess = new System.Windows.Forms.CheckBox();
+            this.allowCustomRandomGuesses = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabGeneral.SuspendLayout();
@@ -699,6 +694,7 @@ namespace GeoChatter.Forms
             // 
             // groupGameSettings
             // 
+            this.groupGameSettings.Controls.Add(this.allowCustomRandomGuesses);
             this.groupGameSettings.Controls.Add(this.chkCheckStreamer);
             this.groupGameSettings.Controls.Add(this.chkAllowSameLocationGuess);
             this.groupGameSettings.Controls.Add(this.chkUseEnglishCountryNames);
@@ -930,7 +926,6 @@ namespace GeoChatter.Forms
             // 
             // groupBoxOtherChatGateways
             // 
-            this.groupBoxOtherChatGateways.Controls.Add(this.ctrlBotChatMessages);
             this.groupBoxOtherChatGateways.Controls.Add(this.checkBoxSendChatMsgsViaStreamerBot);
             this.groupBoxOtherChatGateways.Location = new System.Drawing.Point(8, 208);
             this.groupBoxOtherChatGateways.Name = "groupBoxOtherChatGateways";
@@ -938,13 +933,6 @@ namespace GeoChatter.Forms
             this.groupBoxOtherChatGateways.TabIndex = 13;
             this.groupBoxOtherChatGateways.TabStop = false;
             this.groupBoxOtherChatGateways.Text = "Other chat gateways";
-            // 
-            // ctrlBotChatMessages
-            // 
-            this.ctrlBotChatMessages.Location = new System.Drawing.Point(2, 49);
-            this.ctrlBotChatMessages.Name = "ctrlBotChatMessages";
-            this.ctrlBotChatMessages.Size = new System.Drawing.Size(233, 32);
-            this.ctrlBotChatMessages.TabIndex = 25;
             // 
             // checkBoxSendChatMsgsViaStreamerBot
             // 
@@ -1339,7 +1327,6 @@ namespace GeoChatter.Forms
             // 
             // groupBoxGameEnd
             // 
-            this.groupBoxGameEnd.Controls.Add(this.ctrlBotGameEnd);
             this.groupBoxGameEnd.Controls.Add(this.label25);
             this.groupBoxGameEnd.Controls.Add(this.label26);
             this.groupBoxGameEnd.Controls.Add(this.comboOBSGameEndSource);
@@ -1355,13 +1342,6 @@ namespace GeoChatter.Forms
             this.groupBoxGameEnd.TabIndex = 25;
             this.groupBoxGameEnd.TabStop = false;
             this.groupBoxGameEnd.Text = "Game End";
-            // 
-            // ctrlBotGameEnd
-            // 
-            this.ctrlBotGameEnd.Location = new System.Drawing.Point(208, 13);
-            this.ctrlBotGameEnd.Name = "ctrlBotGameEnd";
-            this.ctrlBotGameEnd.Size = new System.Drawing.Size(233, 32);
-            this.ctrlBotGameEnd.TabIndex = 24;
             // 
             // label25
             // 
@@ -1444,7 +1424,6 @@ namespace GeoChatter.Forms
             // 
             // groupBoxRoundEnd
             // 
-            this.groupBoxRoundEnd.Controls.Add(this.ctrlBotRoundEnd);
             this.groupBoxRoundEnd.Controls.Add(this.label19);
             this.groupBoxRoundEnd.Controls.Add(this.label24);
             this.groupBoxRoundEnd.Controls.Add(this.comboOBSRoundEndSource);
@@ -1460,13 +1439,6 @@ namespace GeoChatter.Forms
             this.groupBoxRoundEnd.TabIndex = 24;
             this.groupBoxRoundEnd.TabStop = false;
             this.groupBoxRoundEnd.Text = "Round End";
-            // 
-            // ctrlBotRoundEnd
-            // 
-            this.ctrlBotRoundEnd.Location = new System.Drawing.Point(208, 13);
-            this.ctrlBotRoundEnd.Name = "ctrlBotRoundEnd";
-            this.ctrlBotRoundEnd.Size = new System.Drawing.Size(233, 32);
-            this.ctrlBotRoundEnd.TabIndex = 24;
             // 
             // label19
             // 
@@ -1549,7 +1521,6 @@ namespace GeoChatter.Forms
             // 
             // groupBoxRoundTimer
             // 
-            this.groupBoxRoundTimer.Controls.Add(this.ctrlBotRoundStart);
             this.groupBoxRoundTimer.Controls.Add(this.label18);
             this.groupBoxRoundTimer.Controls.Add(this.label17);
             this.groupBoxRoundTimer.Controls.Add(this.comboRoundTimerObsSource);
@@ -1565,13 +1536,6 @@ namespace GeoChatter.Forms
             this.groupBoxRoundTimer.TabIndex = 10;
             this.groupBoxRoundTimer.TabStop = false;
             this.groupBoxRoundTimer.Text = "Round Start";
-            // 
-            // ctrlBotRoundStart
-            // 
-            this.ctrlBotRoundStart.Location = new System.Drawing.Point(208, 13);
-            this.ctrlBotRoundStart.Name = "ctrlBotRoundStart";
-            this.ctrlBotRoundStart.Size = new System.Drawing.Size(233, 32);
-            this.ctrlBotRoundStart.TabIndex = 24;
             // 
             // label18
             // 
@@ -1654,7 +1618,6 @@ namespace GeoChatter.Forms
             // 
             // groupBoxEventDistance
             // 
-            this.groupBoxEventDistance.Controls.Add(this.ctrlBotSpecialDistance);
             this.groupBoxEventDistance.Controls.Add(this.chkSpecialDistanceRange);
             this.groupBoxEventDistance.Controls.Add(this.label22);
             this.groupBoxEventDistance.Controls.Add(this.txtSpecialDistanceTo);
@@ -1675,13 +1638,6 @@ namespace GeoChatter.Forms
             this.groupBoxEventDistance.TabIndex = 3;
             this.groupBoxEventDistance.TabStop = false;
             this.groupBoxEventDistance.Text = "Special distance event";
-            // 
-            // ctrlBotSpecialDistance
-            // 
-            this.ctrlBotSpecialDistance.Location = new System.Drawing.Point(208, 50);
-            this.ctrlBotSpecialDistance.Name = "ctrlBotSpecialDistance";
-            this.ctrlBotSpecialDistance.Size = new System.Drawing.Size(233, 32);
-            this.ctrlBotSpecialDistance.TabIndex = 30;
             // 
             // chkSpecialDistanceRange
             // 
@@ -1816,7 +1772,6 @@ namespace GeoChatter.Forms
             // 
             // groupBoxEventSpecial
             // 
-            this.groupBoxEventSpecial.Controls.Add(this.ctrlBotSpecialScore);
             this.groupBoxEventSpecial.Controls.Add(this.chkSpecialScoreRange);
             this.groupBoxEventSpecial.Controls.Add(this.txtSpecialScoreTo);
             this.groupBoxEventSpecial.Controls.Add(this.label20);
@@ -1837,13 +1792,6 @@ namespace GeoChatter.Forms
             this.groupBoxEventSpecial.TabIndex = 1;
             this.groupBoxEventSpecial.TabStop = false;
             this.groupBoxEventSpecial.Text = "Special score event";
-            // 
-            // ctrlBotSpecialScore
-            // 
-            this.ctrlBotSpecialScore.Location = new System.Drawing.Point(208, 50);
-            this.ctrlBotSpecialScore.Name = "ctrlBotSpecialScore";
-            this.ctrlBotSpecialScore.Size = new System.Drawing.Size(233, 32);
-            this.ctrlBotSpecialScore.TabIndex = 28;
             // 
             // chkSpecialScoreRange
             // 
@@ -3379,6 +3327,26 @@ namespace GeoChatter.Forms
             this.tabDevelopment.Text = "DEV SETTINGS";
             this.tabDevelopment.UseVisualStyleBackColor = true;
             // 
+            // chkDEVEnableRandomBotGuess
+            // 
+            this.chkDEVEnableRandomBotGuess.AutoSize = true;
+            this.chkDEVEnableRandomBotGuess.Location = new System.Drawing.Point(60, 98);
+            this.chkDEVEnableRandomBotGuess.Name = "chkDEVEnableRandomBotGuess";
+            this.chkDEVEnableRandomBotGuess.Size = new System.Drawing.Size(158, 19);
+            this.chkDEVEnableRandomBotGuess.TabIndex = 2;
+            this.chkDEVEnableRandomBotGuess.Text = "Enable !randomBotGuess";
+            this.chkDEVEnableRandomBotGuess.UseVisualStyleBackColor = true;
+            // 
+            // chkDEVShowDevTools
+            // 
+            this.chkDEVShowDevTools.AutoSize = true;
+            this.chkDEVShowDevTools.Location = new System.Drawing.Point(60, 73);
+            this.chkDEVShowDevTools.Name = "chkDEVShowDevTools";
+            this.chkDEVShowDevTools.Size = new System.Drawing.Size(106, 19);
+            this.chkDEVShowDevTools.TabIndex = 1;
+            this.chkDEVShowDevTools.Text = "Show dev tools";
+            this.chkDEVShowDevTools.UseVisualStyleBackColor = true;
+            // 
             // chkDEVUseDevApi
             // 
             this.chkDEVUseDevApi.AutoSize = true;
@@ -3447,25 +3415,19 @@ namespace GeoChatter.Forms
             this.usernameColorDialog.FullOpen = true;
             this.usernameColorDialog.SolidColorOnly = true;
             // 
-            // chkDEVShowDevTools
+            // allowCustomRandomGuesses
             // 
-            this.chkDEVShowDevTools.AutoSize = true;
-            this.chkDEVShowDevTools.Location = new System.Drawing.Point(60, 73);
-            this.chkDEVShowDevTools.Name = "chkDEVShowDevTools";
-            this.chkDEVShowDevTools.Size = new System.Drawing.Size(106, 19);
-            this.chkDEVShowDevTools.TabIndex = 1;
-            this.chkDEVShowDevTools.Text = "Show dev tools";
-            this.chkDEVShowDevTools.UseVisualStyleBackColor = true;
-            // 
-            // chkDEVEnableRandomBotGuess
-            // 
-            this.chkDEVEnableRandomBotGuess.AutoSize = true;
-            this.chkDEVEnableRandomBotGuess.Location = new System.Drawing.Point(60, 98);
-            this.chkDEVEnableRandomBotGuess.Name = "chkDEVEnableRandomBotGuess";
-            this.chkDEVEnableRandomBotGuess.Size = new System.Drawing.Size(158, 19);
-            this.chkDEVEnableRandomBotGuess.TabIndex = 2;
-            this.chkDEVEnableRandomBotGuess.Text = "Enable !randomBotGuess";
-            this.chkDEVEnableRandomBotGuess.UseVisualStyleBackColor = true;
+            this.allowCustomRandomGuesses.AutoSize = true;
+            this.allowCustomRandomGuesses.Location = new System.Drawing.Point(7, 145);
+            this.allowCustomRandomGuesses.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.allowCustomRandomGuesses.Name = "allowCustomRandomGuesses";
+            this.allowCustomRandomGuesses.Size = new System.Drawing.Size(254, 19);
+            this.allowCustomRandomGuesses.TabIndex = 12;
+            this.allowCustomRandomGuesses.Text = "Enable random guessing in specific regions";
+            this.toolTip1.SetToolTip(this.allowCustomRandomGuesses, "When enabled, players can use random guessing command and the map to make random " +
+        "guesses in their choice of regions with customized probabilities for each choice" +
+        "");
+            this.allowCustomRandomGuesses.UseVisualStyleBackColor = true;
             // 
             // SettingsDialog
             // 
@@ -3836,6 +3798,7 @@ namespace GeoChatter.Forms
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.CheckBox chkDEVEnableRandomBotGuess;
         private System.Windows.Forms.CheckBox chkDEVShowDevTools;
+        private System.Windows.Forms.CheckBox allowCustomRandomGuesses;
     }
 }
 

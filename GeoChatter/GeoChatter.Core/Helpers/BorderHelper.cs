@@ -553,6 +553,41 @@ namespace GeoChatter.Core.Helpers
             return match ?? codeOrName;
         }
 
+        private static string GetNameFromRandomGuessArg(string arg)
+        {
+            if (string.IsNullOrWhiteSpace(arg))
+            {
+                return string.Empty;
+            }
+
+            string[] splt = arg.Split(':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (splt.Length >= 1)
+            {
+                return splt[0];
+            }
+            else
+            {
+                return arg;
+            }
+        }
+
+        private static double GetWeightFromRandomGuessArg(string arg)
+        {
+            if (string.IsNullOrWhiteSpace(arg))
+            {
+                return 0D;
+            }
+
+            string[] splt = arg.Split(':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (splt.Length <= 1)
+            {
+                return 1D;
+            }
+            else
+            {
+                return splt[1].ParseAsDouble(1);
+            }
+        }
         /// <summary>
         /// Get random coordinates around given areas
         /// </summary>
@@ -569,31 +604,26 @@ namespace GeoChatter.Core.Helpers
                 }
 
                 // TODO: Refactor
-                string[] countryArgs = randomGuessQuery.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                string[] countryArgs = randomGuessQuery
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .OrderBy(s => GetWeightFromRandomGuessArg(s))
+                    .ToArray();
                 if (countryArgs.Length > 0)
                 {
 
                     if (countryArgs.Length == 1)
                     {
-                        string match = GetAlpha3FromCodeOrName(countryArgs[0].Split(':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[0]);
+                        string match = GetAlpha3FromCodeOrName(GetNameFromRandomGuessArg(countryArgs[0]));
                         rand = GetRandomPointCloseOrWithin(match, out Feature _);
                     }
                     else
                     {
                         List<string> matches = countryArgs
-                            .Select(c => c.Split(':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)[0])
+                            .Select(c => GetNameFromRandomGuessArg(c))
                             .ToList();
 
                         List<double> probs = countryArgs
-                            .Select(c =>
-                            {
-                                string[] splt = c.Split(':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                                if (splt.Length == 1)
-                                {
-                                    return 1;
-                                }
-                                return splt[1].ParseAsDouble(1);
-                            })
+                            .Select(c => GetWeightFromRandomGuessArg(c))
                             .ToList();
 
                         double totalProb = probs.Sum();
