@@ -1360,6 +1360,8 @@ th.sorting, th.sorting_asc, th.sorting_desc {
     font-size: 18px;
     overflow-x: hidden;
     width: var(--platform-icon-width-hidden);
+    padding-left: 2px;
+    z-index: 1000;
 }
 
 [data-colfield="#{$PlayerNameFieldName}"] > span:last-child:hover:before {
@@ -1396,4 +1398,20 @@ th.sorting, th.sorting_asc, th.sorting_desc {
     --platform-icon: "\f7a2";
     --platform-icon-width: 27px;
     --platform-icon-width-hidden: 4px;
+}
+
+#roundSettingsContainer {
+    text-transform: unset;
+}
+
+.clusterInfoWindowRowContainer {
+    display: flex;
+    width: fit-content;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.clusterInfoWindowRow {
+    padding: 2px
 }

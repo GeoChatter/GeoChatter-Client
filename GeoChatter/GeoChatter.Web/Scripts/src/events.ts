@@ -199,7 +199,9 @@ export namespace EventHandler
                     .parent()
                     .append(Control.InfiniteGameButton().css("display", $(btn).data("qa") == "start-streak-game-button" ? "none" : "inline-block"))
                     .parent()
-                    .append(await Control.RoundSettingsContainer(true));
+                    .parent()
+                    .parent()
+                    .prepend(await Control.RoundSettingsContainer(true));
             }
             else
             {

@@ -63,7 +63,7 @@ export namespace MapUtil
 
         const markerIcon = {
             path: google.maps.SymbolPath.CIRCLE,
-            fillColor: "#ff0000",
+            fillColor: "#52456b",
             fillOpacity: 0.82,
             scale: 19,
             strokeColor: "#FFFFFF",
@@ -146,7 +146,7 @@ export namespace MapUtil
 
         const markerIcon = {
             path: google.maps.SymbolPath.CIRCLE,
-            fillColor: "#ff0000",
+            fillColor: "#52456b",
             fillOpacity: 0.82,
             scale: 19,
             strokeColor: "#FFFFFF",

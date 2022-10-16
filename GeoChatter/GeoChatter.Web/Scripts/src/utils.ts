@@ -291,11 +291,11 @@ export namespace Util
     */
     export function GetInfoWindowHtmlForCluster(names: Array<string>): string
     {
-        return `<div class="gm-iw-custom" style='border: 3px solid #ff0000 !important;'>
+        return `<div class="gm-iw-custom" style='border: 3px solid var(--gc-gg-main-color) !important;'>
                     <div style="font-size:${Setting.Overlay.FontSize}${Setting.Overlay.FontSizeUnit}">
                         GUESSES AROUND AREA (${names.length})
                     </div>
-                    <div class="clusterInfoWindowRowContainer" style="display: flex; width: fit-content; flex-direction: column; justify-content: flex-start;">
+                    <div class="clusterInfoWindowRowContainer">
                     ${(names ? names.join(" ") : "")}
                     </div>
                 </div>`;
