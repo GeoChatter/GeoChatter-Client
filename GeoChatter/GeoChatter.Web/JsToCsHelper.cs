@@ -15,6 +15,7 @@ using GeoChatter.Model;
 using GeoChatter.Core.Common.Extensions;
 using GeoChatter.Core.Helpers;
 using CefSharp;
+using GeoChatter.Core.Model.Map;
 
 namespace GeoChatter.Web
 {
@@ -244,6 +245,15 @@ namespace GeoChatter.Web
         }
 
         /// <summary>
+        /// Get list of available layer names
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetAvailableLayers()
+        {
+            return mainForm?.AvailableLayers ?? new List<string>();
+        }
+
+        /// <summary>
         /// Change map round setting for next round
         /// </summary>
         /// <param name="settingName"></param>
@@ -251,7 +261,86 @@ namespace GeoChatter.Web
         /// <param name="forEveryone"></param>
         public void ChangeRoundSetting(string settingName, object value, bool forEveryone)
         {
+            if (mainForm == null || mainForm.RoundSettingsPreference == null)
+            {
+                return;
+            }
 
+            switch (settingName)
+            {
+                case nameof(MapRoundSettings.Blurry):
+                    {
+                        if (value is bool val)
+                        {
+                            mainForm.RoundSettingsPreference.Blurry = val;
+                        }
+                        break;
+                    }
+                case nameof(MapRoundSettings.UpsideDown):
+                    {
+                        if (value is bool val)
+                        {
+                            mainForm.RoundSettingsPreference.UpsideDown = val;
+                        }
+                        break;
+                    }
+                case nameof(MapRoundSettings.Is3dEnabled):
+                    {
+                        if (value is bool val)
+                        {
+                            mainForm.RoundSettingsPreference.Is3dEnabled = val;
+                        }
+                        break;
+                    }
+                case nameof(MapRoundSettings.BlackAndWhite):
+                    {
+                        if (value is bool val)
+                        {
+                            mainForm.RoundSettingsPreference.BlackAndWhite = val;
+                        }
+                        break;
+                    }
+                case nameof(MapRoundSettings.Sepia):
+                    {
+                        if (value is bool val)
+                        {
+                            mainForm.RoundSettingsPreference.Sepia = val;
+                        }
+                        break;
+                    }
+                case nameof(MapRoundSettings.Mirrored):
+                    {
+                        if (value is bool val)
+                        {
+                            mainForm.RoundSettingsPreference.Mirrored = val;
+                        }
+                        break;
+                    }
+                case nameof(MapRoundSettings.Layers):
+                    {
+                        if (value is string val && !string.IsNullOrWhiteSpace(val))
+                        {
+                            if (!mainForm.RoundSettingsPreference.Layers.Remove(val))
+                            {
+                                mainForm.RoundSettingsPreference.Layers.Add(val);
+                            }
+                        }
+                        break;
+                    }
+                case nameof(MapRoundSettings.MaxZoomLevel):
+                    {
+                        if (value is string v)
+                        {
+                            int val = v.ParseAsInt();
+                            mainForm.RoundSettingsPreference.MaxZoomLevel = val > 1 ? (val < 23 ? val : 23) : 1;
+                        }
+                        else if (value is int i)
+                        {
+                            mainForm.RoundSettingsPreference.MaxZoomLevel = i > 1 ? (i < 23 ? i : 23) : 1;
+                        }
+                        break;
+                    }
+            }
         }
 
         /// <summary>

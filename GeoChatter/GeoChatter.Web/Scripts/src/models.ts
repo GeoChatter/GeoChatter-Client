@@ -123,6 +123,8 @@ export class App
 
     StartedRun: Nullable<Date>;
 
+    InitiallyAvailableLayers: string[] = [];
+
     get FirstChild(): Nullable<Game>
     {
         return this.Games[0]
@@ -800,7 +802,8 @@ export class Round
         let round = new Round(game,
             data.RoundNumber,
             data.MultiGuessEnabled,
-            data.CorrectLocation)
+            data.CorrectLocation,
+            data.MapRoundSettings)
 
         let guesses = data.Guesses;
         for (let i = 0; i < guesses.length; i++)
@@ -918,7 +921,7 @@ export class Guess
 
     Source: GuessSource;
 
-    Layer: MapLayer;
+    Layer: string;
 
     ResultFinalOrder: number = 0;
 

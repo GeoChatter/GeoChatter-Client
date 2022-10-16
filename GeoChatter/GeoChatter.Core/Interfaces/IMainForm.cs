@@ -3,6 +3,8 @@ using GeoChatter.Core.Model;
 using System;
 using System.Threading.Tasks;
 using GeoChatter.Model;
+using GeoChatter.Core.Model.Map;
+using System.Collections.Generic;
 
 namespace GeoChatter.Core.Interfaces
 {
@@ -24,6 +26,10 @@ namespace GeoChatter.Core.Interfaces
         /// <param name="reuse"></param>
         void SendRandomGuess(int amount = 30, bool reuse = false);
 #endif
+        public MapRoundSettings RoundSettingsPreference { get; }
+        public List<string> BackupLayers { get; }
+        public List<string> AvailableLayers { get; }
+
         void ToggleGuessSlider();
         /// <summary>
         /// GeoChatter version

@@ -7,6 +7,9 @@ declare export global
      * */
     export interface IJSHelper
     {
+        /** Get available layer names */
+        getAvailableLayers(): Promise<string[]>
+
         /**
          * Change MapRoundSetting for next round
          * @param settingName setting name

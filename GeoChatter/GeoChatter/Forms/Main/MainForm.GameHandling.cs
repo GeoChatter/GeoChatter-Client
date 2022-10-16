@@ -16,11 +16,16 @@ using GeoChatter.Core.Helpers;
 using GeoChatter.Helpers;
 using GeoChatter.Core.Interfaces;
 using GeoChatter.Core.Model.Map;
+using Newtonsoft.Json;
+using RestSharp;
+using System.IO;
+using static ScintillaNET.Style;
 
 namespace GeoChatter.Forms
 {
     public partial class MainForm
     {
+        private static readonly List<string> availableLayers = new List<string>();
 
 
         /// <inheritdoc/>
@@ -53,18 +58,99 @@ namespace GeoChatter.Forms
             TriggerRoundStartActions();
         }
 
-        private static void CreateAndAssignMapRoundSettings(Round round)
+        /// <summary>
+        /// ISO json file
+        /// </summary>
+        public static string LayersFile => "availablemaplayers.json";
+
+        private static RestClient restClient { get; } = new();
+
+        internal static bool LayersListInitialized { get; set; }
+
+        /// <summary>
+        /// Initializer
+        /// </summary>
+        public void InitializeAvailableLayers()
         {
-            MapRoundSettings roundSettings = new MapRoundSettings()
+            if (LayersListInitialized) return;
+
+            LayersListInitialized = true;
+
+            availableLayers.Clear();
+            logger.Info("Initializing available layer names");
+
+            try
             {
-                IsMultiGuess = round.IsMultiGuess,
-                RoundNumber = round.RealRoundNumber(),
-                StartTime = round.TimeStamp,
-                Layers = new List<string>() 
-                { 
-                    "STREETS", "SATELLITE", "TERRAIN", "OSM", "OPENTOPOMAP", "3D DEFAULT", "3D SATELLITE", "3D OUTDOORS", "3D LIGHTMODE", "3D DARKMODE", "3D SATELLITE (NO LABELS)"
+                RestRequest req = new(Path.Combine(ResourceHelper.OtherServiceURL, LayersFile), Method.Get) { RequestFormat = DataFormat.Json };
+                RestResponse res = restClient.Execute(req);
+
+                if (res.IsSuccessful)
+                {
+                    logger.Debug($"GET {LayersFile} done");
+                    var r = JsonConvert.DeserializeObject<List<string>>(res.Content);
+
+                    availableLayers.AddRange(r);
+
+                    logger.Info($"Initialized available layers with {r.Count} entries");
                 }
+                else
+                {
+                    availableLayers.AddRange(BackupLayers);
+                    logger.Error($"GET {LayersFile} failed({res.ErrorMessage}): {res.ErrorException?.Summarize()}");
+                }
+            }
+            catch (Exception ex)
+            {
+                availableLayers.AddRange(BackupLayers);
+                logger.Error(ex.Summarize());
+            }
+            if (RoundSettingsPreference.Layers == null)
+            {
+                RoundSettingsPreference.Layers = AvailableLayers;
+            }
+            else
+            {
+                RoundSettingsPreference.Layers.Clear();
+                RoundSettingsPreference.Layers.AddRange(AvailableLayers);
+            }
+        }
+
+        public List<string> BackupLayers => new List<string>() { "STREETS", "SATELLITE", "TERRAIN", "OSM", "OPENTOPOMAP", "3D DEFAULT", "3D SATELLITE", "3D OUTDOORS", "3D LIGHTMODE", "3D DARKMODE", "3D SATELLITE (NO LABELS)" };
+
+        public List<string> AvailableLayers => availableLayers?.Select(l => l).ToList();
+
+        public MapRoundSettings RoundSettingsPreference { get; } = new MapRoundSettings();
+
+        public MapRoundSettings CopyRoundSettings(MapRoundSettings set)
+        {
+            if (set == null)
+            {
+                return new MapRoundSettings()
+                {
+                    Layers = AvailableLayers
+                };
+            }
+
+            return new MapRoundSettings()
+            {
+                BlackAndWhite = set.BlackAndWhite,
+                Blurry = set.Blurry,
+                Is3dEnabled = set.Is3dEnabled,
+                Mirrored = set.Mirrored,
+                UpsideDown = set.UpsideDown,
+                Sepia = set.Sepia,
+                MaxZoomLevel = set.MaxZoomLevel,
+                Layers = set.Layers.Select(l => l).ToList()
             };
+        }
+
+        private void CreateAndAssignMapRoundSettings(Round round)
+        {
+            MapRoundSettings roundSettings = CopyRoundSettings(RoundSettingsPreference);
+            RoundSettingsPreference.IsMultiGuess = round.IsMultiGuess;
+            RoundSettingsPreference.RoundNumber = round.RealRoundNumber();
+            RoundSettingsPreference.StartTime = round.TimeStamp;
+
             round.MapRoundSettings = roundSettings;
         }
 
@@ -233,7 +319,7 @@ namespace GeoChatter.Forms
         private async Task SaveAndExit(bool instantexit = false)
         {
             logger.Info("Exiting current game: " + instantexit);
-            if(guessesOpen)
+            if (guessesOpen)
                 guessesOpen = false;
             try
             {
@@ -380,7 +466,7 @@ namespace GeoChatter.Forms
                 {
 
                     Game g = ClientDbCache.RunningGame;
-                    if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot) 
+                    if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
                     {
                         if (!guessApiClient.SummaryEnabled)
                         {
@@ -396,12 +482,12 @@ namespace GeoChatter.Forms
                                 msg = msg.ReplaceDefault("results", "testing_results");
                             CurrentBot?.SendMessage(msg);
                         }
-                        
+
                     }
                 }
                 else
                 {
-                    
+
                     Game g = ClientDbCache.RunningGame;
                     while (g.Previous != null)
                     {
@@ -427,7 +513,7 @@ namespace GeoChatter.Forms
 
                         }
                     }
-                    
+
 
                 }
                 SendEndGameToMaps(ClientDbCache.RunningGame);

@@ -327,6 +327,7 @@ namespace GeoChatter.Forms
                 if (string.IsNullOrWhiteSpace(args.Arguments) || !Settings.Default.CustomRandomGuessingEnabled)
                 {
                     rand = BorderHelper.GetRandomPointCloseOrWithinAPolygon();
+                    args.Arguments = string.Empty;
                 }
                 else
                 {
@@ -336,7 +337,7 @@ namespace GeoChatter.Forms
                 if (rand == null || (rand.Latitude == 0 && rand.Longitude == 0))
                 {
                     rand = BorderHelper.GetRandomPointCloseOrWithinAPolygon();
-                    args.Arguments = String.Empty;
+                    args.Arguments = string.Empty;
                 }
 
                 GuessReceivedEventArgs g = new(args.UserId, args.Username, args.UserPlatform, args.Bot, args.Command)

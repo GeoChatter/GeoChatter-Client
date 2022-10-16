@@ -178,7 +178,7 @@ export namespace Setting
         GetRandomGuessIndicator(args?: string)
         {
             let extra = args ? ` (${args})` : "";
-            return `<span data-tooltip='Random guess${extra}' title='Used random guess${extra}'>${extra ? Color.ColorUsername(this.CustomRandomGuessColor, this.CustomRandomGuessCharacter) : Color.ColorUsername(this.ScoreboardForeground, this.RandomGuessCharacter)}</span>`
+            return `<span title='Used random guess${extra}'>${extra ? Color.ColorUsername(this.CustomRandomGuessColor, this.CustomRandomGuessCharacter) : Color.ColorUsername(this.ScoreboardForeground, this.RandomGuessCharacter)}</span>`
         }
     };
 

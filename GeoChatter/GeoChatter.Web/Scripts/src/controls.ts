@@ -220,6 +220,8 @@ export namespace Control
 
         SetExportFormatDropdownDisplay(dropdownExportFormat);
 
+        let layers = GeoChatter.Main.LastChild?.LastChild?.Settings?.Layers ?? GeoChatter.Main.InitiallyAvailableLayers;
+
         return $("<div>")
             .attr("id", "roundSettingsContainer")
             .addClass("section_sectionHeader__WQ7Xz section_sizeMedium__yPqLK")
@@ -233,30 +235,41 @@ export namespace Control
 
                 HeaderBars("Map Settings"),
 
+                CheckboxDropdownRoundSettingElement("Available Layers",
+                    "round-layers-map",
+                    (layer: any) => Util.ChangeRoundSetting("Layers", layer, false),
+                    GeoChatter.Main.InitiallyAvailableLayers,
+                    (layer: any) => layers.indexOf(layer) != -1),
+
+                NumericInputRoundSettingElement("Maximum zoom level (1-23)",
+                    "round-maxzoom-level",
+                    (e: JQuery<HTMLElement>) => Util.ChangeRoundSetting("MaxZoomLevel", parseFloat(e.val()?.toString() ?? "23") as number, false),
+                    GeoChatter.Main.LastChild?.LastChild?.Settings?.MaxZoomLevel),
+
                 CheckboxRoundSettingElement("Blurry Map",
                     "round-blurry-map",
                     (_: Event) => Util.ChangeRoundSetting("Blurry", $("[data-qa=round-blurry-map]").is(":checked"), false),
-                    GeoChatter.Main.LastChild?.LastChild?.Settings.blurry),
+                    GeoChatter.Main.LastChild?.LastChild?.Settings?.Blurry ?? false),
 
                 CheckboxRoundSettingElement("Black & White Map",
                     "round-blackandwhite-map",
                     (_: Event) => Util.ChangeRoundSetting("BlackAndWhite", $("[data-qa=round-blackandwhite-map]").is(":checked"), false),
-                    GeoChatter.Main.LastChild?.LastChild?.Settings.blackAndWhite),
+                    GeoChatter.Main.LastChild?.LastChild?.Settings?.BlackAndWhite ?? false),
 
                 CheckboxRoundSettingElement("Mirrored Map",
                     "round-mirrored-map",
                     (_: Event) => Util.ChangeRoundSetting("Mirrored", $("[data-qa=round-mirrored-map]").is(":checked"), false),
-                    GeoChatter.Main.LastChild?.LastChild?.Settings.mirrored),
+                    GeoChatter.Main.LastChild?.LastChild?.Settings?.Mirrored ?? false),
 
                 CheckboxRoundSettingElement("Upside Down Map",
                     "round-upsidedown-map",
                     (_: Event) => Util.ChangeRoundSetting("UpsideDown", $("[data-qa=round-upsidedown-map]").is(":checked"), false),
-                    GeoChatter.Main.LastChild?.LastChild?.Settings.upsideDown),
+                    GeoChatter.Main.LastChild?.LastChild?.Settings?.UpsideDown ?? false),
 
                 CheckboxRoundSettingElement("Sepia Map",
                     "round-sepia-map",
                     (_: Event) => Util.ChangeRoundSetting("Sepia", $("[data-qa=round-sepia-map]").is(":checked"), false),
-                    GeoChatter.Main.LastChild?.LastChild?.Settings.sepia),
+                    GeoChatter.Main.LastChild?.LastChild?.Settings?.Sepia ?? false),
 
                 HeaderBars("Export Settings"),
 
@@ -296,6 +309,103 @@ export namespace Control
         {
             el.hide();
         }
+    }
+
+    export function CheckboxDropdownRoundSettingElement(text: string, inputqa: string,
+        inputcallback: Callback<any, void>, allItems: any[],
+        startChecked: Callback<any, boolean>): JQuery<HTMLElement>
+    {
+
+        let container = $("<div>")
+            .addClass("checkboxlist")
+            .attr("data-qa", inputqa)
+            .data("qa", inputqa);
+
+        let root = $("<div>")
+            .addClass("checkboxlistroot")
+            .append($("<span>").text(text))
+            .append(container);
+
+        let inputqaelement = inputqa + "-element";
+
+        for (let c of allItems)
+        {
+            let val = c;
+            let inp = $("<input>")
+                .attr("type", "checkbox")
+                .attr("data-qa", inputqaelement)
+                .data("qa", inputqaelement)
+                .addClass("toggle_toggle__hwnyw")
+                .on("change", () => inputcallback(val))
+                .prop("checked", startChecked(c));
+
+            let ele = RoundSettingElementContainer(
+                $("<div>")
+                    .addClass("game-settings_toggleLabel__nipwm")
+                    .append(
+                        $("<div>")
+                            .addClass("label_sizeXSmall__mFnrR")
+                            .text(c)
+                    ),
+                $("<div>")
+                    .append(inp)
+            );
+
+            container.append(ele);
+        }
+
+        return root;
+    }
+
+    export function NumericInputRoundSettingElement(text: string,
+        inputqa: string,
+        inputcallback: Callback<JQuery<HTMLElement>, void>,
+        start: number = 23,
+        min: number = 1,
+        max: number = 23): JQuery<HTMLElement>
+    {
+        if (!start || start <= 0 || start > max || start < min)
+        {
+            start = max;
+        }
+
+        let inp = $("<input>")
+            .attr("data-qa", inputqa)
+            .data("qa", inputqa)
+            .attr("type", "number")
+            .attr("min", min.toString())
+            .attr("max", max.toString())
+            .addClass("numericinputSetting")
+            .change(function()
+            {
+                let v = $(this).val() ?? 0;
+                if (v > max)
+                {
+                    $(this).val(max);
+                }
+                else if (v < min)
+                {
+                    $(this).val(min);
+                }
+                inputcallback($(this))
+            })
+            .val(start);
+
+        let ele = RoundSettingElementContainer(
+            $("<div>")
+                .addClass("game-settings_toggleLabel__nipwm")
+                .css("margin", "auto 0")
+                .append(
+                    $("<div>")
+                        .addClass("label_sizeXSmall__mFnrR")
+                        .text(text)
+                ),
+            $("<div>")
+                .css("margin", "auto 0")
+                .append(inp)
+        );
+
+        return ele;
     }
 
     export function CheckboxRoundSettingElement(text: string, inputqa: string, inputcallback: Callback<Event, void>, startchecked: boolean = false): JQuery<HTMLElement>
@@ -361,6 +471,7 @@ export namespace Control
                     .append(
                         $("<div>")
                             .addClass("game-settings_default__DIBgs")
+                            .addClass("settingRow")
                             .append(...cols)
                     )
             );

@@ -419,31 +419,28 @@ declare export global
     /** Round minimap settings for players */
     export type MapRoundSettings = {
         /** Round number */
-        roundNumber: number,
+        RoundNumber: number,
         /** Wheter round is multiguess */
-        isMultiGuess: boolean,
+        IsMultiGuess: boolean,
         /** Start datetime */
-        startTime: string,
+        StartTime: string,
         /** Available layers */
-        layers: MapLayer[],
+        Layers: string[],
         /** Wheter 3D is enabled*/
-        is3dEnabled: boolean,
+        Is3dEnabled: boolean,
         /** Black & white effect*/
-        blackAndWhite: boolean,
+        BlackAndWhite: boolean,
         /** Blur effect */
-        blurry: boolean,
+        Blurry: boolean,
         /** Mirrored */
-        mirrored: boolean,
+        Mirrored: boolean,
         /** Upside down*/
-        upsideDown: boolean,
+        UpsideDown: boolean,
         /** Sepia effect */
-        sepia: boolean,
+        Sepia: boolean,
         /** Maximum zoom level */
-        maxZoomLevel: number
+        MaxZoomLevel: number
     }
-
-    /** Available map round setting names */
-    export type MapRoundSettingsName = "Blurry" | "Mirrored" | "UpsideDown" | "Sepia" | "MaxZoomLevel" | "BlackAndWhite" | "Is3dEnabled" | "Layers"
 
     /** Correct location */
     export type RoundCorrectLocationJson = LocationSource & Feature
@@ -535,18 +532,13 @@ declare export global
         /** Random guess arguments */
         RandomGuessArgs: string,
         /** Map layer guess was made on */
-        Layer: MapLayer,
+        Layer: string,
         /** Map layer guess was made on */
         Source: GuessSource,
     } & GameResult
 
     /** Source of the guess */
     export type GuessSource = "MAP" | "EXT" | "CHAT"
-
-    /** Available minimap layers for players */
-    export type MapLayer = "STREETS" | "SATELLITE" | "TERRAIN"
-        | "OSM" | "OPENTOPOMAP"
-        | "3D DEFAULT" | "3D SATELLITE" | "3D OUTDOORS" | "3D LIGHTMODE" | "3D DARKMODE" | "3D SATELLITE (NO LABELS)"
 
     /** Game results summary */
     export type GameSummary = {

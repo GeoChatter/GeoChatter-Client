@@ -169,8 +169,7 @@ namespace GeoChatter.Forms
             SplashScreenHelper.SetPercentage(50, "Responding to SOS....");
 
             SplashScreenHelper.SetPercentage(55, "Tying everything together...");
-
-          
+            InitializeAvailableLayers();
 
             SplashScreenHelper.SetPercentage(60, "Preparing secret sauce...");
             SetupBinds();
