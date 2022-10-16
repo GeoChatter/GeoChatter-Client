@@ -246,12 +246,17 @@ export namespace Control
                     (e: JQuery<HTMLElement>) => Util.ChangeRoundSetting("MaxZoomLevel", parseFloat(e.val()?.toString() ?? "23") as number, false),
                     GeoChatter.Main.LastChild?.LastChild?.Settings?.MaxZoomLevel),
 
-                CheckboxRoundSettingElement("Blurry Map",
+                CheckboxRoundSettingElement("Allow 3D Viewing",
+                    "round-is3d-map",
+                    (_: Event) => Util.ChangeRoundSetting("Is3dEnabled", $("[data-qa=round-is3d-map]").is(":checked"), false),
+                    GeoChatter.Main.LastChild?.LastChild?.Settings?.Is3dEnabled ?? false),
+
+                CheckboxRoundSettingElement("Blur Effect",
                     "round-blurry-map",
                     (_: Event) => Util.ChangeRoundSetting("Blurry", $("[data-qa=round-blurry-map]").is(":checked"), false),
                     GeoChatter.Main.LastChild?.LastChild?.Settings?.Blurry ?? false),
 
-                CheckboxRoundSettingElement("Black & White Map",
+                CheckboxRoundSettingElement("Black & White Effect",
                     "round-blackandwhite-map",
                     (_: Event) => Util.ChangeRoundSetting("BlackAndWhite", $("[data-qa=round-blackandwhite-map]").is(":checked"), false),
                     GeoChatter.Main.LastChild?.LastChild?.Settings?.BlackAndWhite ?? false),
@@ -266,7 +271,7 @@ export namespace Control
                     (_: Event) => Util.ChangeRoundSetting("UpsideDown", $("[data-qa=round-upsidedown-map]").is(":checked"), false),
                     GeoChatter.Main.LastChild?.LastChild?.Settings?.UpsideDown ?? false),
 
-                CheckboxRoundSettingElement("Sepia Map",
+                CheckboxRoundSettingElement("Sepia Effect",
                     "round-sepia-map",
                     (_: Event) => Util.ChangeRoundSetting("Sepia", $("[data-qa=round-sepia-map]").is(":checked"), false),
                     GeoChatter.Main.LastChild?.LastChild?.Settings?.Sepia ?? false),
@@ -347,8 +352,7 @@ export namespace Control
                             .addClass("label_sizeXSmall__mFnrR")
                             .text(c)
                     ),
-                $("<div>")
-                    .append(inp)
+                inp
             );
 
             container.append(ele);
@@ -426,8 +430,7 @@ export namespace Control
                         .addClass("label_sizeXSmall__mFnrR")
                         .text(text)
                 ),
-            $("<div>")
-                .append(inp)
+            inp
         );
 
         return ele;

@@ -14,9 +14,9 @@ declare export global
          * Change MapRoundSetting for next round
          * @param settingName setting name
          * @param value new value
-         * @param forEveryone wheter for all players or client
+         * @param forClient wheter only for the client
          */
-        changeRoundSetting(settingName: string, value: boolean | string | number, forEveryone: boolean): Promise<void>
+        changeRoundSetting(settingName: string, value: boolean | string | number, forClient: boolean): Promise<void>
 
         /** Execute managed user scripts */
         executeUserScripts(): Promise<void>

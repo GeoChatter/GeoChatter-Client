@@ -258,8 +258,8 @@ namespace GeoChatter.Web
         /// </summary>
         /// <param name="settingName"></param>
         /// <param name="value"></param>
-        /// <param name="forEveryone"></param>
-        public void ChangeRoundSetting(string settingName, object value, bool forEveryone)
+        /// <param name="forClient"></param>
+        public void ChangeRoundSetting(string settingName, object value, bool forClient)
         {
             if (mainForm == null || mainForm.RoundSettingsPreference == null)
             {
