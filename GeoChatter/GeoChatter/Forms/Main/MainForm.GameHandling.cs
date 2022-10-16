@@ -60,8 +60,10 @@ namespace GeoChatter.Forms
                 IsMultiGuess = round.IsMultiGuess,
                 RoundNumber = round.RealRoundNumber(),
                 StartTime = round.TimeStamp,
-                Layers = new List<string>()
-
+                Layers = new List<string>() 
+                { 
+                    "STREETS", "SATELLITE", "TERRAIN", "OSM", "OPENTOPOMAP", "3D DEFAULT", "3D SATELLITE", "3D OUTDOORS", "3D LIGHTMODE", "3D DARKMODE", "3D SATELLITE (NO LABELS)"
+                }
             };
             round.MapRoundSettings = roundSettings;
         }

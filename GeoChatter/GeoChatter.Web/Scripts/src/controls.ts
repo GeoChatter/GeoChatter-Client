@@ -231,6 +231,33 @@ export namespace Control
                     Util.MarkNextRoundAsMultiGuess,
                     State.App.PreferredMultiguess),
 
+                HeaderBars("Map Settings"),
+
+                CheckboxRoundSettingElement("Blurry Map",
+                    "round-blurry-map",
+                    (_: Event) => Util.ChangeRoundSetting("Blurry", $("[data-qa=round-blurry-map]").is(":checked"), false),
+                    GeoChatter.Main.LastChild?.LastChild?.Settings.blurry),
+
+                CheckboxRoundSettingElement("Black & White Map",
+                    "round-blackandwhite-map",
+                    (_: Event) => Util.ChangeRoundSetting("BlackAndWhite", $("[data-qa=round-blackandwhite-map]").is(":checked"), false),
+                    GeoChatter.Main.LastChild?.LastChild?.Settings.blackAndWhite),
+
+                CheckboxRoundSettingElement("Mirrored Map",
+                    "round-mirrored-map",
+                    (_: Event) => Util.ChangeRoundSetting("Mirrored", $("[data-qa=round-mirrored-map]").is(":checked"), false),
+                    GeoChatter.Main.LastChild?.LastChild?.Settings.mirrored),
+
+                CheckboxRoundSettingElement("Upside Down Map",
+                    "round-upsidedown-map",
+                    (_: Event) => Util.ChangeRoundSetting("UpsideDown", $("[data-qa=round-upsidedown-map]").is(":checked"), false),
+                    GeoChatter.Main.LastChild?.LastChild?.Settings.upsideDown),
+
+                CheckboxRoundSettingElement("Sepia Map",
+                    "round-sepia-map",
+                    (_: Event) => Util.ChangeRoundSetting("Sepia", $("[data-qa=round-sepia-map]").is(":checked"), false),
+                    GeoChatter.Main.LastChild?.LastChild?.Settings.sepia),
+
                 HeaderBars("Export Settings"),
 
                 CheckboxRoundSettingElement("Export round results automatically",
@@ -274,6 +301,7 @@ export namespace Control
     export function CheckboxRoundSettingElement(text: string, inputqa: string, inputcallback: Callback<Event, void>, startchecked: boolean = false): JQuery<HTMLElement>
     {
         let inp = $("<input>")
+            .attr("data-qa", inputqa)
             .data("qa", inputqa)
             .attr("type", "checkbox")
             .addClass("toggle_toggle__hwnyw")

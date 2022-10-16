@@ -244,6 +244,17 @@ namespace GeoChatter.Web
         }
 
         /// <summary>
+        /// Change map round setting for next round
+        /// </summary>
+        /// <param name="settingName"></param>
+        /// <param name="value"></param>
+        /// <param name="forEveryone"></param>
+        public void ChangeRoundSetting(string settingName, object value, bool forEveryone)
+        {
+
+        }
+
+        /// <summary>
         /// Start next round as with multiguessing enabled
         /// </summary>
         public void MarkNextRoundAsMultiGuess(bool state)

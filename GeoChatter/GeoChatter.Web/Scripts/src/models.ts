@@ -556,7 +556,7 @@ export class Round
     /**
      * Round constructor
      */
-    constructor(game: Game, id: number, multi: boolean, location: LocationSource)
+    constructor(game: Game, id: number, multi: boolean, location: LocationSource, settings: MapRoundSettings)
     {
         super();
         this.Game = game;
@@ -565,6 +565,7 @@ export class Round
         this.Location = location;
         this.Location.PanoOverwritten = false;
         this.Guesses = [];
+        this.Settings = settings;
 
         if (this.Game.PreviousValue)
         {
@@ -630,6 +631,8 @@ export class Round
     Standings: Array<TableRow> = [];
 
     IsStandingsSet: boolean = false;
+
+    Settings: MapRoundSettings;
 
     _OriginalAsTableRowsParse = {} as RoundSummary;
 

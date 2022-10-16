@@ -247,6 +247,13 @@ export namespace Util
         ClickElement("[data-qa='start-game-button']");
     }
 
+    export async function ChangeRoundSetting(settingName: MapRoundSettingsName, value: boolean | string | number, forEveryone: boolean): Promise<void>
+    {
+        await CefSharp.BindObjectAsync('jsHelper');
+
+        await jsHelper.changeRoundSetting(settingName, value, forEveryone);
+    }
+
     /** Check if current path is a 5 round game path
      *  @returns {boolean} */
     export function IsInA5RoundGame(): boolean

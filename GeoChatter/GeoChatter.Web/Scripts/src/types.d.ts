@@ -412,6 +412,8 @@ declare export global
         CorrectLocation: RoundCorrectLocationJson,
         /** Guesses already registered */
         Guesses: Array<NonNullable<GuessSummary>>,
+        /** Map round settings for client and all players */
+        MapRoundSettings: MapRoundSettings
     }
 
     /** Round minimap settings for players */
@@ -439,6 +441,9 @@ declare export global
         /** Maximum zoom level */
         maxZoomLevel: number
     }
+
+    /** Available map round setting names */
+    export type MapRoundSettingsName = "Blurry" | "Mirrored" | "UpsideDown" | "Sepia" | "MaxZoomLevel" | "BlackAndWhite" | "Is3dEnabled" | "Layers"
 
     /** Correct location */
     export type RoundCorrectLocationJson = LocationSource & Feature

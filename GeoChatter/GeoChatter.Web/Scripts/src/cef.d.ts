@@ -7,6 +7,14 @@ declare export global
      * */
     export interface IJSHelper
     {
+        /**
+         * Change MapRoundSetting for next round
+         * @param settingName setting name
+         * @param value new value
+         * @param forEveryone wheter for all players or client
+         */
+        changeRoundSetting(settingName: string, value: boolean | string | number, forEveryone: boolean): Promise<void>
+
         /** Execute managed user scripts */
         executeUserScripts(): Promise<void>
 

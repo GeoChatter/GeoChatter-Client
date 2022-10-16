@@ -201,7 +201,7 @@ export namespace EventHandler
                     .parent()
                     .parent()
                     .parent()
-                    .prepend(await Control.RoundSettingsContainer(true));
+                    .append(await Control.RoundSettingsContainer(true));
             }
             else
             {
