@@ -326,7 +326,7 @@ namespace GeoChatter.Forms
 
                 if (string.IsNullOrWhiteSpace(args.Arguments) || !Settings.Default.CustomRandomGuessingEnabled)
                 {
-                    rand = BorderHelper.GetRandomPointCloseOrWithinAPolygon();
+                    rand = BorderHelper.GetRandomPointWithinARandomPolygon();
                     args.Arguments = string.Empty;
                 }
                 else
@@ -336,7 +336,7 @@ namespace GeoChatter.Forms
 
                 if (rand == null || (rand.Latitude == 0 && rand.Longitude == 0))
                 {
-                    rand = BorderHelper.GetRandomPointCloseOrWithinAPolygon();
+                    rand = BorderHelper.GetRandomPointWithinARandomPolygon();
                     args.Arguments = string.Empty;
                 }
 

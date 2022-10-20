@@ -580,7 +580,7 @@ namespace GeoChatter.Web
                 {
                     if (guess.WasRandom)
                     {
-                        guess.GuessLocation = BorderHelper.GetRandomPointCloseOrWithinAPolygon();
+                        guess.GuessLocation = BorderHelper.GetRandomPointWithinARandomPolygon();
                     }
 
                     GuessState? state = mainForm?.ProcessViewerGuess(guess.Player.PlatformId.ToStringDefault(), guess.Player.PlayerName, guess.Player.SourcePlatform, guess.GuessLocation.Latitude.ToStringDefault(), guess.GuessLocation.Longitude.ToStringDefault(), "", guess.Player.DisplayName, guess.Player.ProfilePictureUrl, guess.WasRandom, guess.IsTemporary);

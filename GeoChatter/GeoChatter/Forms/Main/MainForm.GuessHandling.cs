@@ -602,7 +602,7 @@ namespace GeoChatter.Forms
                     FlagRequestReceived(null, new(id, null, CurrentBot, null) { Flag = "random" });
                 }
 
-                Coordinates rand = BorderHelper.GetRandomPointCloseOrWithinAPolygon();
+                Coordinates rand = BorderHelper.GetRandomPointWithinARandomPolygon();
                 string lat = rand.Latitude.ToStringDefault();
                 string lng = rand.Longitude.ToStringDefault();
 

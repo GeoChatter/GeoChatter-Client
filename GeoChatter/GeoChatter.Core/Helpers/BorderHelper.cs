@@ -15,6 +15,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using GeoChatter.Core.Common.Extensions;
+using CefSharp.DevTools.Audits;
 
 namespace GeoChatter.Core.Helpers
 {
@@ -499,12 +500,12 @@ namespace GeoChatter.Core.Helpers
         }
 
         /// <summary>
-        /// See <see cref="GetRandomPointCloseOrWithinAPolygon(out Feature)"/>
+        /// See <see cref="GetRandomPointCloseOrWithinARandomPolygon(out Feature)"/>
         /// </summary>
         /// <returns></returns>
-        public static Coordinates GetRandomPointCloseOrWithinAPolygon()
+        public static Coordinates GetRandomPointCloseOrWithinARandomPolygon()
         {
-            return GetRandomPointCloseOrWithinAPolygon(out Feature _);
+            return GetRandomPointCloseOrWithinARandomPolygon(out Feature _);
         }
 
         /// <summary>
@@ -513,12 +514,96 @@ namespace GeoChatter.Core.Helpers
         /// </summary>
         /// <param name="feature">Randomly picked feature</param>
         /// <returns></returns>
-        public static Coordinates GetRandomPointCloseOrWithinAPolygon(out Feature feature)
+        public static Coordinates GetRandomPointCloseOrWithinARandomPolygon(out Feature feature)
         {
             feature = GetRandomFeature(GetRandomCountry());
             return GetRandomPointWithinBoundBox(feature);
         }
 
+        /// <summary>
+        /// See <see cref="GetRandomPointWithinARandomPolygon(out Feature, int)"/>
+        /// </summary>
+        /// <returns></returns>
+        public static Coordinates GetRandomPointWithinARandomPolygon(int maxTries = 100)
+        {
+            return GetRandomPointWithinARandomPolygon(out Feature _, maxTries);
+        }
+
+        /// <summary>
+        /// Get a random point within ANY polygon
+        /// </summary>
+        /// <para>WARNING: This DOES NOT guarantee but tries <paramref name="maxTries"/> amount of times at max to ensure a hit on ANY polygon</para>
+        /// <param name="maxTries">Maximum tries in case of misses by <see cref="GetRandomPointCloseOrWithinARandomPolygon(out Feature)"/></param>
+        /// <param name="feature">Randomly picked feature</param>
+        /// <returns></returns>
+        public static Coordinates GetRandomPointWithinARandomPolygon(out Feature feature, int maxTries = 100)
+        {
+            Coordinates co = null;
+            feature = null;
+            int tries = 0;
+            while (co == null && tries++ < maxTries)
+            {
+                GeoJson g = GetRandomCountry();
+                co = GetRandomPointWithinBoundBox(GetRandomFeature(g));
+
+                GetFeatureHitBy(new double[2] { co.Longitude, co.Latitude }, out GeoJson gjhit, out feature, out _);
+
+                if (g == gjhit)
+                {
+                    break;
+                }
+            }
+            return co;
+        }
+
+        /// <summary>
+        /// See <see cref="GetRandomPointWithin(string, out Feature, int)"/>
+        /// </summary>
+        /// <returns></returns>
+        public static Coordinates GetRandomPointWithin(string codeOrName, int maxTries = 100)
+        {
+            return GetRandomPointWithin(codeOrName, out Feature _, maxTries);
+        }
+
+        /// <summary>
+        /// Get a random point within a polygon of given <paramref name="codeOrName"/> geojson
+        /// </summary>
+        /// <param name="codeOrName">Country code or name, <see cref="GetCountry(string)"/></param>
+        /// <param name="maxTries">Maximum tries in case of misses by <see cref="GetRandomPointCloseOrWithinARandomPolygon(out Feature)"/></param>
+        /// <param name="feature">Randomly picked feature</param>
+        /// <returns></returns>
+        public static Coordinates GetRandomPointWithin(string codeOrName, out Feature feature, int maxTries = 100)
+        {
+            GeoJson g = GetCountry(codeOrName);
+            if (g == null)
+            {
+                return GetRandomPointCloseOrWithinARandomPolygon(out feature);
+            }
+
+            Coordinates co = null;
+            feature = null;
+            int tries = 0;
+            while (tries++ < maxTries)
+            {
+                co = GetRandomPointWithinBoundBox(GetRandomFeature(g));
+
+                GetFeatureHitBy(new double[2] { co.Longitude, co.Latitude }, out GeoJson gjhit, out feature, out _);
+
+                if (g == gjhit)
+                {
+                    break;
+                }
+                else
+                {
+                    co = null;
+                }
+            }
+            if (co == null)
+            {
+                return GetRandomPointCloseOrWithinARandomPolygon(out feature);
+            }
+            return co;
+        }
         /// <summary>
         /// Get a random point within given country polygon's bounding box present in current border set
         /// <para>WARNING: This DOES NOT guarantee that the point will be within a polygon</para>
@@ -634,7 +719,7 @@ namespace GeoChatter.Core.Helpers
                         {
                             Coordinates old = rand;
                             string match = GetAlpha3FromCodeOrName(matches[i]);
-                            rand = GetRandomPointCloseOrWithin(match, out Feature _);
+                            rand = GetRandomPointWithin(match);
 
                             if (rand == null)
                             {
@@ -649,7 +734,7 @@ namespace GeoChatter.Core.Helpers
                             foreach (string m in matches)
                             {
                                 string match = GetAlpha3FromCodeOrName(m);
-                                rand = GetRandomPointCloseOrWithin(match, out Feature _);
+                                rand = GetRandomPointWithin(match);
                                 if (rand != null)
                                 {
                                     break;

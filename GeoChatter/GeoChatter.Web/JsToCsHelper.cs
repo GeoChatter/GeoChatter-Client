@@ -501,7 +501,7 @@ namespace GeoChatter.Web
         /// <returns></returns>
         public string GetRandomCoordinates()
         {
-            Coordinates coor = Core.Helpers.BorderHelper.GetRandomPointCloseOrWithinAPolygon();
+            Coordinates coor = Core.Helpers.BorderHelper.GetRandomPointWithinARandomPolygon();
             return $"{{\"Latitude\": {coor.Latitude.ToStringDefault()}, \"Longitude\": {coor.Longitude.ToStringDefault()}}}";
         }
         
