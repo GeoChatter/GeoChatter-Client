@@ -74,7 +74,7 @@ namespace GeoChatter.Forms
             Close();
         }
 
-        private void SaveSettings()
+        private async void SaveSettings()
         {
             logger.Debug("Saving settings");
 
@@ -191,7 +191,7 @@ namespace GeoChatter.Forms
             Settings.Default.ScoreboardFGA = (byte)ScoreboardFGAnumericUpDown2.Value;
 
             Settings.Default.ScrollSpeed = (int)ScoreboardScrollSpeednumericUpDown1.Value;
-            if (chkStreamerBotConnectAtStartup.Checked && streamerbotClient.IsRunning())
+            if (chkStreamerBotConnectAtStartup.Checked && await streamerbotClient.IsRunning())
             {
                 Settings.Default.SpecialDistanceAction = checkBoxSpecialDistanceAction.Checked;
                 Settings.Default.SpecialDistanceActionID = ctrlBotSpecialDistance.ActionGuid;
@@ -550,7 +550,7 @@ namespace GeoChatter.Forms
         }
 
 
-        private void SettingsDialog_Load(object sender, EventArgs e)
+        private async void SettingsDialog_Load(object sender, EventArgs e)
         {
             logger.Debug("Loading settings");
             try
@@ -578,13 +578,13 @@ namespace GeoChatter.Forms
                 logger.Error(ex.Summarize());
             }
             logger.Debug("setting up streamer.bot");
-            if (chkStreamerBotConnectAtStartup.Checked && streamerbotClient.IsRunning())
+            if (chkStreamerBotConnectAtStartup.Checked && streamerbotClient.ConnectionSucceeded)
             {
             //    btnSave.Enabled = btnApply.Enabled = false;
               //  streamerbotClient.GetActions();
             }
 
-            SetUpStreambotInputs();
+            SetUpStreambotInputs(chkStreamerBotConnectAtStartup.Checked);
             logger.Debug("Setting up OBS");
             if (chkObsConnectAtStartup.Checked && obsClient.IsAlive())
             {
@@ -989,10 +989,11 @@ namespace GeoChatter.Forms
             txtStreamerBotIP.Enabled = false;
             txtStreamerBotPort.Enabled = false;
             chkStreamerBotConnectAtStartup.Enabled = false;
+            bool enableControls = false;
             if (chkStreamerBotConnectAtStartup.Checked)
             {
                 logger.Debug("connection because at startup");
-                if (!streamerbotClient.IsRunning())
+                if (!streamerbotClient.ConnectionSucceeded)
                 {
                     logger.Debug("disconnected, connect needed");
                     try
@@ -1000,6 +1001,7 @@ namespace GeoChatter.Forms
                         if (streamerbotClient.Connect(txtStreamerBotIP.Text, txtStreamerBotPort.Text, Settings.Default.SendChatActionId, Settings.Default.SendChatActionName, Settings.Default.SendChatMsgsViaStreamerBot, parent).Result)
                         {
                             logger.Debug("connection succeeded");
+                            enableControls = true;
                         }
                         else
                         {
@@ -1011,9 +1013,10 @@ namespace GeoChatter.Forms
                 else
                 {
                     logger.Debug("already connected");
-                    if (sender == buttonConnectStreamerBot)
+                    if (sender == buttonConnectStreamerBot && buttonConnectStreamerBot.Text == "Disconnect")
                     {
                         var closed = await streamerbotClient.CloseConnection();
+
                     }
                 }
 
@@ -1040,23 +1043,24 @@ namespace GeoChatter.Forms
                 }
 
             }
-            SetUpStreambotInputs();
+            SetUpStreambotInputs(enableControls);
             
         }
 
         private void chkStreamerBotConnectAtStartup_CheckedChanged(object sender, EventArgs e)
         {
-            SetUpStreambotInputs();
+            SetUpStreambotInputs(chkStreamerBotConnectAtStartup.Checked);
 
 
 
         }
 
-        private void SetUpStreambotInputs()
+        private async void SetUpStreambotInputs(bool enabled)
         {
+            enabled = streamerbotClient.ConnectionSucceeded;
             if (chkStreamerBotConnectAtStartup.Checked)
             {
-                if (streamerbotClient.IsRunning())
+                if (enabled)
                 {
                     buttonConnectStreamerBot.Text = "Disconnect";
                     txtStreamerBotIP.Enabled =
@@ -1088,7 +1092,7 @@ namespace GeoChatter.Forms
                ctrlBotRoundEnd.Enabled =
                checkBoxSendChatMsgsViaStreamerBot.Enabled =
                ctrlBotSpecialScore.Enabled =
-               ctrlBotChatMessages.Enabled = chkStreamerBotConnectAtStartup.Checked && streamerbotClient.IsRunning();
+               ctrlBotChatMessages.Enabled = chkStreamerBotConnectAtStartup.Checked && enabled;
         }
 
         private void tabPageOverlay_Click(object sender, EventArgs e)

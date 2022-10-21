@@ -323,7 +323,8 @@ namespace GeoChatter.Forms
                 }
 
                 Coordinates rand = null;
-
+                var splt = args.Arguments.Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                if (splt.Length > 1) args.Arguments = string.Join(" ", splt[1..]);
                 if (string.IsNullOrWhiteSpace(args.Arguments) || !Settings.Default.CustomRandomGuessingEnabled)
                 {
                     rand = BorderHelper.GetRandomPointWithinARandomPolygon();

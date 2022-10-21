@@ -47,6 +47,7 @@ namespace GeoChatter.Forms
         {
             await guessApiClient.SendMapOptionsToMaps(options);
         }
+
         public async Task ConnectToGuessApi(bool forceReconnect = false, bool login = true, bool isGGLogon = false)
         {
             if (guessApiClient == null)
@@ -65,6 +66,14 @@ namespace GeoChatter.Forms
                     guessApiClient.ResetToken();
 
                 }
+                guessApiClient.Connected -= GuessApiClient_Connected;
+                guessApiClient.Connected += GuessApiClient_Connected;
+                guessApiClient.OnDisconnect -= GuessApiClient_DisConnected;
+                guessApiClient.OnDisconnect += GuessApiClient_DisConnected;
+                guessApiClient.OnReconnected -= GuessApiClient_ReConnected;
+                guessApiClient.OnReconnected += GuessApiClient_ReConnected;
+                guessApiClient.OnLog -= GuessApiClient_Log;
+                guessApiClient.OnLog += GuessApiClient_Log;
 
             }
 

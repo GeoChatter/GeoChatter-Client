@@ -323,10 +323,14 @@ namespace GeoChatter.Web
                                logging.AddDebug();
                                logging.AddLog4Net();
                                // This will set ALL logging to Debug level
-                               if(mainForm.IsDebugEnabled())
-                                    logging.SetMinimumLevel((Microsoft.Extensions.Logging.LogLevel)LogLevel.Debug);
+                               if (mainForm.IsDebugEnabled())
+                                   logging.SetMinimumLevel((Microsoft.Extensions.Logging.LogLevel)LogLevel.Debug);
                                else
+                               {
                                    logging.SetMinimumLevel((Microsoft.Extensions.Logging.LogLevel)LogLevel.Information);
+                                   logging.AddFilter("Microsoft.AspNetCore.SignalR", (Microsoft.Extensions.Logging.LogLevel)LogLevel.Debug);
+                                   logging.AddFilter("Microsoft.AspNetCore.Http.Connections", (Microsoft.Extensions.Logging.LogLevel)LogLevel.Debug);
+                               }
                            }).WithAutomaticReconnect().Build();
                     connection.Reconnecting += Connection_Reconnecting;
                     connection.Reconnected += Connection_Reconnected;

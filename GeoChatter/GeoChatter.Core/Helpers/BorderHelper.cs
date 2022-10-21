@@ -699,7 +699,7 @@ namespace GeoChatter.Core.Helpers
                     if (countryArgs.Length == 1)
                     {
                         string match = GetAlpha3FromCodeOrName(GetNameFromRandomGuessArg(countryArgs[0]));
-                        rand = GetRandomPointCloseOrWithin(match, out Feature _);
+                        rand = GetRandomPointWithin(match);
                     }
                     else
                     {

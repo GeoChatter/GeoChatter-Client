@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Websocket.Client;
+using WebSocketSharp;
 using GeoChatter.Integrations.StreamerBot;
 using GeoChatter.Core.Model;
 using System.Diagnostics.CodeAnalysis;
@@ -15,7 +15,7 @@ using GeoChatter.Core.Common.Extensions;
 using CefSharp.DevTools.IO;
 using GeoChatter.Helpers;
 using System.Windows;
-using System.Net.WebSockets;
+
 using GuessServerApiInterfaces;
 using Microsoft.AspNetCore.SignalR;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -26,6 +26,8 @@ using System.Reactive.Concurrency;
 using System.Windows.Forms;
 using MessageBox = System.Windows.Forms.MessageBox;
 using MessageBoxOptions = System.Windows.Forms.MessageBoxOptions;
+using System.Windows.Interop;
+
 
 namespace GeoChatter.Integrations
 {
@@ -72,7 +74,7 @@ namespace GeoChatter.Integrations
         /// <inheritdoc/>
         public event EventHandler<BotEventArgs> FlagpacksRequestReceived;
         private static readonly ILog logger = LogManager.GetLogger(typeof(StreamerbotClient));
-        private WebsocketClient ws;
+        private WebSocketSharp.WebSocket ws;
         private List<StreamerbotAction> actions = new List<StreamerbotAction>();
         /// <summary>
         /// Returns a list of StreamerbotActions
@@ -107,7 +109,7 @@ namespace GeoChatter.Integrations
 
                 adress = new Uri($"ws://{ip}:{port}/");
 
-                ws = new WebsocketClient(adress);
+                ws = new WebSocketSharp.WebSocket(adress.ToStringDefault());
             }
             bool success = false;
             this.sendMessageActionGuid = sendMessageActionGuid;
@@ -116,18 +118,18 @@ namespace GeoChatter.Integrations
             AttributeDiscovery.AddEventHandlers(fromMethodSource: this, toTargetInstance: this);
 
             SubscribeToWS();
-            ws.IsReconnectionEnabled = true;
-            ws.ReconnectTimeout = null;
-            ws.ErrorReconnectTimeout = new TimeSpan(0, 0, 10);
             
-            if (!ws.IsRunning)
+            if (ws.ReadyState != WebSocketState.Open)
             {
                 try
                 {
-                    ws.StartOrFail();
-                    ws.Send("ping");
+                    ws.Connect();
+                    
                     Thread.Sleep(1000);
-
+                    if (sendJoin)
+                    {
+                        SendMessage(LanguageStrings.Get("Chat_Msg_joinMessage"));
+                    }
                 }
                 catch (Exception e)
                 {
@@ -139,98 +141,134 @@ namespace GeoChatter.Integrations
 
             SubscribeToEvents();
             isInitialStart = false;
-            return true;// ws.IsRunning;
+            ConnectionSucceeded = true;
+            return ws != null && ws.ReadyState == WebSocketState.Open;
 
         }
         bool reconnectedAlready = false;
         private void SubscribeToWS()
         {
-            //success = ws.IsStarted;
-            ws.ReconnectionHappened.Subscribe(s =>
+            //ws.ReconnectionHappened.Subscribe(s =>
+            //{
+            //    if (reconnectedAlready == false)
+            //    {
+            //        if ((s.Type == ReconnectionType.Error))
+            //        {
+            //            logger.Debug("Streamerbot disconnected, reconnected");
+            //            // SubscribeToEvents();
+            //            reconnectedAlready = true;
+            //            MessageBox.Show("Reconnected to Streamer.Bot");
+            //        }
+            //        if (sendJoin)
+            //        {
+            //            SendMessage(LanguageStrings.Get("Chat_Msg_joinMessage"));
+            //        }
+            //    }
+            //    else
+            //    {
+            //        reconnectedAlready = !reconnectedAlready;
+            //    }
+            //    ConnectionSucceeded = true;
+            //});
+
+            ws.OnMessage +=(sender, e) =>
             {
-                if (reconnectedAlready == false)
+                //success = ws.IsStarted;
+                if (!e.Data.ToLowerInvariant().Contains("\"id\":\"0\",\"events\":", StringComparison.InvariantCulture)
+                   && e.Data.ToLowerInvariant().Contains("\"source\":\"command\"", StringComparison.InvariantCulture))
                 {
-                    if ((s.Type == ReconnectionType.Error))
-                    {
-                        logger.Debug("Streamerbot disconnected, reconnected");
-                        SubscribeToEvents();
-                        reconnectedAlready = true;
-                        MessageBox.Show("Reconnected to Streamer.Bot");
-                    }
-                    if (sendJoin)
-                    {
-                        SendMessage(LanguageStrings.Get("Chat_Msg_joinMessage"));
-                    }
-                }else
-                {
-                    reconnectedAlready = !reconnectedAlready;
-                }
-            });
-            ws.MessageReceived.Where(msg => msg.MessageType == System.Net.WebSockets.WebSocketMessageType.Text && !msg.Text.ToLowerInvariant().Contains("\"id\":\"0\",\"events\":", StringComparison.InvariantCulture)
-                && msg.Text.ToLowerInvariant().Contains("\"source\":\"command\"", StringComparison.InvariantCulture)).Subscribe(msg =>
-                {
-                    StreamerBotCommandMessage command = JsonConvert.DeserializeObject<StreamerBotCommandMessage>(msg.Text);
+                    StreamerBotCommandMessage command = JsonConvert.DeserializeObject<StreamerBotCommandMessage>(e.Data);
 
                     TriggerCommands(command);
-                });
-            ws.MessageReceived.Where(msg => msg.MessageType == System.Net.WebSockets.WebSocketMessageType.Text && !msg.Text.ToLowerInvariant().Contains("\"id\":\"0\",\"events\":", StringComparison.InvariantCulture)
-                && msg.Text.ToLowerInvariant().Contains("\"source\":\"raw\"", StringComparison.InvariantCulture)).Subscribe(msg =>
+                }
+                if (!e.Data.ToLowerInvariant().Contains("\"id\":\"0\",\"events\":", StringComparison.InvariantCulture)
+                && e.Data.ToLowerInvariant().Contains("\"source\":\"raw\"", StringComparison.InvariantCulture))
                 {
-                    StreamerBotActionMessage action = JsonConvert.DeserializeObject<StreamerBotActionMessage>(msg.Text);
+                    StreamerBotActionMessage action = JsonConvert.DeserializeObject<StreamerBotActionMessage>(e.Data);
                     if (action.@event.type.ToLowerInvariant() == "subaction")
                         logger.Debug("Subaction execution resceived: " + action.data.name);
                     else
                         logger.Debug("Action execution resceived: " + action.data.name);
-                });
-            ws.MessageReceived.Where(msg => msg.MessageType == System.Net.WebSockets.WebSocketMessageType.Text && !msg.Text.ToLowerInvariant().Contains("\"id\":\"0\",\"events\":", StringComparison.InvariantCulture)
-                && msg.Text.ToLowerInvariant().Contains("count", StringComparison.InvariantCulture) && msg.Text.ToLowerInvariant().Contains("actions", StringComparison.InvariantCulture)).Subscribe(msg =>
+                }
+                if (!e.Data.ToLowerInvariant().Contains("\"id\":\"0\",\"events\":", StringComparison.InvariantCulture)
+                    && e.Data.ToLowerInvariant().Contains("count", StringComparison.InvariantCulture) && e.Data.ToLowerInvariant().Contains("actions", StringComparison.InvariantCulture))
                 {
-                    StreamerbotActionList list = JsonConvert.DeserializeObject<StreamerbotActionList>(msg.Text);
+                    StreamerbotActionList list = JsonConvert.DeserializeObject<StreamerbotActionList>(e.Data);
                     ActionsReceivedEventArgs args = new();
                     args.Actions.AddRange(list.actions);
                     OnActionsReceived(args);
-                });
-            ws.MessageReceived.Where(msg => msg.MessageType == System.Net.WebSockets.WebSocketMessageType.Text && !msg.Text.ToLowerInvariant().Contains("\"id\":\"0\",\"events\":", StringComparison.InvariantCulture)
-                && msg.Text.ToLowerInvariant().Contains("custom", StringComparison.InvariantCulture)).Subscribe(msg =>
+                };
+                if (!e.Data.ToLowerInvariant().Contains("\"id\":\"0\",\"events\":", StringComparison.InvariantCulture)
+                    && e.Data.ToLowerInvariant().Contains("custom", StringComparison.InvariantCulture))
                 {
-                    StreamerBotCustomMessage @event = JsonConvert.DeserializeObject<StreamerBotCustomMessage>(msg.Text);
+                    StreamerBotCustomMessage @event = JsonConvert.DeserializeObject<StreamerBotCustomMessage>(e.Data);
                     logger.Debug("Custom Event received: " + @event.Data.Data);
                     if (@event.Data.Data == "TimerEnd")
                     {
                         parent.ToggleGuesses();
                     }
-                });
-            ws.MessageReceived.Where(msg => msg.MessageType == System.Net.WebSockets.WebSocketMessageType.Text && msg.Text.ToLowerInvariant().Contains("\"id\":\"0\",\"events\":", StringComparison.InvariantCulture))
-                .ObserveOn(TaskPoolScheduler.Default)
-                .Subscribe(msg =>
+                };
+                if (e.IsPing || e.Data.ToLowerInvariant().Contains("\"id\":\"0\",\"events\":", StringComparison.InvariantCulture))
                 {
                     logger.Debug("Heartbeat successful");
-                    
-                });
-            ws.DisconnectionHappened.Subscribe(async e =>
-            {
-                logger.Debug("Streamerbot disconnected, reconnecting....");
+                    ConnectionSucceeded = true;
 
-                if ((e.Type == DisconnectionType.ByServer && e.CloseStatus == WebSocketCloseStatus.NormalClosure))
+                };
+            };
+            ws.EmitOnPing = true;
+            
+            ws.OnError += (sender, e) => {
+                string t = e.Message;
+            
+            };
+            ws.OnClose += (sender, e) => {
+                // sb close: 1005, clean
+                //sb closed on start: 1006, false, text: An exception has occurred while connecting.
+                //sb crashes: 1006, false, text: An exception has occurred while receiving.
+                if(e.WasClean)
+                    reconnectWanted = MessageBox.Show("Connection to Streamer.Bot lost! Do you want to try to reconnect?", "Connection lost", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+
+                if (!e.WasClean && e.Reason.ToLowerInvariant() == "an exception has occurred while connecting." && !reconnectWanted)
                 {
-                    MessageBox.Show("Connection closed by Streamer.Bot.\r\nTrying to reconnect...", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                    MessageBox.Show("Could not connect to Streamer.Bot\r\nPlease make sure that IP and port are correct,\rthat Streamer.Bot and its websocket server are running!\rThen restart GeoChatter!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                    ws = null;
                 }
-                if (e.Type == DisconnectionType.Lost && e.CloseStatus != WebSocketCloseStatus.NormalClosure)
-                {
-                    MessageBox.Show("Connection to Streamer.Bot lost.\r\nTrying to reconnect...", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+
+                if (!reconnectWanted && !e.WasClean && e.Reason.ToLowerInvariant() == "an exception has occurred while receiving.")
+                { 
+                    reconnectWanted = MessageBox.Show("Connection to Streamer.Bot unexpectedly lost! Do you want to try to reconnect?", "Connection lost", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
                 }
-                if (e.Type == DisconnectionType.Error && e.Exception.Message == "Unable to connect to the remote server")
-                {
-                    MessageBox.Show("Could not connect to Streamer.Bot\r\nPlease make sure that IP and port are correct,\rthat Streamer.Bot and its websocket server are running!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-                }
-                //if(ws.IsRunning || ws.IsStarted)
-                //ws.Stop(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, "");
-                //ws.Reconnect();
-                //Thread.Sleep(5000);
-            });
+                
+                
+            };
+            //ws.DisconnectionHappened.Subscribe(async e =>
+            //{
+            //    logger.Debug("Streamerbot disconnected, reconnecting....");
+
+            //    if ((e.Type == DisconnectionType.ByServer && e.CloseStatus == WebSocketCloseStatus.NormalClosure))
+            //    {
+            //        MessageBox.Show("Connection closed by Streamer.Bot.\r\nTrying to reconnect...", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+            //    }
+            //    if (e.Type == DisconnectionType.Lost && e.CloseStatus != WebSocketCloseStatus.NormalClosure)
+            //    {
+            //        MessageBox.Show("Connection to Streamer.Bot lost.\r\nTrying to reconnect...", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+            //    }
+            //    if (e.Type == DisconnectionType.Error && e.Exception.Message == "Unable to connect to the remote server")
+            //    {
+            //        MessageBox.Show("Could not connect to Streamer.Bot\r\nPlease make sure that IP and port are correct,\rthat Streamer.Bot and its websocket server are running!\rThen restart GeoChatter!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+            //        e.CancelReconnection = true;
+            //    }
+            //    ConnectionSucceeded = false;
+            //    //if(ws.IsRunning || ws.IsStarted)
+            //    //ws.Stop(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, "");
+            //    //ws.Reconnect();
+            //    //Thread.Sleep(5000);
+            //});
             
         }
 
+        private bool reconnectWanted = false;
+        public bool ConnectionSucceeded { get; set; } = false;
         /// <summary>
         /// Fires <see cref="ActionsReceived"/>
         /// </summary>
@@ -249,8 +287,25 @@ namespace GeoChatter.Integrations
         {
             timer = new System.Threading.Timer(async (state) =>
             {
-                if (ws != null && ws.IsStarted)
-                    ws.Send("{\"request\":\"GetEvents\",\"id\":\"0\"}");
+                if (ws != null && ws.ReadyState != WebSocketState.Open && reconnectWanted)
+                {
+                    ws.Connect();
+                    Thread.Sleep(15000);
+                    if (ws.ReadyState == WebSocketState.Open)
+                    {
+                        SubscribeToEvents();
+                        if (sendJoin)
+                        {
+                            SendMessage(LanguageStrings.Get("Chat_Msg_joinMessage"));
+                            reconnectWanted = false;
+                        }
+                    }
+                }
+                if (ws != null && ws.ReadyState == WebSocketState.Open)
+                {
+                    ws.Ping();
+                }
+
 
             }, null, 1000, 10000);
             //{ "request": "GetEvents", "id": "<message id>"}
@@ -264,11 +319,11 @@ namespace GeoChatter.Integrations
         public void GetActions()
         {
             logger.Debug($"Getting actions");
-            if (ws != null && !ws.IsRunning)
+            if (ws != null && ws.ReadyState != WebSocketState.Open)
             {
-                ws.Start();
+                ws.Connect();
             }
-            if (ws != null && ws.IsRunning)
+            if (ws != null && ws.ReadyState == WebSocketState.Open)
             {
                 ws.Send("{\"request\":\"GetActions\",\"id\":\"123\"}");
             }
@@ -281,11 +336,11 @@ namespace GeoChatter.Integrations
         public void SubscribeToEvents()
         {
             logger.Debug($"Subscribing to Streamer.Bot events");
-            if (ws != null && !ws.IsRunning)
+            if (ws != null && ws.ReadyState != WebSocketState.Open)
             {
-                ws.Start();
+                ws.Connect();
             }
-            if (ws != null && ws.IsRunning)
+            if (ws != null && ws.ReadyState == WebSocketState.Open)
             {
                 string requestString = "{\"request\":\"Subscribe\",\"events\":{\"Twitch\":[\"RewardRedemption\"],  \"command\": [\"Message\"],  \"general\": [\"Custom\"],  \"raw\": [\"Action\", \"SubAction\"]},\"id\":\"123\"}";
                 ws.Send(requestString);
@@ -300,11 +355,11 @@ namespace GeoChatter.Integrations
         /// <param name="args"></param>
         public void ExecuteAction(string guid, string name, Dictionary<string, string> args)
         {
-            if (ws != null && !ws.IsRunning)
+            if (ws != null && ws.ReadyState != WebSocketState.Open)
             {
-                ws.Start();
+                ws.Connect();
             }
-            if (ws != null && ws.IsRunning)
+            if (ws != null && ws.ReadyState == WebSocketState.Open)
             {
                 string argsString = JsonConvert.SerializeObject(args);
                 string reqString = @"{""request"": ""DoAction"",""action"": { ""id"": """ + guid + @""", ""name"": """ + name + @""" }, ""args"":  " + argsString +@", ""id"":""123""}";
@@ -335,21 +390,21 @@ namespace GeoChatter.Integrations
             logger.Debug($"Testing Streamerbot connection");
             if (ws == null)
             {
-                ws = new WebsocketClient(new Uri($"ws://{ip}:{port}/"));
+                ws = new WebSocketSharp.WebSocket($"ws://{ip}:{port}/");
             }
 
             bool success;
 
-            if (!ws.IsRunning)
+            if (ws.ReadyState != WebSocketState.Open)
             {
-                ws.Start();
+                ws.Connect();
             }
 
-            success = ws.IsRunning;
+            success = ws.ReadyState == WebSocketState.Open;
             logger.Debug($"SB connection is {success}");
-            if (ws.IsRunning)
+            if (ws.ReadyState == WebSocketState.Open)
             {
-                ws.Stop(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, "");
+                ws.CloseAsync(CloseStatusCode.Normal, "");
             }
 
             return success;
@@ -363,12 +418,12 @@ namespace GeoChatter.Integrations
             logger.Debug($"Closing Streamer.Bot connection");
             if (ws != null)
             {
-                var success = await ws.Stop(System.Net.WebSockets.WebSocketCloseStatus.Empty,"");
-                if (!success && adress != null)
-                    ws = new WebsocketClient(adress);
-                return ws.IsRunning;
+                ws.CloseAsync(CloseStatusCode.Normal,"");
+                if (adress != null)
+                    ws = new WebSocketSharp.WebSocket(adress.ToStringDefault());
+                return ws.ReadyState == WebSocketState.Open;
             }
-
+            ConnectionSucceeded = false;
             return true;
         }
 
@@ -386,9 +441,19 @@ namespace GeoChatter.Integrations
         /// Wheter connection is still alive
         /// </summary>
         /// <returns></returns>
-        public bool IsRunning()
+        public async Task<bool> IsRunning()
         {
-            return ws != null && ws.IsRunning;
+            try
+            {
+                if(ws != null)
+                   ws.Send("ping");
+                return true;
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
+                
         }
 #endregion
 #region botInterface
