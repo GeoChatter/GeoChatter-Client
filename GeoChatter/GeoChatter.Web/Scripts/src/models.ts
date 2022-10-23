@@ -1105,9 +1105,9 @@ export class Guess
         if (this.Round.Game.Mode == Enum.GAMEMODE.DEFAULT)
         {
             row.PlayerName = Util.AsDataTableRowCell(this.GetPlayerNameDisplayHTML(), this.PlayerData.Name.toLowerCase(), Visual.PlatformCSSFromPlatform(this.PlayerData.Platform));
-            row.CountryStreak = Util.AsDataTableRowCell(this.CountryStreak.toString(), this.CountryStreak);
-            row.Distance = Util.GetConvertedDistance(this.Distance);
-            row.Score = Util.AsDataTableRowCell(this.Score.toString(), this.Score);
+            row.CountryStreak = this.Round.Game.Stage == Enum.GAMESTAGE.INROUND && this.RandomGuessArgs ? Util.AsDataTableRowCell("-", -1) : Util.AsDataTableRowCell(this.CountryStreak.toString(), this.CountryStreak);
+            row.Distance = this.Round.Game.Stage == Enum.GAMESTAGE.INROUND && this.RandomGuessArgs ? Util.AsDataTableRowCell("-", 999999) : Util.GetConvertedDistance(this.Distance);
+            row.Score = this.Round.Game.Stage == Enum.GAMESTAGE.INROUND && this.RandomGuessArgs ? Util.AsDataTableRowCell("-", -1) : Util.AsDataTableRowCell(this.Score.toString(), this.Score);
             row.TimeTaken = Util.FormatTimeToString(this.TimeTaken);
         }
         else if (this.Round.Game.Mode == Enum.GAMEMODE.STREAK)
