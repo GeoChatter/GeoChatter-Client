@@ -1112,7 +1112,7 @@ export class Guess
         }
         else if (this.Round.Game.Mode == Enum.GAMEMODE.STREAK)
         {
-            row.GuessPoint = Util.AsDataTableRowCell(this.WrapFlagWithBorder(), this.Location.ExactCountryCode);
+            row.GuessPoint = this.Round.Game.Stage == Enum.GAMESTAGE.INROUND && this.RandomGuessArgs ? Util.AsDataTableRowCell("-", "ZZ") : Util.AsDataTableRowCell(this.WrapFlagWithBorder(), this.Location.ExactCountryCode);
             row.PlayerName = Util.AsDataTableRowCell(this.GetPlayerNameDisplayHTML(), this.PlayerData.Name.toLowerCase(), Visual.PlatformCSSFromPlatform(this.PlayerData.Platform));
             row.TimeTaken = Util.FormatTimeToString(this.TimeTaken);
         }
