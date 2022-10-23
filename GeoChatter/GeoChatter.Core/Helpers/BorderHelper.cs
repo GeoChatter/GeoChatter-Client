@@ -428,10 +428,73 @@ namespace GeoChatter.Core.Helpers
         /// Get given <paramref name="countryNameOrCode"/>'s <see cref="GeoJson"/>
         /// </summary>
         /// <param name="countryNameOrCode">Country name or code</param>
+        /// <param name="feature">Feature found</param>
         /// <returns></returns>
-        public static GeoJson GetCountry(string countryNameOrCode)
+        public static GeoJson GetCountry(string countryNameOrCode, out Feature feature)
         {
-            return BorderData.FirstOrDefault(g => g.features.Any(f => f.properties.shapeName == countryNameOrCode || f.properties.shapeISO == countryNameOrCode || f.properties.shapeGroup == countryNameOrCode));
+            feature = null;
+            if (string.IsNullOrWhiteSpace(countryNameOrCode))
+            {
+                return null;
+            }
+
+            countryNameOrCode = countryNameOrCode.Trim();
+            GeoJson g = null;
+            List<Feature> feats = new List<Feature>();
+
+            foreach (var geo in BorderData)
+            {
+                foreach (var feat in geo.features)
+                {
+                    if (feat.properties.shapeName.ToUpperInvariant() == countryNameOrCode.ToUpperInvariant()
+                        || feat.properties.shapeName.ReplaceDefault(" ", "").ToUpperInvariant() == countryNameOrCode.ToUpperInvariant())
+                    {
+                        feature = feat;
+                        return geo;
+                    }
+                    else if (feat.properties.shapeISO.ToUpperInvariant() == countryNameOrCode.ToUpperInvariant()
+                        || feat.properties.shapeISO.ReplaceDefault("-", "").ToUpperInvariant() == countryNameOrCode.ToUpperInvariant())
+                    {
+                        if (feat.properties.shapeGroup != feat.properties.shapeISO)
+                        {
+                            feature = feat;
+                            return geo;
+                        }
+                        else if (g == null || g == geo)
+                        {
+                            feats.Add(feat);
+                            g = geo;
+                        }
+                        else
+                        {
+                            feats.Clear();
+                            feats.Add(feat);
+                            g = geo;
+                        }
+                    }
+                    else if (feat.properties.shapeGroup.ToUpperInvariant() == countryNameOrCode.ToUpperInvariant()
+                        || feat.properties.shapeGroup.ReplaceDefault("-", "").ToUpperInvariant() == countryNameOrCode.ToUpperInvariant())
+                    {
+                        if (g == null || g == geo)
+                        {
+                            feats.Add(feat);
+                            g = geo;
+                        }
+                        else
+                        {
+                            feats.Clear();
+                            feats.Add(feat);
+                            g = geo;
+                        }
+                    }
+                }
+            }
+
+            if (feats.Count > 0)
+            {
+                feature = feats[random.Next(feats.Count)];
+            }
+            return g;
         }
 
         private static int GetFeatureFactor(GeoJson geo)
@@ -574,7 +637,7 @@ namespace GeoChatter.Core.Helpers
         /// <returns></returns>
         public static Coordinates GetRandomPointWithin(string codeOrName, out Feature feature, int maxTries = 100)
         {
-            GeoJson g = GetCountry(codeOrName);
+            GeoJson g = GetCountry(codeOrName, out Feature feat);
             if (g == null)
             {
                 return GetRandomPointCloseOrWithinARandomPolygon(out feature);
@@ -583,9 +646,11 @@ namespace GeoChatter.Core.Helpers
             Coordinates co = null;
             feature = null;
             int tries = 0;
+            feat ??= GetRandomFeature(g);
+
             while (tries++ < maxTries)
             {
-                co = GetRandomPointWithinBoundBox(GetRandomFeature(g));
+                co = GetRandomPointWithinBoundBox(feat);
 
                 GetFeatureHitBy(new double[2] { co.Longitude, co.Latitude }, out GeoJson gjhit, out feature, out _);
 

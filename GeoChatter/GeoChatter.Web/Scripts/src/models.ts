@@ -852,7 +852,7 @@ export class Guess
         this.IsFirstGuess = !data.GuessedBefore;
         this.GuessNumber = data.GuessCount;
         this.IsRandom = data.WasRandom;
-        this.RandomGuessArgs = data.RandomGuessArgs;
+        this.RandomGuessArgs = data.RandomGuessArgs?.replaceAll("'", "")?.replaceAll("\"", "");
         this.Source = data.Source;
         this.Layer = data.Layer;
 

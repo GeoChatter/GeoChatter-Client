@@ -13,7 +13,7 @@
     "esModuleInterop": true,
     "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": [ "ES2020", "ES5", "DOM" ],
+    "lib": [ "ES2021", "DOM" ],
     "listEmittedFiles": true,
     "listFiles": true,
     "module": "ES2020",
