@@ -541,7 +541,6 @@ namespace GeoChatter.Forms
 
                 logger.Debug("Calculated highscores");
                 string msg = $"@Highscores  (15sec cooldown):" +
-                    ((avgPlayer.SumOfGuesses > 0 && avgPlayer.NoOfGuesses > 1) ? $" Average score: {avgPlayer.OverallAverage.ToStringDefault("F4")} ({avgPlayer.FullDisplayName}) | " : string.Empty) +
                     ((streakPlayer.BestStreak > 0) ? $"Streak : {streakPlayer.BestStreak} ({streakPlayer.FullDisplayName}) | " : string.Empty) +
                     //      ((roundPlayer.BestRound > 0) ? $"Best round: {roundPlayer.BestRound} ({roundPlayer.DisplayName}) | " : string.Empty) +
                     ((no5kPlayer.NoOf5kGuesses > 0) ? $"Perfect rounds: {no5kPlayer.NoOf5kGuesses} ({no5kPlayer.FullDisplayName}) " : string.Empty) +

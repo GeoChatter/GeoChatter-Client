@@ -91,7 +91,7 @@ namespace GeoChatter.Forms
            //huburl = "https://localhost:44350/geoChatterHub";
 #endif
 
-            bool success = await guessApiClient.Initialize(huburl, this, Settings.Default.GCClientId, Settings.Default.EnableDebugLogging, isGGLogon);
+            bool success = await guessApiClient.Initialize(huburl, this, Settings.Default.GCClientId, Settings.Default.EnableDebugLogging, Settings.Default.CustomRandomGuessingEnabled, isGGLogon);
             if (success)
             {
                 ApiClient client = new()

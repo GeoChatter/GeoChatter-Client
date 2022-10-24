@@ -182,7 +182,7 @@ namespace GeoChatter.Core.Model
         public string Arguments { get; set; }
     }
 
-#if DEBUG
+
     /// <summary>
     /// Arguments for <see cref="IBotBase.RandomBotGuessRecieved"/>
     /// </summary>
@@ -208,7 +208,7 @@ namespace GeoChatter.Core.Model
         /// </summary>
         public bool Reuse { get; set; }
     }
-#endif
+
     #endregion
 
     #region Non Command

@@ -851,7 +851,7 @@ namespace GeoChatter.Forms
                 try
                 {
                     logger.Debug("Connecting to Streamer.Bot");
-                    await streamerbotClient.Connect(Settings.Default.StreamerBotIP, Settings.Default.StreamerBotPort, Settings.Default.SendChatActionId, Settings.Default.SendChatActionName, Settings.Default.SendChatMsgsViaStreamerBot, this);
+                    await streamerbotClient.Connect(Settings.Default.StreamerBotIP, Settings.Default.StreamerBotPort, Settings.Default.SendChatActionId, Settings.Default.SendChatActionName, Settings.Default.SendChatMsgsViaStreamerBot, this, Settings.Default.SendJoinMsg);
                     AttributeDiscovery.AddEventHandlers(fromMethodSource: this, toTargetInstance: streamerbotClient);
                     streamerbotClient.GetActions();
                     if (Settings.Default.SendChatMsgsViaStreamerBot)

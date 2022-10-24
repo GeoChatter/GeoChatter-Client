@@ -32,6 +32,8 @@ using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.SignalR.Protocol;
 using System.Net;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using Antlr4.Runtime.Misc;
+using GeoChatter.Web.Properties;
 
 namespace GeoChatter.Web
 {
@@ -270,12 +272,13 @@ namespace GeoChatter.Web
         private IMainForm mainForm;
         string gcClientId = "";
         string token = "";
+        bool enableCustomRandomGuesses = false;
         /// <summary>
         /// Initialize connection to API
         /// </summary>
         /// <param name="url"></param>
         /// <param name="form"></param>
-        public async Task<bool> Initialize(string url, IMainForm form, string clientId, bool debugEnabled, bool isGGLogon = false)
+        public async Task<bool> Initialize(string url, IMainForm form, string clientId, bool debugEnabled, bool enableCustomRandomGuesses, bool isGGLogon = false)
         {
             try
             {
@@ -287,6 +290,7 @@ namespace GeoChatter.Web
                 }
                 gcClientId = clientId;
                 watch = new Stopwatch();
+                this.enableCustomRandomGuesses = enableCustomRandomGuesses;
                 watch.Start();
                 apiUrl = url;
                 uploadLog = debugEnabled;
@@ -584,10 +588,28 @@ namespace GeoChatter.Web
                 {
                     if (guess.WasRandom)
                     {
-                        guess.GuessLocation = BorderHelper.GetRandomPointWithinARandomPolygon();
+                        Coordinates rand = null;
+                        if (string.IsNullOrWhiteSpace(guess.RandomGuessArgs) || !enableCustomRandomGuesses)
+                        {
+                            rand = BorderHelper.GetRandomPointWithinARandomPolygon();
+                            guess.RandomGuessArgs = string.Empty;
+                        }
+                        else
+                        {
+                            rand = BorderHelper.GetRandomCoordinateFromRandomGuessQuery(guess.RandomGuessArgs);
+                        }
+
+                        if (rand == null || (rand.Latitude == 0 && rand.Longitude == 0))
+                        {
+                            rand = BorderHelper.GetRandomPointWithinARandomPolygon();
+                            guess.RandomGuessArgs = string.Empty;
+                        }
+
+                        guess.GuessLocation.Latitude = rand.Latitude;
+                        guess.GuessLocation.Longitude = rand.Longitude;
                     }
 
-                    GuessState? state = mainForm?.ProcessViewerGuess(guess.Player.PlatformId.ToStringDefault(), guess.Player.PlayerName, guess.Player.SourcePlatform, guess.GuessLocation.Latitude.ToStringDefault(), guess.GuessLocation.Longitude.ToStringDefault(), "", guess.Player.DisplayName, guess.Player.ProfilePictureUrl, guess.WasRandom, guess.IsTemporary);
+                    GuessState? state = mainForm?.ProcessViewerGuess(guess.Player.PlatformId.ToStringDefault(), guess.Player.PlayerName, guess.Player.SourcePlatform, guess.GuessLocation.Latitude.ToStringDefault(), guess.GuessLocation.Longitude.ToStringDefault(), "", guess.Player.DisplayName, guess.Player.ProfilePictureUrl, guess.WasRandom, guess.IsTemporary, randomArgs:guess.RandomGuessArgs);
                     result = state.HasValue ? state.Value : GuessState.UndefinedError;
 
                     SendAsync(nameof(IGeoChatterHub.ReportGuessState), guess.Id, result);
@@ -917,9 +939,9 @@ namespace GeoChatter.Web
         /// </summary>
         /// <param name="url"></param>
         /// <param name="form"></param>
-        public async void Initialize(Uri url, IMainForm form, string clientId, bool debugEnabled)
+        public async void Initialize(Uri url, IMainForm form, string clientId, bool debugEnabled, bool customRandomGuesses)
         {
-            await Initialize(url?.OriginalString ?? string.Empty, form, clientId, debugEnabled);
+            await Initialize(url?.OriginalString ?? string.Empty, form, clientId, debugEnabled, customRandomGuesses);
         }
 
         public async void SendStartGameToMaps(MapGameSettings gameSettings)
@@ -1029,7 +1051,7 @@ namespace GeoChatter.Web
         {
             if (connection.State != HubConnectionState.Connected)
             {
-                if(await Initialize(apiUrl, mainForm, gcClientId, uploadLog, forcedReconnect))
+                if(await Initialize(apiUrl, mainForm, gcClientId, uploadLog, forcedReconnect, enableCustomRandomGuesses))
                     await Connect(client, mapOptions, true, true);
             }
         }

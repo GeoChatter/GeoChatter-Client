@@ -124,9 +124,9 @@ namespace GeoChatter.Integrations
                 try
                 {
                     ws.Connect();
-                    
-                    Thread.Sleep(1000);
-                    if (sendJoin)
+                    while(ws != null && ws.ReadyState != WebSocketState.Open)    
+                        Thread.Sleep(500);
+                    if (ws != null && sendJoin)
                     {
                         SendMessage(LanguageStrings.Get("Chat_Msg_joinMessage"));
                     }
@@ -145,7 +145,6 @@ namespace GeoChatter.Integrations
             return ws != null && ws.ReadyState == WebSocketState.Open;
 
         }
-        bool reconnectedAlready = false;
         private void SubscribeToWS()
         {
             //ws.ReconnectionHappened.Subscribe(s =>
@@ -290,16 +289,16 @@ namespace GeoChatter.Integrations
                 if (ws != null && ws.ReadyState != WebSocketState.Open && reconnectWanted)
                 {
                     ws.Connect();
-                    Thread.Sleep(15000);
-                    if (ws.ReadyState == WebSocketState.Open)
+                   
+                    while(ws.ReadyState != WebSocketState.Open)
+                        Thread.Sleep(500);
+                    SubscribeToEvents();
+                    if (sendJoin)
                     {
-                        SubscribeToEvents();
-                        if (sendJoin)
-                        {
-                            SendMessage(LanguageStrings.Get("Chat_Msg_joinMessage"));
-                            reconnectWanted = false;
-                        }
+                        SendMessage(LanguageStrings.Get("Chat_Msg_joinMessage"));
+                        reconnectWanted = false;
                     }
+                    
                 }
                 if (ws != null && ws.ReadyState == WebSocketState.Open)
                 {
@@ -342,7 +341,7 @@ namespace GeoChatter.Integrations
             }
             if (ws != null && ws.ReadyState == WebSocketState.Open)
             {
-                string requestString = "{\"request\":\"Subscribe\",\"events\":{\"Twitch\":[\"RewardRedemption\"],  \"command\": [\"Message\"],  \"general\": [\"Custom\"],  \"raw\": [\"Action\", \"SubAction\"]},\"id\":\"123\"}";
+                string requestString = "{\"request\":\"Subscribe\",\"events\":{\"Twitch\":[\"RewardRedemption\"],  \"command\": [\"Message\", \"Whisper\"],  \"general\": [\"Custom\"],  \"raw\": [\"Action\", \"SubAction\"]},\"id\":\"123\"}";
                 ws.Send(requestString);
             }
         }
