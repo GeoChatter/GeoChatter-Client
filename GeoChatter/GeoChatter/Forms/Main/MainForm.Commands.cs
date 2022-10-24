@@ -508,6 +508,13 @@ namespace GeoChatter.Forms
                         args.Bot?.SendMessage(targetmsg);
                     return;
                 }
+                else if(guessesOpen)
+                {
+                    string targetmsg = LanguageStrings.Get("Chat_Msg_CommandUnavailable", new Dictionary<string, string>() { { "targetName", player.FullDisplayName } });
+                    if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                        args.Bot?.SendMessage(targetmsg);
+                    return;
+                }
                 else
                 {
                     string msg = player.GetStatsMessage((Units)Settings.Default.OverlayUnit);

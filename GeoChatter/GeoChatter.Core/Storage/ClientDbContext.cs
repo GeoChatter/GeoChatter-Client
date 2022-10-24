@@ -134,6 +134,12 @@ namespace GeoChatter.Core.Storage
                 
                 SaveChanges();
             }
+            if(migrations.FirstOrDefault(s => s.ContainsDefault("RandomGuessArgs")) != null)
+            {
+                ChatMessages.Add(new ChatMessage { Name = "Chat_Msg_CommandUnavailable", Message = "Sorry, @<targetName>, but this command is not available during rounds" });
+
+                SaveChanges();
+            }
         }
 
         // The following configures EF to create a Sqlite database file in the
