@@ -341,7 +341,7 @@ namespace GeoChatter.Integrations
             }
             if (ws != null && ws.ReadyState == WebSocketState.Open)
             {
-                string requestString = "{\"request\":\"Subscribe\",\"events\":{\"Twitch\":[\"RewardRedemption\"],  \"command\": [\"Message\", \"Whisper\"],  \"general\": [\"Custom\"],  \"raw\": [\"Action\", \"SubAction\"]},\"id\":\"123\"}";
+                string requestString = "{\"request\":\"Subscribe\",\"events\":{\"Twitch\":[\"RewardRedemption\"],  \"command\": [\"Message\", \"Whisper\", \"BotWhisper\"],  \"general\": [\"Custom\"],  \"raw\": [\"Action\", \"SubAction\"]},\"id\":\"123\"}";
                 ws.Send(requestString);
             }
         }
