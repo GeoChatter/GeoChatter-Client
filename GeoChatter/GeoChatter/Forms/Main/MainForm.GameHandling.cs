@@ -147,9 +147,9 @@ namespace GeoChatter.Forms
         private void CreateAndAssignMapRoundSettings(Round round)
         {
             MapRoundSettings roundSettings = CopyRoundSettings(RoundSettingsPreference);
-            RoundSettingsPreference.IsMultiGuess = round.IsMultiGuess;
-            RoundSettingsPreference.RoundNumber = round.RealRoundNumber();
-            RoundSettingsPreference.StartTime = round.TimeStamp;
+            roundSettings.IsMultiGuess = round.IsMultiGuess;
+            roundSettings.RoundNumber = round.RealRoundNumber();
+            roundSettings.StartTime = round.TimeStamp;
 
             round.MapRoundSettings = roundSettings;
         }
