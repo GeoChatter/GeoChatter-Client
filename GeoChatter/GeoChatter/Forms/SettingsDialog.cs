@@ -628,7 +628,8 @@ namespace GeoChatter.Forms
                 if (string.IsNullOrEmpty(svg))
                 {
                     var pack = FlagPackHelper.FlagPacks.FirstOrDefault(p => !string.IsNullOrEmpty(p.Flags.FirstOrDefault(f => f.Value.ToLowerInvariant() == code).Value));
-                    svg = File.ReadAllText($"Styles/flags/{pack.Name}/{code}.svg");
+                    if(pack != null)
+                        svg = File.ReadAllText($"Styles/flags/{pack.Name}/{code}.svg");
                 }
 
                 if (!string.IsNullOrEmpty(svg))
