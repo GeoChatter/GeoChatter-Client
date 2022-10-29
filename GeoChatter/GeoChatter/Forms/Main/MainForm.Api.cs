@@ -252,7 +252,7 @@ namespace GeoChatter.Forms
                 gameResult.TimeTaken = result.TimeTaken;
                 gameResult.Streak = result.Streak;
                 gameResult.GuessCount = result.GuessCount;
-                gameResult.IsStreamerResult = result.Player.PlayerName == result.Player.Channel;
+                gameResult.IsStreamerResult = result.Player.PlatformId == result.Player.Channel;
                 gameResult.GameId = currGame.Source?.token;
                 response.Add(gameResult);
 
