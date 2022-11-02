@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "GeoChatter"
-#define MyAppVersion "1.1.0.0"
+#define MyAppVersion "1.2.0.0"
 #define MyAppPublisher "NoBuddy&Rhino"
 #define MyAppURL "https://geochatter.tv"
 #define MyAppExeName "GeoChatter.exe"
@@ -23,7 +23,7 @@ DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 OutputDir=C:\Users\Denis\Desktop\Setup
-OutputBaseFilename=GeoChatter_v1.1.0.0
+OutputBaseFilename=GeoChatter_v1.2.0.0
 SetupIconFile=D:\Projects\Github\GeoChatter\GeoChatter-Client\GeoChatter\GeoChatter\Resources\logo_clean.ico
 Compression=lzma
 SolidCompression=yes
