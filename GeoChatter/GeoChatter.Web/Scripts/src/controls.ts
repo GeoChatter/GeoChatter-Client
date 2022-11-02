@@ -256,10 +256,11 @@ export namespace Control
                     (_: Event) => Util.ChangeRoundSetting("Blurry", $("[data-qa=round-blurry-map]").is(":checked"), false),
                     GeoChatter.Main.LastChild?.LastChild?.Settings?.Blurry ?? false),
 
-                CheckboxRoundSettingElement("Black & White Effect",
-                    "round-blackandwhite-map",
-                    (_: Event) => Util.ChangeRoundSetting("BlackAndWhite", $("[data-qa=round-blackandwhite-map]").is(":checked"), false),
-                    GeoChatter.Main.LastChild?.LastChild?.Settings?.BlackAndWhite ?? false),
+                // TODO: Figure out why B&W is shown as enabled in rounds 2-5, even though it is in fact disabled
+                //CheckboxRoundSettingElement("Black & White Effect",
+                //    "round-blackandwhite-map",
+                //    (_: Event) => Util.ChangeRoundSetting("BlackAndWhite", $("[data-qa=round-blackandwhite-map]").is(":checked"), false),
+                //    GeoChatter.Main.LastChild?.LastChild?.Settings?.BlackAndWhite ?? false),
 
                 CheckboxRoundSettingElement("Mirrored Map",
                     "round-mirrored-map",
