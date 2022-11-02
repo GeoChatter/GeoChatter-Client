@@ -1,6 +1,7 @@
 ﻿using Antlr4.StringTemplate.Compiler;
 using CefSharp.DevTools.Browser;
 using GeoChatter.Core.Common.Extensions;
+using GeoChatter.Core.Model.Map;
 using GeoChatter.Helpers;
 using GeoChatter.Model;
 using Microsoft.EntityFrameworkCore;
@@ -133,6 +134,12 @@ namespace GeoChatter.Core.Storage
                 
                 SaveChanges();
             }
+            if(migrations.FirstOrDefault(s => s.ContainsDefault("RandomGuessArgs")) != null)
+            {
+                ChatMessages.Add(new ChatMessage { Name = "Chat_Msg_CommandUnavailable", Message = "Sorry, @<targetName>, but this command is not available during rounds" });
+
+                SaveChanges();
+            }
         }
 
         // The following configures EF to create a Sqlite database file in the
@@ -215,6 +222,12 @@ namespace GeoChatter.Core.Storage
             modelBuilder.Entity<Game>()
                 .HasOne(f => f.Source);
             #endregion
+
+            modelBuilder.Entity<MapRoundSettings>()
+            .Property(e => e.Layers)
+            .HasConversion(
+                v => string.Join(',', v),
+                v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList());
         }
 
 

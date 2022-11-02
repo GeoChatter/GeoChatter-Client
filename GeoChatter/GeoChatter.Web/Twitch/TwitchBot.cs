@@ -15,6 +15,7 @@ using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
 using GeoChatter.Core.Common.Extensions;
+using GeoChatter.Model.Enums;
 
 namespace GeoChatter.Web.Twitch
 {
@@ -103,13 +104,15 @@ namespace GeoChatter.Web.Twitch
         /// <param name="userid"></param>
         /// <param name="username"></param>
         /// <param name="userlevel"></param>
-        public bool GetUserInfo(object eventargs, out string userid, out string username, out int userlevel)
+        /// <param name="userPlatform"></param>
+        public bool GetUserInfo(object eventargs, out string userid, out string username, out int userlevel, out Platforms userPlatform)
         {
             if (eventargs is OnMessageReceivedArgs m)
             {
                 userid = m.ChatMessage.UserId;
                 username = m.ChatMessage.Username;
                 userlevel = (int)m.ChatMessage.UserType;
+                
             }
             else if (eventargs is OnWhisperReceivedArgs w)
             {
@@ -123,6 +126,7 @@ namespace GeoChatter.Web.Twitch
                 username = null;
                 userlevel = 0;
             }
+            userPlatform = Platforms.Twitch;
             return userid != null && username != null;
         }
 

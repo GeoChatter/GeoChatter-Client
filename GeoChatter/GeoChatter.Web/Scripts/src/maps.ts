@@ -63,7 +63,7 @@ export namespace MapUtil
 
         const markerIcon = {
             path: google.maps.SymbolPath.CIRCLE,
-            fillColor: "#ff0000",
+            fillColor: "#52456b",
             fillOpacity: 0.82,
             scale: 19,
             strokeColor: "#FFFFFF",
@@ -112,7 +112,7 @@ export namespace MapUtil
                     for (var i = 0; i < markers.length; i++)
                     {
                         let mg = markers[i]?.guess as Guess;
-                        if (mg) names.push(`#${mg.ResultFinalOrder} ${mg.GetPlayerNameDisplayHTML()}`);
+                        if (mg) names.push(`<div class="clusterInfoWindowRow">#${mg.ResultFinalOrder} ${mg.GetPlayerNameDisplayHTML()}</div>`);
                     }
                     let html = Util.GetInfoWindowHtmlForCluster(names);
                     infowindow.setContent(html);
@@ -146,7 +146,7 @@ export namespace MapUtil
 
         const markerIcon = {
             path: google.maps.SymbolPath.CIRCLE,
-            fillColor: "#ff0000",
+            fillColor: "#52456b",
             fillOpacity: 0.82,
             scale: 19,
             strokeColor: "#FFFFFF",

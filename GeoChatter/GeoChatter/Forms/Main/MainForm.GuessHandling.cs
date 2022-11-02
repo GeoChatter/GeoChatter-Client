@@ -38,21 +38,44 @@ namespace GeoChatter.Forms
             browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync(JsToCsHelper.GetSendGuessObjToJsScript(guess));
         }
         /// <inheritdoc/>
-        public GuessState ProcessViewerGuess(string userId, string userName, Platforms userPlatform, string latString, string lngString, string color, string displayName, Uri profilePicUrl, bool wasRandom, bool isTemporary)
+        public GuessState ProcessViewerGuess(string userId,
+                                             string userName,
+                                             Platforms userPlatform,
+                                             string latString,
+                                             string lngString,
+                                             string color,
+                                             string displayName,
+                                             Uri profilePicUrl,
+                                             bool wasRandom,
+                                             bool isTemporary,
+                                             string randomArgs = "",
+                                             string source = "",
+                                             string layer = "")
         {
-            return ProcessViewerGuess(userId, userName, userPlatform, latString, lngString, color, displayName, profilePicUrl?.OriginalString ?? string.Empty, wasRandom, isTemporary);
+            return ProcessViewerGuess(userId, userName, userPlatform, latString, lngString, color, displayName, profilePicUrl?.OriginalString ?? string.Empty, wasRandom, isTemporary, randomArgs, source, layer);
         }
-
-#if DEBUG
+        
         [DiscoverableEvent]
         private void RandomBotGuessRecieved(object sender, RandomBotGuessRecievedEventArgs args)
         {
-            SendRandomGuess(args.Count, args.Reuse);
+            if(Settings.Default.DebugEnableRandomBotGuesses)
+                SendRandomGuess(args.Count, args.Reuse);
         }
-#endif
 
         /// <inheritdoc/>
-        public GuessState ProcessViewerGuess(string userId, string userName, Platforms userPlatform, string latString, string lngString, string color = "", string displayName = "", string profilePicUrl = "", bool wasRandom = false, bool isTemporary = false)
+        public GuessState ProcessViewerGuess(string userId,
+                                             string userName,
+                                             Platforms userPlatform,
+                                             string latString,
+                                             string lngString,
+                                             string color = "",
+                                             string displayName = "",
+                                             string profilePicUrl = "",
+                                             bool wasRandom = false,
+                                             bool isTemporary = false,
+                                             string randomArgs = "",
+                                             string source = "",
+                                             string layer = "")
         {
             try
             {
@@ -213,6 +236,9 @@ namespace GeoChatter.Forms
                     existant.GuessedBefore = true;
                     existant.WasRandom = wasRandom;
                     existant.TimeStamp = DateTime.Now;
+                    existant.Layer = layer;
+                    existant.Source = source;
+                    existant.RandomGuessArgs = randomArgs;
                     existant.GuessCounter++;
                 }
                 else
@@ -226,7 +252,10 @@ namespace GeoChatter.Forms
                         TimeStamp = DateTime.Now,
                         GuessedBefore = false,
                         GuessCounter = 1,
-                        WasRandom = wasRandom
+                        WasRandom = wasRandom,
+                        Layer = layer,
+                        Source = source,
+                        RandomGuessArgs = randomArgs,
                     };
                 }
                 Round round = game.Rounds.First(r => r.RoundNumber == game.CurrentRound);
@@ -244,9 +273,11 @@ namespace GeoChatter.Forms
                         ScoreFormulator.LastCompiledScript,
                         game.Rounds.Where(r => r.RoundNumber < ClientDbCache.RunningGame.CurrentRound).ToList()
                     );
-
-                TriggerSpecialScoreActions(player, existant.Score);
-                TriggerSpecialDistanceActions(player, existant.Distance);
+                if (!round.IsMultiGuess)
+                {
+                    TriggerSpecialScoreActions(player, existant.Score);
+                    TriggerSpecialDistanceActions(player, existant.Distance);
+                }
                 logger.Debug("Actions executed");
 
                 SendGuessToJS(existant);
@@ -255,7 +286,7 @@ namespace GeoChatter.Forms
 
                 UpdatePlayerAndGuessInCache(player, existant);
 
-                if (Settings.Default.SendConfirmGuessMsg && Settings.Default.EnableTwitchChatMsgs)
+                if (Settings.Default.SendConfirmGuessMsg && (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot))
                 {
                     CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_guessReveived", new Dictionary<string, string>() { { "playerName", player.FullDisplayName } }));
                 }
@@ -499,7 +530,8 @@ namespace GeoChatter.Forms
 
                 if (ClientDbCache.RunningGame.CurrentRound > -1)
                 {
-                    guessesOpen = false;
+                    if(guessesOpen)
+                        guessesOpen = false;
                     SetRefreshMenuItemsEnabledState(false);
                     SendEndRoundToJS(finishedRound);
                     SendEndRoundToMaps(finishedRound);
@@ -513,7 +545,8 @@ namespace GeoChatter.Forms
                 }
                 else if (ClientDbCache.RunningGame.CurrentRound > -2)
                 {
-                    guessesOpen = false;
+                    if (guessesOpen)
+                        guessesOpen = false;
                     SendEndGameToJS(ClientDbCache.RunningGame);
                     SendEndRoundToMaps(finishedRound);
                     SetRefreshMenuItemsEnabledState(false);
@@ -521,7 +554,8 @@ namespace GeoChatter.Forms
                 }
                 else
                 {
-                    guessesOpen = false;
+                    if (guessesOpen)
+                        guessesOpen = false;
                     SendEndRoundMessage(round);
 
                     FinalizeGame();
@@ -568,7 +602,7 @@ namespace GeoChatter.Forms
                     FlagRequestReceived(null, new(id, null, CurrentBot, null) { Flag = "random" });
                 }
 
-                Coordinates rand = BorderHelper.GetRandomPointCloseOrWithinAPolygon();
+                Coordinates rand = BorderHelper.GetRandomPointWithinARandomPolygon();
                 string lat = rand.Latitude.ToStringDefault();
                 string lng = rand.Longitude.ToStringDefault();
 

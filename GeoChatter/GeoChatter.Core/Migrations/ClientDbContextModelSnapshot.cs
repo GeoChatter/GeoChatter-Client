@@ -17,6 +17,100 @@ namespace GeoChatter.Core.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.6");
 
+            modelBuilder.Entity("GeoChatter.Core.Model.Map.MapGameSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("ForbidMoving")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("ForbidRotating")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("ForbidZooming")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("GameMode")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("GameState")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("GameType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsInfinite")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsStreak")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("MapID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MapName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("RoundCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("StreakType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TimeLimit")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MapGameSettings");
+                });
+
+            modelBuilder.Entity("GeoChatter.Core.Model.Map.MapRoundSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("BlackAndWhite")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Blurry")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Is3dEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsMultiGuess")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Layers")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MaxZoomLevel")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Mirrored")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RoundNumber")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Sepia")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("UpsideDown")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MapRoundSettings");
+                });
+
             modelBuilder.Entity("GeoChatter.Model.Bounds", b =>
                 {
                     b.Property<int>("Id")
@@ -119,6 +213,9 @@ namespace GeoChatter.Core.Migrations
                     b.Property<bool>("IsUsStreak")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("MapGameSettingsId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Mode")
                         .HasColumnType("INTEGER");
 
@@ -139,6 +236,8 @@ namespace GeoChatter.Core.Migrations
                     b.HasAlternateKey("Id", "Channel");
 
                     b.HasIndex("BoundsId");
+
+                    b.HasIndex("MapGameSettingsId");
 
                     b.HasIndex("NextId")
                         .IsUnique();
@@ -596,6 +695,9 @@ namespace GeoChatter.Core.Migrations
                     b.Property<bool>("IsTemporary")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Layer")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Pano")
                         .HasColumnType("TEXT");
 
@@ -605,11 +707,17 @@ namespace GeoChatter.Core.Migrations
                     b.Property<int?>("PlayerId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("RandomGuessArgs")
+                        .HasColumnType("TEXT");
+
                     b.Property<int?>("RoundId")
                         .HasColumnType("INTEGER");
 
                     b.Property<double>("Score")
                         .HasColumnType("REAL");
+
+                    b.Property<string>("Source")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("State")
                         .HasColumnType("INTEGER");
@@ -756,6 +864,9 @@ namespace GeoChatter.Core.Migrations
                     b.Property<double>("SumOfGuesses")
                         .HasColumnType("REAL");
 
+                    b.Property<string>("SupabaseId")
+                        .HasColumnType("TEXT");
+
                     b.Property<double>("TotalDistance")
                         .HasColumnType("REAL");
 
@@ -794,6 +905,9 @@ namespace GeoChatter.Core.Migrations
                     b.Property<int?>("GameId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("MapRoundSettingsId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("RoundNumber")
                         .HasColumnType("INTEGER");
 
@@ -809,6 +923,8 @@ namespace GeoChatter.Core.Migrations
                     b.HasIndex("ExactCountryId");
 
                     b.HasIndex("GameId");
+
+                    b.HasIndex("MapRoundSettingsId");
 
                     b.ToTable("Round");
                 });
@@ -867,6 +983,10 @@ namespace GeoChatter.Core.Migrations
                         .WithMany()
                         .HasForeignKey("BoundsId");
 
+                    b.HasOne("GeoChatter.Core.Model.Map.MapGameSettings", "MapGameSettings")
+                        .WithMany()
+                        .HasForeignKey("MapGameSettingsId");
+
                     b.HasOne("GeoChatter.Model.Game", "Next")
                         .WithOne("Previous")
                         .HasForeignKey("GeoChatter.Model.Game", "NextId")
@@ -877,6 +997,8 @@ namespace GeoChatter.Core.Migrations
                         .HasForeignKey("SourceId");
 
                     b.Navigation("Bounds");
+
+                    b.Navigation("MapGameSettings");
 
                     b.Navigation("Next");
 
@@ -1050,11 +1172,17 @@ namespace GeoChatter.Core.Migrations
                         .WithMany("Rounds")
                         .HasForeignKey("GameId");
 
+                    b.HasOne("GeoChatter.Core.Model.Map.MapRoundSettings", "MapRoundSettings")
+                        .WithMany()
+                        .HasForeignKey("MapRoundSettingsId");
+
                     b.Navigation("CorrectLocation");
 
                     b.Navigation("Country");
 
                     b.Navigation("ExactCountry");
+
+                    b.Navigation("MapRoundSettings");
                 });
 
             modelBuilder.Entity("GeoChatter.Model.RoundResult", b =>

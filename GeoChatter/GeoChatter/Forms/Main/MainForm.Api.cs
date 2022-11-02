@@ -6,6 +6,7 @@ using GeoChatter.Model;
 using GeoChatter.Model.Enums;
 using GeoChatter.Properties;
 using GeoChatter.Web;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -46,7 +47,8 @@ namespace GeoChatter.Forms
         {
             await guessApiClient.SendMapOptionsToMaps(options);
         }
-        private async Task ConnectToGuessApi(bool forceReconnect = false, bool login = true, bool isGGLogon = false)
+
+        public async Task ConnectToGuessApi(bool forceReconnect = false, bool login = true, bool isGGLogon = false)
         {
             if (guessApiClient == null)
             {
@@ -61,8 +63,17 @@ namespace GeoChatter.Forms
                 if (guessApiClient.IsConnected)
                 {
                     await guessApiClient.Disconnect();
+                    guessApiClient.ResetToken();
 
                 }
+                guessApiClient.Connected -= GuessApiClient_Connected;
+                guessApiClient.Connected += GuessApiClient_Connected;
+                guessApiClient.OnDisconnect -= GuessApiClient_DisConnected;
+                guessApiClient.OnDisconnect += GuessApiClient_DisConnected;
+                guessApiClient.OnReconnected -= GuessApiClient_ReConnected;
+                guessApiClient.OnReconnected += GuessApiClient_ReConnected;
+                guessApiClient.OnLog -= GuessApiClient_Log;
+                guessApiClient.OnLog += GuessApiClient_Log;
 
             }
 
@@ -72,12 +83,15 @@ namespace GeoChatter.Forms
             string version = fvi.FileVersion;
 
             string huburl = Settings.Default.GuessServer;
+            if(Settings.Default.DebugUseDevApi)
+                huburl = Settings.Default.AlternateGuessApiUrl;
+
 #if DEBUG
             huburl = Settings.Default.AlternateGuessApiUrl;
            //huburl = "https://localhost:44350/geoChatterHub";
 #endif
 
-            bool success = await guessApiClient.Initialize(huburl, this, Settings.Default.GCClientId, Settings.Default.EnableDebugLogging, isGGLogon);
+            bool success = await guessApiClient.Initialize(huburl, this, Settings.Default.GCClientId, Settings.Default.EnableDebugLogging, Settings.Default.CustomRandomGuessingEnabled, isGGLogon);
             if (success)
             {
                 ApiClient client = new()
@@ -158,7 +172,7 @@ namespace GeoChatter.Forms
         {
             logger.Error("Connection to GuessServer re-established: "+e?.ToString());
             LoadingScreen(false);
-            //MessageBox.Show("Connection to guess server re-established!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+          //  MessageBox.Show("Connection to guess server re-established!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void GuessApiClient_DisConnected(object sender, LogEventArgs e)
@@ -199,6 +213,8 @@ namespace GeoChatter.Forms
                 roundResult.UserName = result.Player.PlayerName;
                 roundResult.ProfilePicUrl = result.Player.ProfilePictureUrl;
                 roundResult.PlayerFlagName = result.Player.PlayerFlagName;
+                roundResult.PlayerColor = result.Player.Color;
+                roundResult.SourcePlatform = result.Player.SourcePlatform.ToString();
                 roundResult.PlayerFlag = result.Player.PlayerFlag;
                 roundResult.WasRandom = guess.WasRandom;
                 roundResult.Score = result.Score;
@@ -210,6 +226,7 @@ namespace GeoChatter.Forms
                 roundResult.GuessCount = guess.GuessCounter;
                 roundResult.IsStreamerResult = guess.IsStreamerGuess;
                 roundResult.GuessedBefore = guess.GuessedBefore;
+                roundResult.GameId = finishedRound.Game.Source?.token;
                 response.Add(roundResult);
 
             }
@@ -228,12 +245,14 @@ namespace GeoChatter.Forms
                 gameResult.ProfilePicUrl = result.Player.ProfilePictureUrl;
                 gameResult.PlayerFlagName = result.Player.PlayerFlagName;
                 gameResult.PlayerFlag = result.Player.PlayerFlag;
+                gameResult.PlayerColor = result.Player.Color;
+                gameResult.SourcePlatform = result.Player.SourcePlatform.ToString();
                 gameResult.Score = result.Score;
                 gameResult.Distance = result.Distance;
                 gameResult.TimeTaken = result.TimeTaken;
                 gameResult.Streak = result.Streak;
                 gameResult.GuessCount = result.GuessCount;
-                gameResult.IsStreamerResult = result.Player.PlayerName == result.Player.Channel;
+                gameResult.IsStreamerResult = result.Player.PlatformId == result.Player.Channel;
                 gameResult.GameId = currGame.Source?.token;
                 response.Add(gameResult);
 
@@ -253,7 +272,7 @@ namespace GeoChatter.Forms
                 GameType = runningGame.Source.type,
                 IsInfinite = runningGame.IsPartOfInfiniteGame,
                 IsStreak = runningGame.Mode == GameMode.STREAK,
-                MapID = runningGame.Source.Id,
+                MapID = runningGame.Source.map,
                 MapName = runningGame.Source.mapName,
                 RoundCount = runningGame.Source.roundCount,
                 StreakType = runningGame.Source.streakType,
@@ -264,13 +283,8 @@ namespace GeoChatter.Forms
 
         private void SendStartRoundToMaps(Round round)
         {
-            MapRoundSettings roundSettings = new MapRoundSettings()
-            {
-                IsMultiGuess = round.IsMultiGuess,
-                RoundNumber = round.RealRoundNumber(),
-                StartTime = round.TimeStamp
-            };
-            guessApiClient.SendStartRoundToMaps(roundSettings);
+            
+            guessApiClient.SendStartRoundToMaps(round.MapRoundSettings);
         }
 
     }

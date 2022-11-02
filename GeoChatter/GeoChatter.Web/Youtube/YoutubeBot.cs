@@ -15,6 +15,8 @@ using YouTube.Base;
 using YouTube.Base.Clients;
 using GeoChatter.Core.Common.Extensions;
 using GeoChatter.Core.Helpers;
+using GeoChatter.Core;
+using GeoChatter.Model.Enums;
 
 namespace GeoChatter.Web.YouTube
 {
@@ -103,7 +105,7 @@ namespace GeoChatter.Web.YouTube
         /// <param name="userid"></param>
         /// <param name="username"></param>
         /// <param name="userlevel"></param>
-        public bool GetUserInfo(object eventargs, out string userid, out string username, out int userlevel)
+        public bool GetUserInfo(object eventargs, out string userid, out string username, out int userlevel, out Platforms userPlatform)
         {
             if (eventargs is LiveChatMessage m)
             {
@@ -121,6 +123,7 @@ namespace GeoChatter.Web.YouTube
                 username = null;
                 userlevel = 0;
             }
+            userPlatform = Platforms.YouTube;
             return userid != null && username != null;
         }
 

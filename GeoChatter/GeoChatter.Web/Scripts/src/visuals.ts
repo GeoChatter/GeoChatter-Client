@@ -900,7 +900,7 @@ export namespace Visual
                                         ? 'none'
                                         : 'unset')
                                     .on('click', ScoreboardSubTitleClick)
-                                    .text('(Current Standings)'),
+                                    .text('(View Current Standings)'),
                             );
                     },
                 },
@@ -1165,7 +1165,7 @@ export namespace Visual
                 GeoChatter.Main.SingleOnContentReadyWeakCallbacks.push(() =>
                 {
                     $("#scoreboardTitle").html(oldsubtitle);
-                    $("#scoreboardSubTitle").text('(Current Standings)');
+                    $("#scoreboardSubTitle").text('(View Current Standings)');
                     State.Scoreboard.DisplayingCurrentStandings = false;
                     State.Scoreboard.SubtitleClickReady = true;
                     SetScoreboardTitleCount(len);

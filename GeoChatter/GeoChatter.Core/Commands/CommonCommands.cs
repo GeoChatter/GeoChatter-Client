@@ -1,34 +1,17 @@
 ﻿using GeoChatter.Core.Attributes;
+using GeoChatter.Core.Common.Extensions;
 using GeoChatter.Core.Interfaces;
+using GeoChatter.Model.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GeoChatter.Core.Common.Extensions;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace GeoChatter.Web
-{
-    /// <summary>
-    /// Common user level names across platforms for command restriction use
-    /// </summary>
-    public enum CommonUserLevel
-    {
-        /// <summary>
-        /// Regular viewer with no special previliges
-        /// </summary>
-        Viewer = TwitchLib.Client.Enums.UserType.Viewer,
-        /// <summary>
-        /// Moderator with moderation privileges
-        /// </summary>
-        Moderator = TwitchLib.Client.Enums.UserType.Moderator,
-        /// <summary>
-        /// Broadcaster with all privileges
-        /// </summary>
-        Broadcaster = TwitchLib.Client.Enums.UserType.Broadcaster,
-    }
-
-    /// <summary>
-    /// Class for common command definitions
-    /// </summary>
+namespace GeoChatter.Core
+{ /// <summary>
+  /// Class for common command definitions
+  /// </summary>
     public static class CommonCommands
     {
         private static Dictionary<Type, List<ICommandBase>> _commands = new();
@@ -99,7 +82,7 @@ namespace GeoChatter.Web
         [CommandRestriction(AccessLevel = (int)CommonUserLevel.Moderator)]
         private static void RandomBotGuess(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _))
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform))
             {
                 return;
             }
@@ -123,7 +106,7 @@ namespace GeoChatter.Web
                     return;
             }
 
-            bot.FireRandomBotGuessRecieved(new(userid, username, bot, command) { Count = count, Reuse = reuse });
+            bot.FireRandomBotGuessRecieved(new(userid, username, userPlatform, bot, command) { Count = count, Reuse = reuse });
         }
 #endif
 
@@ -131,20 +114,20 @@ namespace GeoChatter.Web
         [CommandRestriction(commandCooldown: 3, applyTo: CooldownTarget.Individual)]
         private static void GetFlagOf(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _)
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform)
                 || !GetTargetUserNameFromArgs(username, ref args, out string targetUser, out bool isSelfReference))
             {
                 return;
             }
 
-            bot.FireFlagOfTargetReceived(new(userid, username, targetUser, isSelfReference, bot, command));
+            bot.FireFlagOfTargetReceived(new(userid, username, targetUser, isSelfReference, userPlatform, bot, command));
         }
 
         [Command("flag", "f", Description = "Set flag to given flag")]
         [CommandRestriction(commandCooldown: 3, applyTo: CooldownTarget.Individual)]
         private static void ChangeFlag(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _))
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform))
             {
                 return;
             }
@@ -168,27 +151,27 @@ namespace GeoChatter.Web
                     break;
             }
             // Fire custom event
-            bot.FireFlagRequestReceived(new(userid, username, bot, command) { Flag = flagName });
+            bot.FireFlagRequestReceived(new(userid, username, bot, command, userPlatform) { Flag = flagName });
         }
 
         [Command("colorof", "colourof", Description = "Get the color of given player's name")]
         [CommandRestriction(commandCooldown: 3, applyTo: CooldownTarget.Individual)]
         private static void GetColorOf(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _)
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform)
                 || !GetTargetUserNameFromArgs(username, ref args, out string targetUser, out bool isSelfReference))
             {
                 return;
             }
 
-            bot.FireColorOfTargetReceived(new(userid, username, targetUser, isSelfReference, bot, command));
+            bot.FireColorOfTargetReceived(new(userid, username, targetUser, isSelfReference, userPlatform, bot, command));
         }
 
         [Command("color", "colour", "c", Description = "Set color to given color name or value")]
         [CommandRestriction(commandCooldown: 3, applyTo: CooldownTarget.Individual)]
         private static void SetColor(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _))
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform))
             {
                 return;
             }
@@ -212,72 +195,72 @@ namespace GeoChatter.Web
                     break;
             }
             // Fire custom event
-            bot.FireColorRequestReceived(new(userid, username, bot, command) { Color = color });
+            bot.FireColorRequestReceived(new(userid, username, bot, command, userPlatform) { Color = color });
         }
 
         [Command("me", "m", Description = "Get personal statistics")]
         [CommandRestriction(commandCooldown: 15, applyTo: CooldownTarget.Individual)]
         private static void RequestMeStats(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _))
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform))
             {
                 return;
             }
 
             // Fire custom event
-            bot.FireMeRequestReceived(new(userid, username, bot, command));
+            bot.FireMeRequestReceived(new(userid, username, bot, command, userPlatform));
         }
 
         [Command("gc", "geo", "GC", "Gc", "gC", Description = "Get guessing map link")]
         [CommandRestriction(commandCooldown: 10, applyTo: CooldownTarget.Global)]
         private static void RequestMapLink(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _))
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform))
             {
                 return;
             }
 
             // Fire custom event
-            bot.FireLinkRequestReceived(new(userid, username, bot, command));
+            bot.FireLinkRequestReceived(new(userid, username, bot, command, userPlatform));
         }
 
         [Command("best", "b", Description = "Get best channel statistics")]
         [CommandRestriction(commandCooldown: 15, applyTo: CooldownTarget.Global)]
         private static void RequestBestStats(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _))
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform))
             {
                 return;
             }
-
+         
             // Fire custom event
-            bot.FireBestRequestReceived(new(userid, username, bot, command));
+            bot.FireBestRequestReceived(new(userid, username, bot, command, userPlatform));
         }
 
         [Command("bestof", Description = "Get best statistics of a given player")]
         [CommandRestriction(commandCooldown: 5, applyTo: CooldownTarget.Individual)]
         private static void RequestBestOfStats(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _)
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform)
                 || !GetTargetUserNameFromArgs(username, ref args, out string targetUser, out bool isSelfReference))
             {
                 return;
             }
 
-            bot.FireBestOfRequestReceived(new(userid, username, targetUser, isSelfReference, bot, command));
+            bot.FireBestOfRequestReceived(new(userid, username, targetUser, isSelfReference, userPlatform, bot, command));
         }
 
         [Command("map", Description = "Get information about the map")]
         [CommandRestriction(commandCooldown: 15, applyTo: CooldownTarget.Global)]
         private static void RequestMapExplanation(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _))
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform))
             {
                 return;
             }
 
             // Fire custom event
-            bot.FireMapRequestReceived(new(userid, username, bot, command));
+            bot.FireMapRequestReceived(new(userid, username, bot, command, userPlatform));
         }
 
 
@@ -285,64 +268,64 @@ namespace GeoChatter.Web
         [CommandRestriction(commandCooldown: 8, applyTo: CooldownTarget.Global)]
         private static void RequestColors(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _))
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform))
             {
                 return;
             }
 
             // Fire custom event
-            bot.FireColorsRequestReceived(new(userid, username, bot, command));
+            bot.FireColorsRequestReceived(new(userid, username, bot, command, userPlatform));
         }
 
         [Command("flags", "gc_flags", "gcflags", Description = "Get a link for checking out available flag names and codes")]
         [CommandRestriction(commandCooldown: 8, applyTo: CooldownTarget.Global)]
         private static void RequestFlags(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _))
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform))
             {
                 return;
             }
 
             // Fire custom event
-            bot.FireFlagsRequestReceived(new(userid, username, bot, command));
+            bot.FireFlagsRequestReceived(new(userid, username, bot, command, userPlatform));
         }
         [Command("packs", Description = "Get a list of installed flag packs")]
         [CommandRestriction(commandCooldown: 8, applyTo: CooldownTarget.Global)]
         private static void RequestFlagpacks(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _))
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform))
             {
                 return;
             }
 
             // Fire custom event
-            bot.FireFlagpacksRequestReceived(new(userid, username, bot, command));
+            bot.FireFlagpacksRequestReceived(new(userid, username, bot, command, userPlatform));
         }
 
         [Command("flagpacks", "gc_flagpacks", "gcflagpacks", Description = "Get a link for checking out available flag names and codes in curated flag packs")]
         [CommandRestriction(commandCooldown: 8, applyTo: CooldownTarget.Global)]
         private static void RequestFlagpacksLink(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _))
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform))
             {
                 return;
             }
 
             // Fire custom event
-            bot.FireFlagpacksLinkRequestReceived(new(userid, username, bot, command));
+            bot.FireFlagpacksLinkRequestReceived(new(userid, username, bot, command, userPlatform));
         }
 
         [Command("commands", "gc_commands", "gccommands", Description = "Get a link for checking out available flag names and codes")]
         [CommandRestriction(commandCooldown: 8, applyTo: CooldownTarget.Global)]
         private static void RequestCommands(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _))
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform))
             {
                 return;
             }
 
             // Fire custom event
-            bot.FireCommandsRequestReceived(new(userid, username, bot, command));
+            bot.FireCommandsRequestReceived(new(userid, username, bot, command, userPlatform));
         }
 
         [Command("reset", Description = "Reset your stats")]
@@ -350,27 +333,47 @@ namespace GeoChatter.Web
         private static void ResetStats(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
             // Get event arguments object
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _))
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform))
             {
                 return;
             }
 
-            bot.FireResetStatsRecieved(new(userid, username, bot, command));
+            bot.FireResetStatsRecieved(new(userid, username, bot, command, userPlatform));
         }
 
         [Command("version", Description = "Send GC version to chat")]
         [CommandRestriction(commandCooldown: 60, applyTo: CooldownTarget.Global, AccessLevel = (int)CommonUserLevel.Moderator, CanDeveloperBypass = true)]
         private static void VersionRequest(IBotBase bot, ICommandBase command, object eventArgs, string[] args)
         {
-            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _))
+            if (!bot.GetUserInfo(eventArgs, out string userid, out string username, out _, out Platforms userPlatform))
             {
                 return;
             }
 
 
-            bot.FireVersionRequestRecieved(new(userid, username, bot, command));
+            bot.FireVersionRequestRecieved(new(userid, username, bot, command, userPlatform));
         }
 
         #endregion
     }
+
+    /// <summary>
+    /// Common user level names across platforms for command restriction use
+    /// </summary>
+    public enum CommonUserLevel
+    {
+        /// <summary>
+        /// Regular viewer with no special previliges
+        /// </summary>
+        Viewer = 0,//TwitchLib.Client.Enums.UserType.Viewer,
+        /// <summary>
+        /// Moderator with moderation privileges
+        /// </summary>
+        Moderator = 1,// TwitchLib.Client.Enums.UserType.Moderator,
+        /// <summary>
+        /// Broadcaster with all privileges
+        /// </summary>
+        Broadcaster = 3//TwitchLib.Client.Enums.UserType.Broadcaster,
+    }
+
 }

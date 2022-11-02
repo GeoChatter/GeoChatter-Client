@@ -284,6 +284,8 @@ export namespace GeoChatter
         Dependency.Head = document.head;
         Dependency.Body = document.body;
 
+        await CefSharp.BindObjectAsync("jsHelper");
+        Main.InitiallyAvailableLayers = await jsHelper.getAvailableLayers();
         await EventHandler.ApplySettings()
         await Dependency.SetupScheme();
 

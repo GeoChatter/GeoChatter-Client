@@ -36,7 +36,8 @@ namespace GeoChatter.Forms
             CurrentState = AppGameState.INROUND;
             logger.Debug("SendStartRoundToJS");
             browser.GetBrowser().FocusedFrame.ExecuteJavaScriptAsync(JsToCsHelper.GetStartRoundJsScript(round));
-            SendStartRoundMessage(round);
+            if(round.RoundNumber > 1)
+                SendStartRoundMessage(round);
         }
               
 
@@ -55,6 +56,12 @@ namespace GeoChatter.Forms
                 browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync(JsToCsHelper.DisableLoadingScreen());
             }
         }
+
+        public void ToggleGuessSlider()
+        {
+            browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync(JsToCsHelper.ToggleGuessSlider());
+        }
+
         /// <summary>
         /// Sends the end round event to JS
         /// </summary>

@@ -17,10 +17,11 @@ namespace GeoChatter.Core.Model
         /// </summary>
         /// <param name="userid"></param>
         /// <param name="username"></param>
+        /// <param name="platform"></param>
         /// <param name="bot"></param>
         /// <param name="command"></param>
-        public GuessReceivedEventArgs(string userid, string username, IBotBase bot, ICommandBase command)
-: base(userid, username, bot, command) { }
+        public GuessReceivedEventArgs(string userid, string username, Platforms platform, IBotBase bot, ICommandBase command)
+        : base(userid, username, bot, command, platform) { }
 
         /// <summary>
         /// Guess latitude
@@ -38,6 +39,18 @@ namespace GeoChatter.Core.Model
         /// Wheter guess was random
         /// </summary>
         public bool WasRandom { get; set; }
+        /// <summary>
+        /// See <see cref="Guess.RandomGuessArgs"/>
+        /// </summary>
+        public string RandomGuessArgs { get; set; }
+        /// <summary>
+        /// See <see cref="Guess.Source"/>
+        /// </summary>
+        public string Source { get; set; }
+        /// <summary>
+        /// See <see cref="Guess.Layer"/>
+        /// </summary>
+        public string Layer { get; set; }
     }
 
     /// <summary>
@@ -45,13 +58,16 @@ namespace GeoChatter.Core.Model
     /// </summary>
     public class FlagRequestReceivedEventArgs : BotEventArgs
     {
-/// <summary>
-/// 
-/// </summary>
-/// <param name="userid"></param>
-/// <param name="username"></param>
-/// <param name="bot"></param>
-/// <param name="command"></param>
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userid"></param>
+        /// <param name="username"></param>
+        /// <param name="bot"></param>
+        /// <param name="command"></param>
+        /// <param name="userPlatform"></param>
+        /// <param name="displayName"></param>
+        /// <param name="profilePicUrl"></param>
         public FlagRequestReceivedEventArgs(string userid, string username, IBotBase bot, ICommandBase command, Platforms userPlatform = Platforms.Twitch, string displayName = "", string profilePicUrl = "")
 : base(userid, username, bot, command, userPlatform, displayName, profilePicUrl) { }
 
@@ -73,6 +89,9 @@ namespace GeoChatter.Core.Model
         /// <param name="username"></param>
         /// <param name="bot"></param>
         /// <param name="command"></param>
+        /// <param name="userPlatform"></param>
+        /// <param name="displayName"></param>
+        /// <param name="profilePicUrl"></param>
         public ColorRequestReceivedEventArgs(string userid, string username, IBotBase bot, ICommandBase command, Platforms userPlatform = Platforms.Twitch, string displayName = "", string profilePicUrl = "")
 : base(userid, username, bot, command, userPlatform, displayName, profilePicUrl) { }
 
@@ -111,8 +130,9 @@ namespace GeoChatter.Core.Model
         /// <param name="username"></param>
         /// <param name="bot"></param>
         /// <param name="command"></param>
-        public RandomGuessRecievedEventArgs(string userid, string username, IBotBase bot, ICommandBase command)
-            : base(userid, username, bot, command) { }
+        /// <param name="platform"></param>
+        public RandomGuessRecievedEventArgs(string userid, string username, Platforms platform, IBotBase bot, ICommandBase command)
+            : base(userid, username, bot, command, platform) { }
 
         /// <summary>
         /// Extra guess arguments
@@ -126,6 +146,18 @@ namespace GeoChatter.Core.Model
         /// User profile picture
         /// </summary>
         public string ProfilePicture { get; set; }
+        /// <summary>
+        /// See <see cref="Guess.RandomGuessArgs"/>
+        /// </summary>
+        public string RandomGuessArgs { get; set; }
+        /// <summary>
+        /// See <see cref="Guess.Source"/>
+        /// </summary>
+        public string Source { get; set; }
+        /// <summary>
+        /// See <see cref="Guess.Layer"/>
+        /// </summary>
+        public string Layer { get; set; }
     }
 
     /// <summary>
@@ -140,8 +172,9 @@ namespace GeoChatter.Core.Model
         /// <param name="username"></param>
         /// <param name="bot"></param>
         /// <param name="command"></param>
-        public ResetStatsRecievedEventArgs(string userid, string username, IBotBase bot, ICommandBase command)
-            : base(userid, username, bot, command) { }
+        /// <param name="platform"></param>
+        public ResetStatsRecievedEventArgs(string userid, string username, Platforms platform, IBotBase bot, ICommandBase command)
+            : base(userid, username, bot, command, platform) { }
 
         /// <summary>
         /// Extra arguments
@@ -149,7 +182,7 @@ namespace GeoChatter.Core.Model
         public string Arguments { get; set; }
     }
 
-#if DEBUG
+
     /// <summary>
     /// Arguments for <see cref="IBotBase.RandomBotGuessRecieved"/>
     /// </summary>
@@ -162,8 +195,9 @@ namespace GeoChatter.Core.Model
         /// <param name="username"></param>
         /// <param name="bot"></param>
         /// <param name="command"></param>
-        public RandomBotGuessRecievedEventArgs(string userid, string username, IBotBase bot, ICommandBase command)
-            : base(userid, username, bot, command) { }
+        /// <param name="platform"></param>
+        public RandomBotGuessRecievedEventArgs(string userid, string username, Platforms platform, IBotBase bot, ICommandBase command)
+            : base(userid, username, bot, command, platform) { }
 
         /// <summary>
         /// Amount of guesses
@@ -174,7 +208,7 @@ namespace GeoChatter.Core.Model
         /// </summary>
         public bool Reuse { get; set; }
     }
-#endif
+
     #endregion
 
     #region Non Command

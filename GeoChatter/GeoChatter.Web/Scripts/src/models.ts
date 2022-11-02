@@ -123,6 +123,8 @@ export class App
 
     StartedRun: Nullable<Date>;
 
+    InitiallyAvailableLayers: string[] = [];
+
     get FirstChild(): Nullable<Game>
     {
         return this.Games[0]
@@ -556,7 +558,7 @@ export class Round
     /**
      * Round constructor
      */
-    constructor(game: Game, id: number, multi: boolean, location: LocationSource)
+    constructor(game: Game, id: number, multi: boolean, location: LocationSource, settings: MapRoundSettings)
     {
         super();
         this.Game = game;
@@ -565,6 +567,7 @@ export class Round
         this.Location = location;
         this.Location.PanoOverwritten = false;
         this.Guesses = [];
+        this.Settings = settings;
 
         if (this.Game.PreviousValue)
         {
@@ -630,6 +633,8 @@ export class Round
     Standings: Array<TableRow> = [];
 
     IsStandingsSet: boolean = false;
+
+    Settings: MapRoundSettings;
 
     _OriginalAsTableRowsParse = {} as RoundSummary;
 
@@ -797,7 +802,8 @@ export class Round
         let round = new Round(game,
             data.RoundNumber,
             data.MultiGuessEnabled,
-            data.CorrectLocation)
+            data.CorrectLocation,
+            data.MapRoundSettings)
 
         let guesses = data.Guesses;
         for (let i = 0; i < guesses.length; i++)
@@ -846,6 +852,9 @@ export class Guess
         this.IsFirstGuess = !data.GuessedBefore;
         this.GuessNumber = data.GuessCount;
         this.IsRandom = data.WasRandom;
+        this.RandomGuessArgs = data.RandomGuessArgs?.replaceAll("'", "")?.replaceAll("\"", "");
+        this.Source = data.Source;
+        this.Layer = data.Layer;
 
         this.PlayerData.FlagDisplay = Util.FixFlagHTML(this.PlayerData.FlagCode, this.PlayerData.FlagName);
         if (!this.PlayerData.Color)
@@ -907,6 +916,12 @@ export class Guess
     GuessNumber: number;
 
     IsRandom: boolean;
+
+    RandomGuessArgs: string;
+
+    Source: GuessSource;
+
+    Layer: string;
 
     ResultFinalOrder: number = 0;
 
@@ -1006,7 +1021,7 @@ export class Guess
 
     GetPlayerNameDisplayHTML = function(this: Guess)
     {
-        return `${this.PlayerData.FlagDisplay}${(this.IsRandom ? Setting.Overlay.GetRandomGuessIndicator() : "")}${Color.ColorUsername(this.PlayerData.Color, this.PlayerData.Display)}`
+        return `${this.PlayerData.FlagDisplay}${(this.IsRandom ? Setting.Overlay.GetRandomGuessIndicator(this.RandomGuessArgs) : "")}${Color.ColorUsername(this.PlayerData.Color, this.PlayerData.Display)}`
     }
 
     GetGuessPoints = function(this: Guess)
@@ -1090,14 +1105,14 @@ export class Guess
         if (this.Round.Game.Mode == Enum.GAMEMODE.DEFAULT)
         {
             row.PlayerName = Util.AsDataTableRowCell(this.GetPlayerNameDisplayHTML(), this.PlayerData.Name.toLowerCase(), Visual.PlatformCSSFromPlatform(this.PlayerData.Platform));
-            row.CountryStreak = Util.AsDataTableRowCell(this.CountryStreak.toString(), this.CountryStreak);
-            row.Distance = Util.GetConvertedDistance(this.Distance);
-            row.Score = Util.AsDataTableRowCell(this.Score.toString(), this.Score);
+            row.CountryStreak = this.Round.Game.Stage == Enum.GAMESTAGE.INROUND && this.RandomGuessArgs ? Util.AsDataTableRowCell("-", -1) : Util.AsDataTableRowCell(this.CountryStreak.toString(), this.CountryStreak);
+            row.Distance = this.Round.Game.Stage == Enum.GAMESTAGE.INROUND && this.RandomGuessArgs ? Util.AsDataTableRowCell("-", 999999) : Util.GetConvertedDistance(this.Distance);
+            row.Score = this.Round.Game.Stage == Enum.GAMESTAGE.INROUND && this.RandomGuessArgs ? Util.AsDataTableRowCell("-", -1) : Util.AsDataTableRowCell(this.Score.toString(), this.Score);
             row.TimeTaken = Util.FormatTimeToString(this.TimeTaken);
         }
         else if (this.Round.Game.Mode == Enum.GAMEMODE.STREAK)
         {
-            row.GuessPoint = Util.AsDataTableRowCell(this.WrapFlagWithBorder(), this.Location.ExactCountryCode);
+            row.GuessPoint = this.Round.Game.Stage == Enum.GAMESTAGE.INROUND && this.RandomGuessArgs ? Util.AsDataTableRowCell("-", "ZZ") : Util.AsDataTableRowCell(this.WrapFlagWithBorder(), this.Location.ExactCountryCode);
             row.PlayerName = Util.AsDataTableRowCell(this.GetPlayerNameDisplayHTML(), this.PlayerData.Name.toLowerCase(), Visual.PlatformCSSFromPlatform(this.PlayerData.Platform));
             row.TimeTaken = Util.FormatTimeToString(this.TimeTaken);
         }

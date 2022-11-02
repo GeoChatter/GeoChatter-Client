@@ -247,6 +247,13 @@ export namespace Util
         ClickElement("[data-qa='start-game-button']");
     }
 
+    export async function ChangeRoundSetting(settingName: string, value: boolean | string | number, forClient: boolean): Promise<void>
+    {
+        await CefSharp.BindObjectAsync('jsHelper');
+
+        await jsHelper.changeRoundSetting(settingName, value, forClient);
+    }
+
     /** Check if current path is a 5 round game path
      *  @returns {boolean} */
     export function IsInA5RoundGame(): boolean
@@ -291,11 +298,13 @@ export namespace Util
     */
     export function GetInfoWindowHtmlForCluster(names: Array<string>): string
     {
-        return `<div class="gm-iw-custom" style='border: 3px solid #ff0000 !important;'>
+        return `<div class="gm-iw-custom" style='border: 3px solid var(--gc-gg-main-color) !important;'>
                     <div style="font-size:${Setting.Overlay.FontSize}${Setting.Overlay.FontSizeUnit}">
                         GUESSES AROUND AREA (${names.length})
                     </div>
-                    ${(names ? names.join("<br/>") : "")}
+                    <div class="clusterInfoWindowRowContainer">
+                    ${(names ? names.join(" ") : "")}
+                    </div>
                 </div>`;
     }
 

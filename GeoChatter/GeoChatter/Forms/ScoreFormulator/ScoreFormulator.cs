@@ -1113,7 +1113,7 @@ namespace GeoChatter.Forms.ScoreCalculator
 
         private async void button45_Click(object sender, EventArgs e)
         {
-            Coordinates rand = BorderHelper.GetRandomPointCloseOrWithinAPolygon();
+            Coordinates rand = BorderHelper.GetRandomPointWithinARandomPolygon();
 
             await testMap.ExecuteScriptAsync($"(() => window.addMarker(L.latLng({rand.Latitude.ToStringDefault()},{rand.Longitude.ToStringDefault()})))();");
         }

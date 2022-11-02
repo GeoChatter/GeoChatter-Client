@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "GeoChatter"
-#define MyAppVersion "1.1.0.0"
+#define MyAppVersion "1.2.0.0"
 #define MyAppPublisher "NoBuddy&Rhino"
 #define MyAppURL "https://geochatter.tv"
 #define MyAppExeName "GeoChatter.exe"
@@ -23,7 +23,7 @@ DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
 OutputDir=C:\Users\Denis\Desktop\Setup
-OutputBaseFilename=GeoChatter_v1.1.0.0
+OutputBaseFilename=GeoChatter_v1.2.0.0
 SetupIconFile=D:\Projects\Github\GeoChatter\GeoChatter-Client\GeoChatter\GeoChatter\Resources\logo_clean.ico
 Compression=lzma
 SolidCompression=yes
@@ -43,7 +43,7 @@ Name: {app}; Permissions: everyone-full
 Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\GeoChatter\GeoChatter\bin\Release\publish\*"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\GeoChatter\GeoChatter\bin\Release\publish\Styles\*"; DestDir: "{app}\Styles"; Flags: ignoreversion recursesubdirs
 Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\GeoChatter\GeoChatter\bin\Release\publish\Scripts\*"; DestDir: "{app}\Scripts"; Flags: ignoreversion recursesubdirs
-Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\Dependencies\Quickstart.pdf"; DestDir: "{app}\Scripts"; Flags: ignoreversion 
+Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\Dependencies\Quickstart.pdf"; DestDir: "{app}"; Flags: ignoreversion 
 Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\Dependencies\windowsdesktop-runtime-6.0.3-win-x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall dontcopy
 Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\Dependencies\aspnetcore-runtime-6.0.3-win-x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall dontcopy 
 Source: "D:\Projects\Github\GeoChatter\GeoChatter-Client\Dependencies\VC_redist.x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall dontcopy 

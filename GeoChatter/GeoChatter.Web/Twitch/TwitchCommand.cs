@@ -1,4 +1,5 @@
-﻿using GeoChatter.Core.Attributes;
+﻿using GeoChatter.Core;
+using GeoChatter.Core.Attributes;
 using GeoChatter.Core.Interfaces;
 using GeoChatter.Model.Enums;
 using System;
@@ -107,7 +108,7 @@ namespace GeoChatter.Web.Twitch
         /// </summary>
         public bool CommandCooldownAvailablity(IBotBase bot, object eventArgs)
         {
-            if (bot == null || !bot.GetUserInfo(eventArgs, out string userid, out string _, out int _))
+            if (bot == null || !bot.GetUserInfo(eventArgs, out string userid, out string _, out int _, out _))
             {
                 return false;
             }
@@ -142,7 +143,7 @@ namespace GeoChatter.Web.Twitch
         public void CallCommand(TwitchBot bot, object eventArgs)
         {
             if (bot == null
-                || !bot.GetUserInfo(eventArgs, out string userid, out string _, out int userlevel)
+                || !bot.GetUserInfo(eventArgs, out string userid, out string _, out int userlevel, out _)
                 || !bot.GetEventArgObject(eventArgs, out TwitchLibMessage msg, out Type _)
                 || (Restrictions.AllowedState != AppGameState.ANYTIME && (bot.Parent.CurrentState & Restrictions.AllowedState) == 0))
             {

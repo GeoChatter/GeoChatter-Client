@@ -15,6 +15,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using GeoChatter.Core.Common.Extensions;
+using CefSharp.DevTools.Audits;
 
 namespace GeoChatter.Core.Helpers
 {
@@ -427,10 +428,73 @@ namespace GeoChatter.Core.Helpers
         /// Get given <paramref name="countryNameOrCode"/>'s <see cref="GeoJson"/>
         /// </summary>
         /// <param name="countryNameOrCode">Country name or code</param>
+        /// <param name="feature">Feature found</param>
         /// <returns></returns>
-        public static GeoJson GetCountry(string countryNameOrCode)
+        public static GeoJson GetCountry(string countryNameOrCode, out Feature feature)
         {
-            return BorderData.FirstOrDefault(g => g.features.Any(f => f.properties.shapeName == countryNameOrCode || f.properties.shapeISO == countryNameOrCode || f.properties.shapeGroup == countryNameOrCode));
+            feature = null;
+            if (string.IsNullOrWhiteSpace(countryNameOrCode))
+            {
+                return null;
+            }
+
+            countryNameOrCode = countryNameOrCode.Trim();
+            GeoJson g = null;
+            List<Feature> feats = new List<Feature>();
+
+            foreach (var geo in BorderData)
+            {
+                foreach (var feat in geo.features)
+                {
+                    if (feat.properties.shapeName.ToUpperInvariant() == countryNameOrCode.ToUpperInvariant()
+                        || feat.properties.shapeName.ReplaceDefault(" ", "").ToUpperInvariant() == countryNameOrCode.ToUpperInvariant())
+                    {
+                        feature = feat;
+                        return geo;
+                    }
+                    else if (feat.properties.shapeISO.ToUpperInvariant() == countryNameOrCode.ToUpperInvariant()
+                        || feat.properties.shapeISO.ReplaceDefault("-", "").ToUpperInvariant() == countryNameOrCode.ToUpperInvariant())
+                    {
+                        if (feat.properties.shapeGroup != feat.properties.shapeISO)
+                        {
+                            feature = feat;
+                            return geo;
+                        }
+                        else if (g == null || g == geo)
+                        {
+                            feats.Add(feat);
+                            g = geo;
+                        }
+                        else
+                        {
+                            feats.Clear();
+                            feats.Add(feat);
+                            g = geo;
+                        }
+                    }
+                    else if (feat.properties.shapeGroup.ToUpperInvariant() == countryNameOrCode.ToUpperInvariant()
+                        || feat.properties.shapeGroup.ReplaceDefault("-", "").ToUpperInvariant() == countryNameOrCode.ToUpperInvariant())
+                    {
+                        if (g == null || g == geo)
+                        {
+                            feats.Add(feat);
+                            g = geo;
+                        }
+                        else
+                        {
+                            feats.Clear();
+                            feats.Add(feat);
+                            g = geo;
+                        }
+                    }
+                }
+            }
+
+            if (feats.Count > 0)
+            {
+                feature = feats[random.Next(feats.Count)];
+            }
+            return g;
         }
 
         private static int GetFeatureFactor(GeoJson geo)
@@ -474,6 +538,20 @@ namespace GeoChatter.Core.Helpers
         }
 
         /// <summary>
+        /// Get GeoJson of given country code or name
+        /// </summary>
+        /// <returns></returns>
+        public static GeoJson GetGeoJSONOf(string codeOrName)
+        {
+            codeOrName = codeOrName?.Trim().ToUpperInvariant();
+            return BorderData
+                .FirstOrDefault(b => b.features
+                    .Any(f => f.properties.shapeGroup == codeOrName 
+                        || f.properties.shapeISO == codeOrName 
+                        || f.properties.shapeName.ToUpperInvariant() == codeOrName));
+        }
+
+        /// <summary>
         /// Get a random feature from given country
         /// </summary>
         /// <param name="geo">Country GeoJson object</param>
@@ -485,12 +563,12 @@ namespace GeoChatter.Core.Helpers
         }
 
         /// <summary>
-        /// See <see cref="GetRandomPointCloseOrWithinAPolygon(out Feature)"/>
+        /// See <see cref="GetRandomPointCloseOrWithinARandomPolygon(out Feature)"/>
         /// </summary>
         /// <returns></returns>
-        public static Coordinates GetRandomPointCloseOrWithinAPolygon()
+        public static Coordinates GetRandomPointCloseOrWithinARandomPolygon()
         {
-            return GetRandomPointCloseOrWithinAPolygon(out Feature _);
+            return GetRandomPointCloseOrWithinARandomPolygon(out Feature _);
         }
 
         /// <summary>
@@ -499,10 +577,244 @@ namespace GeoChatter.Core.Helpers
         /// </summary>
         /// <param name="feature">Randomly picked feature</param>
         /// <returns></returns>
-        public static Coordinates GetRandomPointCloseOrWithinAPolygon(out Feature feature)
+        public static Coordinates GetRandomPointCloseOrWithinARandomPolygon(out Feature feature)
         {
             feature = GetRandomFeature(GetRandomCountry());
             return GetRandomPointWithinBoundBox(feature);
+        }
+
+        /// <summary>
+        /// See <see cref="GetRandomPointWithinARandomPolygon(out Feature, int)"/>
+        /// </summary>
+        /// <returns></returns>
+        public static Coordinates GetRandomPointWithinARandomPolygon(int maxTries = 100)
+        {
+            return GetRandomPointWithinARandomPolygon(out Feature _, maxTries);
+        }
+
+        /// <summary>
+        /// Get a random point within ANY polygon
+        /// </summary>
+        /// <para>WARNING: This DOES NOT guarantee but tries <paramref name="maxTries"/> amount of times at max to ensure a hit on ANY polygon</para>
+        /// <param name="maxTries">Maximum tries in case of misses by <see cref="GetRandomPointCloseOrWithinARandomPolygon(out Feature)"/></param>
+        /// <param name="feature">Randomly picked feature</param>
+        /// <returns></returns>
+        public static Coordinates GetRandomPointWithinARandomPolygon(out Feature feature, int maxTries = 100)
+        {
+            Coordinates co = null;
+            feature = null;
+            int tries = 0;
+            while (co == null && tries++ < maxTries)
+            {
+                GeoJson g = GetRandomCountry();
+                co = GetRandomPointWithinBoundBox(GetRandomFeature(g));
+
+                GetFeatureHitBy(new double[2] { co.Longitude, co.Latitude }, out GeoJson gjhit, out feature, out _);
+
+                if (g == gjhit)
+                {
+                    break;
+                }
+            }
+            return co;
+        }
+
+        /// <summary>
+        /// See <see cref="GetRandomPointWithin(string, out Feature, int)"/>
+        /// </summary>
+        /// <returns></returns>
+        public static Coordinates GetRandomPointWithin(string codeOrName, int maxTries = 100)
+        {
+            return GetRandomPointWithin(codeOrName, out Feature _, maxTries);
+        }
+
+        /// <summary>
+        /// Get a random point within a polygon of given <paramref name="codeOrName"/> geojson
+        /// </summary>
+        /// <param name="codeOrName">Country code or name, <see cref="GetCountry(string)"/></param>
+        /// <param name="maxTries">Maximum tries in case of misses by <see cref="GetRandomPointCloseOrWithinARandomPolygon(out Feature)"/></param>
+        /// <param name="feature">Randomly picked feature</param>
+        /// <returns></returns>
+        public static Coordinates GetRandomPointWithin(string codeOrName, out Feature feature, int maxTries = 100)
+        {
+            GeoJson g = GetCountry(codeOrName, out Feature feat);
+            if (g == null)
+            {
+                return GetRandomPointCloseOrWithinARandomPolygon(out feature);
+            }
+
+            Coordinates co = null;
+            feature = null;
+            int tries = 0;
+            feat ??= GetRandomFeature(g);
+
+            while (tries++ < maxTries)
+            {
+                co = GetRandomPointWithinBoundBox(feat);
+
+                GetFeatureHitBy(new double[2] { co.Longitude, co.Latitude }, out GeoJson gjhit, out feature, out _);
+
+                if (g == gjhit)
+                {
+                    break;
+                }
+                else
+                {
+                    co = null;
+                }
+            }
+            if (co == null)
+            {
+                return GetRandomPointCloseOrWithinARandomPolygon(out feature);
+            }
+            return co;
+        }
+        /// <summary>
+        /// Get a random point within given country polygon's bounding box present in current border set
+        /// <para>WARNING: This DOES NOT guarantee that the point will be within a polygon</para>
+        /// </summary>
+        /// <param name="codeOrName">Randomly picked feature</param>
+        /// <param name="feature">Randomly picked feature</param>
+        /// <returns></returns>
+        public static Coordinates GetRandomPointCloseOrWithin(string codeOrName, out Feature feature)
+        {
+            feature = GetRandomFeature(GetGeoJSONOf(codeOrName));
+            return GetRandomPointWithinBoundBox(feature);
+        }
+
+        /// <summary>
+        /// Get alpha3 code from alpha2 code or name
+        /// </summary>
+        /// <param name="codeOrName"></param>
+        /// <returns></returns>
+        public static string GetAlpha3FromCodeOrName(string codeOrName)
+        {
+            if (string.IsNullOrWhiteSpace(codeOrName))
+            {
+                return string.Empty;
+            }
+
+            string match = codeOrName.ToUpperInvariant();
+            if (match.Length == 2)
+                match = ISO3166Helper.FromAlpha2(match)?.Alpha3;
+            else
+                match = ISO3166Helper.Collection.FirstOrDefault(c => c.Name.ToUpperInvariant() == match)?.Alpha3;
+
+            return match ?? codeOrName;
+        }
+
+        private static string GetNameFromRandomGuessArg(string arg)
+        {
+            if (string.IsNullOrWhiteSpace(arg))
+            {
+                return string.Empty;
+            }
+
+            string[] splt = arg.Split(':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (splt.Length >= 1)
+            {
+                return splt[0];
+            }
+            else
+            {
+                return arg;
+            }
+        }
+
+        private static double GetWeightFromRandomGuessArg(string arg)
+        {
+            if (string.IsNullOrWhiteSpace(arg))
+            {
+                return 0D;
+            }
+
+            string[] splt = arg.Split(':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (splt.Length <= 1)
+            {
+                return 1D;
+            }
+            else
+            {
+                return splt[1].ParseAsDouble(1);
+            }
+        }
+        /// <summary>
+        /// Get random coordinates around given areas
+        /// </summary>
+        /// <param name="randomGuessQuery"><code>targetCountryNameOrCode</code> OR <code>target1:relativeProbability1 target2:relativeProbability2 ...</code></param>
+        /// <returns></returns>
+        public static Coordinates GetRandomCoordinateFromRandomGuessQuery(string randomGuessQuery)
+        {
+            Coordinates rand = null;
+            try
+            {
+                if (string.IsNullOrWhiteSpace(randomGuessQuery))
+                {
+                    return rand;
+                }
+
+                // TODO: Refactor
+                string[] countryArgs = randomGuessQuery
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .OrderBy(GetWeightFromRandomGuessArg)
+                    .ToArray();
+                if (countryArgs.Length > 0)
+                {
+
+                    if (countryArgs.Length == 1)
+                    {
+                        string match = GetAlpha3FromCodeOrName(GetNameFromRandomGuessArg(countryArgs[0]));
+                        rand = GetRandomPointWithin(match);
+                    }
+                    else
+                    {
+                        List<string> matches = countryArgs
+                            .Select(GetNameFromRandomGuessArg)
+                            .ToList();
+
+                        List<double> probs = countryArgs
+                            .Select(GetWeightFromRandomGuessArg)
+                            .ToList();
+
+                        double totalProb = probs.Sum();
+
+                        int i = matches.Count - 1;
+                        double r = random.NextDouble() * totalProb;
+                        while (r > 0 && i >= 0)
+                        {
+                            Coordinates old = rand;
+                            string match = GetAlpha3FromCodeOrName(matches[i]);
+                            rand = GetRandomPointWithin(match);
+
+                            if (rand == null)
+                            {
+                                rand = old;
+                            }
+
+                            r -= probs[i--];
+                        }
+
+                        if (rand == null)
+                        {
+                            foreach (string m in matches)
+                            {
+                                string match = GetAlpha3FromCodeOrName(m);
+                                rand = GetRandomPointWithin(match);
+                                if (rand != null)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                return rand;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Summarize());
+                return rand;
+            }
         }
 
         /// <summary>

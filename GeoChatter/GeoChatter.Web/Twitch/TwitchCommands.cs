@@ -1,4 +1,5 @@
-﻿using GeoChatter.Core.Attributes;
+﻿using GeoChatter.Core;
+using GeoChatter.Core.Attributes;
 using GeoChatter.Core.Interfaces;
 using GeoChatter.Model.Enums;
 using System;
@@ -46,7 +47,7 @@ namespace GeoChatter.Web.Twitch
             string userid = message.UserId;
             string color = message.ColorHex;
 
-            bot.FireRandomGuessRecieved(new(userid, username, bot, command) { Arguments = string.Join(' ', args), Color = color });
+            bot.FireRandomGuessRecieved(new(userid, username, Platforms.Twitch, bot, command) { Arguments = string.Join(' ', args), Color = color });
         }
 
 

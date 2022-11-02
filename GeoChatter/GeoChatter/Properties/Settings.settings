@@ -81,22 +81,22 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="OverlayShowIndex" Type="System.String" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="OverlayShowPlayername" Type="System.String" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="OverlayShowStreak" Type="System.String" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="OverlayShowPlonked" Type="System.String" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="OverlayShowDistance" Type="System.String" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="OverlayShowScore" Type="System.String" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="SpecialScoreAction" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -126,13 +126,13 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="OverlayDisplayCorrectLocations" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="OverlayUseWrongRegionColors" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="OverlayRegionalFlags" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="StreamerBotConnectAtStartup" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -336,7 +336,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="UseUsStateFlags" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="SendDoubleGuessTooFastMsg" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -396,16 +396,16 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="EnableDebugLogging" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="MOShowBorders" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="MOShowFlags" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="OverlayMarkerClustersEnabled" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="MOEnableTempGuesses" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -438,6 +438,27 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="LoginRequired" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="SendChatActionId" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="SendChatMsgsViaStreamerBot" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="SendChatActionName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="DebugUseDevApi" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="DebugShowDevTools" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="DebugEnableRandomBotGuesses" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="CustomRandomGuessingEnabled" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>

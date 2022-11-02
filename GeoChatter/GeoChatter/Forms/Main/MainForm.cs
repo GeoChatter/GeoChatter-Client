@@ -31,34 +31,32 @@ using System.Globalization;
 #if !DEBUG
 using System.IO;
 #endif
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GeoChatter.Core.Common.Extensions;
-using System.Windows.Documents;
 using TwitchLib.Client.Events;
-using Handlers;
-using GeoChatter.Core.Model.Map;
-using GeoChatter.Core.Model.Extensions;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 using System.Reflection;
 
 namespace GeoChatter.Forms
 {
     /// <inheritdoc/>
     [SupportedOSPlatform("windows7.0")]
-    public  partial class MainForm : Form, IMainForm
+    public partial class MainForm : Form, IMainForm
     {
         #region Properties & Fields & Constants
         private static readonly ILog logger = LogManager.GetLogger(typeof(MainForm));
-        private static readonly StreamerbotClient streamerbotClient = new();
+        private static StreamerbotClient streamerbotClient = new();
         private static readonly OBSClient obsClient = new();
         public GuessApiClient guessApiClient;
 
-        internal bool guessesOpen = true;
+        internal bool guessesOpen
+        {
+            get;
+            set;
+        } = true;
+
         private const int WM_SYSCOMMAND = 0x112;
         private const int MF_STRING = 0x0;
         private const int MF_SEPARATOR = 0x800;
@@ -81,13 +79,13 @@ namespace GeoChatter.Forms
         /// </summary>
         public bool ExtensionsInitialized { get; set; }
 
-    
+
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         public AppGameState CurrentState { get; set; } = AppGameState.NOTINGAME;
 
-     
+
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
@@ -106,7 +104,7 @@ namespace GeoChatter.Forms
         /// </summary>
         public bool IsFullscreen { get; private set; }
 
-        
+
 
         private bool GameSetupInTitleChange { get; set; }
 
@@ -134,11 +132,11 @@ namespace GeoChatter.Forms
             Version = version;
 
             logger.Info("Configured channel: " + GCResourceRequestHandler.ClientUserID);
-           
+
             CultureInfo.CurrentCulture = CoreExtensions.DEFAULTCULTURE;
             Application.CurrentCulture = CultureInfo.CurrentCulture;
 
-            
+
             KeyPreview = true;
 
             SplashScreenHelper.Show();
@@ -171,8 +169,7 @@ namespace GeoChatter.Forms
             SplashScreenHelper.SetPercentage(50, "Responding to SOS....");
 
             SplashScreenHelper.SetPercentage(55, "Tying everything together...");
-
-          
+            InitializeAvailableLayers();
 
             SplashScreenHelper.SetPercentage(60, "Preparing secret sauce...");
             SetupBinds();
@@ -186,11 +183,11 @@ namespace GeoChatter.Forms
             SplashScreenHelper.SetPercentage(75, "Sending bot off to Twitch...");
             LanguageStrings.Initialize(Settings.Default);
             LoadLabelSettings();
-           
 
-           // SplashScreenHelper.SetPercentage(80, "Creating guess receiver...");
-           
-            
+
+            // SplashScreenHelper.SetPercentage(80, "Creating guess receiver...");
+
+
 
             SplashScreenHelper.SetPercentage(85, "Contracting Streamer.Bot...");
             ConnectToStreamerbot();
@@ -201,11 +198,11 @@ namespace GeoChatter.Forms
             SplashScreenHelper.SetPercentage(95, "Hiring useless managers...");
             InitializeManagers();
 
-#if DEBUG
-            devToolsToolStripMenuItem.Visible = true;
-#endif
+
+            devToolsToolStripMenuItem.Visible = Settings.Default.DebugShowDevTools;
+
             SplashScreenHelper.SetPercentage(100, "Connecting to guess server....");
-          
+
 
         }
 
@@ -278,7 +275,7 @@ namespace GeoChatter.Forms
         {
         };
 
-       
+
         private static void InitializeBorders()
         {
             BorderHelper.Initialize();
@@ -326,12 +323,12 @@ namespace GeoChatter.Forms
 
         private void OnGeoGuessrCookieHijackedFirst(object sender, EventArgs e)
         {
-                HandleGGEvent(false);
+            HandleGGEvent(false);
         }
 
         private void OnGeoGuessrSignedIn(object sender, EventArgs e)
         {
-            if(Settings.Default.LastLoginVersion != FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion)
+            if (Settings.Default.LastLoginVersion != FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion)
             {
                 Settings.Default.LastLoginVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
                 Settings.Default.Save();
@@ -366,7 +363,7 @@ namespace GeoChatter.Forms
 
                 waitingForApi = true;
                 ConnectToGuessApi(true, isGGLogon: isLogin);
-                if(Settings.Default.EnableTwitchChatMsgs && !string.IsNullOrEmpty(Properties.Settings.Default.TwitchChannel)&& !string.IsNullOrEmpty(Settings.Default.oauthToken))
+                if (Settings.Default.EnableTwitchChatMsgs && !string.IsNullOrEmpty(Properties.Settings.Default.TwitchChannel) && !string.IsNullOrEmpty(Settings.Default.oauthToken))
                     ConnectBot();
             }
             isRefresh = false;
@@ -379,7 +376,7 @@ namespace GeoChatter.Forms
         #endregion
 
         #region JavaScript Events
-      
+
         #endregion
 
         /// <inheritdoc/>
@@ -406,7 +403,7 @@ namespace GeoChatter.Forms
         {
             ClientDbCache cache = ClientDbCache.Instance;
         }
-       
+
         private const string UserScriptUpdateMessage = "UserScripts were updated... Page needs to be refreshed for changes to take effect. Do you want to refresh now ?";
 
         private void ReportUpdates(string updates)
@@ -424,34 +421,32 @@ namespace GeoChatter.Forms
 
         public void CopyMapLink()
         {
-            if(CopyMapLinkToClipboard())
+            if (CopyMapLinkToClipboard())
                 MessageBox.Show($"We have copied the map url to your clipboard!\n\rPlease make sure to share it with your viewers!\n\r\n\rYour map name is " + guessApiClient.MapIdentifier, "Map link copied", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
         }
 
-           public void CopyResultLink()
+        public void CopyResultLink()
         {
-            if(CopyResultLinkToClipboard())
+            if (CopyResultLinkToClipboard())
                 MessageBox.Show($"We have copied the reuslt link to your clipboard!\n\rPlease make sure to share it with your viewers!", "Result link copied", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
         }
 
-        
+
 
         private bool CopyResultLinkToClipboard()
         {
-            
 
-#if DEBUG
-            new SetClipboardHelper(DataFormats.Text, $"https://geochatter.tv/testing_results/?id={ClientDbCache.RunningGame.GeoGuessrId}").Go();
 
-#else
-           new SetClipboardHelper(DataFormats.Text, $"https://geochatter.tv/results/?id={ClientDbCache.RunningGame.GeoGuessrId}").Go();;
-           
-#endif
+            if (Settings.Default.DebugUseDevApi)
+                new SetClipboardHelper(DataFormats.Text, $"https://geochatter.tv/testing_results/?id={ClientDbCache.RunningGame.GeoGuessrId}").Go();
+            else
+                new SetClipboardHelper(DataFormats.Text, $"https://geochatter.tv/results/?id={ClientDbCache.RunningGame.GeoGuessrId}").Go(); ;
+
             return true;
         }
-        
+
 
         private bool CopyMapLinkToClipboard()
         {
@@ -460,17 +455,16 @@ namespace GeoChatter.Forms
                 MessageBox.Show("You are not curently connected to our guess server!\n\rPlease restart the application!", "Not connected", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return false;
             }
-#if DEBUG
-            new SetClipboardHelper(DataFormats.Text, $"https://geochatter.tv/testing_map/?{guessApiClient.MapIdentifier}").Go();
+            if (Settings.Default.DebugUseDevApi)
+                new SetClipboardHelper(DataFormats.Text, $"https://geochatter.tv/testing_map/?{guessApiClient.MapIdentifier}").Go();
 
-#else
-           new SetClipboardHelper(DataFormats.Text, $"https://geochatter.tv/map/?{guessApiClient.MapIdentifier}").Go();;
-           
-#endif
+            else
+                new SetClipboardHelper(DataFormats.Text, $"https://geochatter.tv/map/?{guessApiClient.MapIdentifier}").Go(); ;
+
             return true;
         }
 
-     
+
         private void UpdatePlayerAndGuessInCache(Player player, Guess guess)
         {
             player.IdOfLastGame = ClientDbCache.RunningGame.Id;
@@ -507,11 +501,11 @@ namespace GeoChatter.Forms
             }
         }
 
-      
+
         /// <inheritdoc/>
         public string LabelPath => Settings.Default.LabelPath;
 
-     
+
         [DiscoverableEvent]
         private void BadStateExceptionThrown(object sender, TwitchLib.Client.TwitchClient.BadStateExceptionThrownArgs args)
         {
@@ -544,9 +538,9 @@ namespace GeoChatter.Forms
 		 */
         #region Event Handlers
 
-        
 
-        
+
+
         private string LastAddress { get; set; } = string.Empty;
 
         private bool RefreshHandled { get; set; }
@@ -560,32 +554,33 @@ namespace GeoChatter.Forms
             isRefresh = true;
         }
 
-       
 
-       
 
-   
+
+
+
         private int LastBrowserID { get; set; } = 1;
 
         /// <inheritdoc/>
-      
+
         private void SetRefreshMenuItemsEnabledState(bool enabled)
         {
-            this.InvokeDefault(f => f.browserToolStripMenuItem.Enabled = 
-            f.userScriptsToolStripMenuItem.Enabled = 
+            this.InvokeDefault(f => f.browserToolStripMenuItem.Enabled =
+            f.userScriptsToolStripMenuItem.Enabled =
             f.flagManagerToolStripMenuItem.Enabled = enabled);
         }
 
-      
+
 
         public void UpdateMapInTitle()
         {
 
-            this.InvokeDefault(f => {
+            this.InvokeDefault(f =>
+            {
                 string[] titleParts = f.Text.Split(':');
                 string currentMapName = titleParts[titleParts.Length - 1].Trim();
-                f.Text = f.Text.ReplaceDefault(currentMapName, guessApiClient.MapIdentifier ?? "Disconnected"); 
-            
+                f.Text = f.Text.ReplaceDefault(currentMapName, string.IsNullOrEmpty(guessApiClient.MapIdentifier) ? "Disconnected" : guessApiClient.MapIdentifier);
+
             });
         }
 
@@ -608,24 +603,31 @@ namespace GeoChatter.Forms
             Invoke(delegate ()
                 {
                     try
-                            {
-                                settingsDialog = new(this, streamerbotClient, obsClient);
-                                settingsDialog.SettingsApplied += (object sender, EventArgs a) => { LoadLabelSettings(); };
-                                settingsDialog.TopMost = true;
-                                settingsDialog.Show(this);
-                            }
-                            catch (Exception e)
-                            {
-                                logger.Error(e);
-                            }
-                            finally
-                            { settingsDialog = null; }
+                    {
+                        settingsDialog = new(this, streamerbotClient, obsClient);
+                        settingsDialog.SettingsApplied += (object sender, EventArgs a) => { LoadLabelSettings(); };
+                        settingsDialog.TopMost = true;
+                        settingsDialog.FormClosed += (object sender, FormClosedEventArgs e) =>
+                        {
+                            devToolsToolStripMenuItem.Visible = Settings.Default.DebugShowDevTools;
+                        };
+                        settingsDialog.Show(this);
+
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Error(e);
+                    }
+                    finally
+                    { settingsDialog = null; }
 
 
                 }
             );
             LoadLabelSettings();
         }
+
+
         /// <summary>
         /// Obvious, i think
         /// </summary>
@@ -726,18 +728,32 @@ namespace GeoChatter.Forms
         /// Toggle guesses opened/closed
         /// </summary>
         /// <param name="open"></param>
-        public void ToggleGuesses(bool open)
+        public void ToggleGuesses()
+        {
+            ToggleGuesses(!guessesOpen);
+            ToggleGuessSlider();
+        }
+
+        /// <summary>
+        /// Toggle guesses opened/closed
+        /// </summary>
+        /// <param name="open"></param>
+        /// <param name="sendMessage"></param>
+        public void ToggleGuesses(bool open, bool sendMessage = true)
         {
             if (!open)
                 ProcessTemporaryGuesses();
             guessesOpen = open;
-            if (open && Settings.Default.EnableTwitchChatMsgs)
+            if (open)
             {
-                CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_GuessesOpenedMessage"));
+                if (sendMessage && (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot))
+                    CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_GuessesOpenedMessage"));
             }
             else
             {
-                CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_GuessesClosedMessage"));
+                if (sendMessage && (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot))
+                    CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_GuessesClosedMessage"));
+
             }
         }
 
@@ -828,19 +844,18 @@ namespace GeoChatter.Forms
             }
         }
 
-        private static void ConnectToStreamerbot()
+        private async void ConnectToStreamerbot()
         {
             if (Settings.Default.StreamerBotConnectAtStartup && !string.IsNullOrEmpty(Settings.Default.StreamerBotIP) && !string.IsNullOrEmpty(Settings.Default.StreamerBotPort))
             {
                 try
                 {
                     logger.Debug("Connecting to Streamer.Bot");
-                    if (!streamerbotClient.Connect(Settings.Default.StreamerBotIP, Settings.Default.StreamerBotPort).Result)
-                    {
-                        MessageBox.Show("Could not connect to Streamer.Bot\r\nPlease make sure that IP and port are correct,\rthat Streamer.Bot and its websocket server are running!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-                        return;
-                    }
+                    await streamerbotClient.Connect(Settings.Default.StreamerBotIP, Settings.Default.StreamerBotPort, Settings.Default.SendChatActionId, Settings.Default.SendChatActionName, Settings.Default.SendChatMsgsViaStreamerBot, this, Settings.Default.SendJoinMsg);
+                    AttributeDiscovery.AddEventHandlers(fromMethodSource: this, toTargetInstance: streamerbotClient);
                     streamerbotClient.GetActions();
+                    if (Settings.Default.SendChatMsgsViaStreamerBot)
+                        CurrentBot = streamerbotClient;
                 }
                 catch (Exception ex) { logger.Error(ex.Summarize()); }
             }
@@ -921,9 +936,8 @@ namespace GeoChatter.Forms
 
         private void devToolsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-#if DEBUG
-            ShowDevTools();
-#endif
+            if (Settings.Default.DebugShowDevTools)
+                ShowDevTools();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Disposed on work end.")]
@@ -967,9 +981,9 @@ namespace GeoChatter.Forms
                 SaveAndExit(true);
             }
             guessApiClient?.Disconnect();
-#if DEBUG
-            randomBotImageClient?.Dispose();
-#endif
+            if (Settings.Default.DebugEnableRandomBotGuesses)
+                randomBotImageClient?.Dispose();
+
             browser?.CloseDevTools();
         }
 
@@ -1016,7 +1030,8 @@ namespace GeoChatter.Forms
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            
+            Settings.Default.DebugUseDevApi = false;
+            Settings.Default.Save();
         }
 
         private void extensionsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1032,7 +1047,7 @@ namespace GeoChatter.Forms
 
         private void CheckForReloginAndRedirect()
         {
-           if(Settings.Default.LoginRequired && Settings.Default.LastLoginVersion != Version)
+            if (Settings.Default.LoginRequired && Settings.Default.LastLoginVersion != Version)
             {
                 LogoutAndRedirect();
             }
@@ -1070,8 +1085,31 @@ namespace GeoChatter.Forms
         {
             BeginInvoke(new Action(() =>
             {
-                    hasFocus = !(Form.ActiveForm == null);
+                hasFocus = !(Form.ActiveForm == null);
             }));
+        }
+
+        public bool IsDebugEnabled()
+        {
+            return Settings.Default.EnableDebugLogging;
+        }
+
+        private void resetStreamerBotToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to reset the connection?", "Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                streamerbotClient = new();
+                ConnectToStreamerbot();
+            }
+        }
+
+        private async void ResetApitoolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to reset the connection?", "Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                guessApiClient = new();
+                await ConnectToGuessApi(true);
+            }
         }
     }
 }

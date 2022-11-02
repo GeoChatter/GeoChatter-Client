@@ -14,11 +14,18 @@ using GeoChatter.Core.Common.Extensions;
 using GeoChatter.Properties;
 using GeoChatter.Core.Helpers;
 using GeoChatter.Helpers;
+using GeoChatter.Core.Interfaces;
+using GeoChatter.Core.Model.Map;
+using Newtonsoft.Json;
+using RestSharp;
+using System.IO;
+using static ScintillaNET.Style;
 
 namespace GeoChatter.Forms
 {
     public partial class MainForm
     {
+        private static readonly List<string> availableLayers = new List<string>();
 
 
         /// <inheritdoc/>
@@ -44,11 +51,107 @@ namespace GeoChatter.Forms
 
             SetCountry(firstRound);
             SetRefreshMenuItemsEnabledState(true);
-            SendStartRoundToMaps(firstRound);
+            CreateAndAssignMapRoundSettings(firstRound);
             SendStartRoundToJS(firstRound);
-            guessesOpen = true;
-
+            SendStartRoundToMaps(firstRound);
+            //ToggleGuesses(true);
             TriggerRoundStartActions();
+        }
+
+        /// <summary>
+        /// ISO json file
+        /// </summary>
+        public static string LayersFile => "availablemaplayers.json";
+
+        private static RestClient restClient { get; } = new();
+
+        internal static bool LayersListInitialized { get; set; }
+
+        /// <summary>
+        /// Initializer
+        /// </summary>
+        public void InitializeAvailableLayers()
+        {
+            if (LayersListInitialized) return;
+
+            LayersListInitialized = true;
+
+            availableLayers.Clear();
+            logger.Info("Initializing available layer names");
+
+            try
+            {
+                RestRequest req = new(Path.Combine(ResourceHelper.OtherServiceURL, LayersFile), Method.Get) { RequestFormat = DataFormat.Json };
+                RestResponse res = restClient.Execute(req);
+
+                if (res.IsSuccessful)
+                {
+                    logger.Debug($"GET {LayersFile} done");
+                    var r = JsonConvert.DeserializeObject<List<string>>(res.Content);
+
+                    availableLayers.AddRange(r);
+
+                    logger.Info($"Initialized available layers with {r.Count} entries");
+                }
+                else
+                {
+                    availableLayers.AddRange(BackupLayers);
+                    logger.Error($"GET {LayersFile} failed({res.ErrorMessage}): {res.ErrorException?.Summarize()}");
+                }
+            }
+            catch (Exception ex)
+            {
+                availableLayers.AddRange(BackupLayers);
+                logger.Error(ex.Summarize());
+            }
+            if (RoundSettingsPreference.Layers == null)
+            {
+                RoundSettingsPreference.Layers = AvailableLayers;
+            }
+            else
+            {
+                RoundSettingsPreference.Layers.Clear();
+                RoundSettingsPreference.Layers.AddRange(AvailableLayers);
+            }
+        }
+
+        public List<string> BackupLayers => new List<string>() { "STREETS", "SATELLITE", "TERRAIN", "OSM", "OPENTOPOMAP", "3D DEFAULT", "3D SATELLITE", "3D OUTDOORS", "3D LIGHTMODE", "3D DARKMODE", "3D SATELLITE (NO LABELS)" };
+
+        public List<string> AvailableLayers => availableLayers?.Select(l => l).ToList();
+
+        public MapRoundSettings RoundSettingsPreference { get; } = new MapRoundSettings();
+
+        public MapRoundSettings CopyRoundSettings(MapRoundSettings set)
+        {
+            if (set == null)
+            {
+                return new MapRoundSettings()
+                {
+                    Layers = AvailableLayers
+                };
+            }
+
+            return new MapRoundSettings()
+            {
+                BlackAndWhite = set.BlackAndWhite,
+                Blurry = set.Blurry,
+                Is3dEnabled = set.Is3dEnabled,
+                Mirrored = set.Mirrored,
+                UpsideDown = set.UpsideDown,
+                Sepia = set.Sepia,
+                MaxZoomLevel = set.MaxZoomLevel,
+                Layers = set.Layers.Select(l => l).ToList()
+            };
+        }
+
+        private void CreateAndAssignMapRoundSettings(Round round)
+        {
+            MapRoundSettings roundSettings = CopyRoundSettings(RoundSettingsPreference);
+            roundSettings.IsMultiGuess = round.IsMultiGuess;
+            roundSettings.RoundNumber = round.RealRoundNumber();
+            roundSettings.StartTime = round.TimeStamp;
+
+            round.MapRoundSettings = roundSettings;
         }
 
         public async Task<GameFoundStatus> SetupStartGame(GeoGuessrGame geoGame, bool retrigger)
@@ -124,6 +227,8 @@ namespace GeoChatter.Forms
             {
                 logger.Info("Verifying game start for " + id);
                 GameStartFires.Remove(id);
+                ToggleGuesses(true, false);
+                SendStartRoundMessage(ClientDbCache.RunningGame.GetCurrentRound());
             }
             else
             {
@@ -214,6 +319,8 @@ namespace GeoChatter.Forms
         private async Task SaveAndExit(bool instantexit = false)
         {
             logger.Info("Exiting current game: " + instantexit);
+            if (guessesOpen)
+                guessesOpen = false;
             try
             {
                 bool status = await ClientDbCache.SaveGame(ClientDbCache.RunningGame);
@@ -236,7 +343,6 @@ namespace GeoChatter.Forms
             finally
             {
                 ClientDbCache.RunningGame = null;
-                guessesOpen = false;
             }
         } /// <inheritdoc/>
         public void OverwriteRoundData(int round, double lat, double lng, string panoid)
@@ -356,29 +462,59 @@ namespace GeoChatter.Forms
                         TriggerSpecialScoreActions(result.Player, result.Score);
                     }
                 }
-                if (ClientDbCache.RunningGame.Mode == GameMode.STREAK && Settings.Default.EnableTwitchChatMsgs)
+                if (ClientDbCache.RunningGame.Mode == GameMode.STREAK)
                 {
 
                     Game g = ClientDbCache.RunningGame;
-                    if (!guessApiClient.SummaryEnabled)
-                        CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_EndStreak", new Dictionary<string, string>() { { "endRoundNumber", (ClientDbCache.RunningGame.Rounds.Count - 1).ToStringDefault() } }));
-                    else
-                        CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_EndStreakSummary", new Dictionary<string, string>() { { "winner", player.FullDisplayName }, { "gameId", g.GeoGuessrId }, { "endRoundNumber", (ClientDbCache.RunningGame.Rounds.Count - 1).ToStringDefault() } }));
+                    if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                    {
+                        if (!guessApiClient.SummaryEnabled)
+                        {
+                            string msg = LanguageStrings.Get("Chat_Msg_EndStreak", new Dictionary<string, string>() { { "winner", player.FullDisplayName }, { "gameId", g.GeoGuessrId }, { "endRoundNumber", (ClientDbCache.RunningGame.Rounds.Count - 1).ToStringDefault() } });
+                            if (Settings.Default.DebugUseDevApi)
+                                msg = msg.ReplaceDefault("results", "testing_results");
+                            CurrentBot?.SendMessage(msg);
+                        }
+                        else
+                        {
+                            string msg = LanguageStrings.Get("Chat_Msg_EndStreakSummary", new Dictionary<string, string>() { { "winner", player.FullDisplayName }, { "gameId", g.GeoGuessrId }, { "endRoundNumber", (ClientDbCache.RunningGame.Rounds.Count - 1).ToStringDefault() } });
+                            if (Settings.Default.DebugUseDevApi)
+                                msg = msg.ReplaceDefault("results", "testing_results");
+                            CurrentBot?.SendMessage(msg);
+                        }
 
+                    }
                 }
                 else
                 {
-                    
+
                     Game g = ClientDbCache.RunningGame;
                     while (g.Previous != null)
                     {
                         g = g.Previous;
                     }
-                    if (Settings.Default.EnableTwitchChatMsgs)
-                        if (guessApiClient.SummaryEnabled)
-                            CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_gameEnd", new Dictionary<string, string>() { { "winner", player.FullDisplayName }, { "gameId", g.GeoGuessrId } }));
+                    if (Settings.Default.EnableTwitchChatMsgs || Settings.Default.SendChatMsgsViaStreamerBot)
+                    {
+                        if (!guessApiClient.SummaryEnabled)
+                        {
+                            string msg = LanguageStrings.Get("Chat_Msg_gameEndNoSummary", new Dictionary<string, string>() { { "winner", player.FullDisplayName }, { "gameId", g.GeoGuessrId }, { "endRoundNumber", (ClientDbCache.RunningGame.Rounds.Count - 1).ToStringDefault() } });
+                            if (Settings.Default.DebugUseDevApi)
+
+                                msg = msg.ReplaceDefault("results", "testing_results");
+                            CurrentBot?.SendMessage(msg);
+
+                        }
                         else
-                            CurrentBot?.SendMessage(LanguageStrings.Get("Chat_Msg_gameEndNoSummary", new Dictionary<string, string>() { { "winner", player.FullDisplayName } }));
+                        {
+                            string msg = LanguageStrings.Get("Chat_Msg_gameEnd", new Dictionary<string, string>() { { "winner", player.FullDisplayName }, { "gameId", g.GeoGuessrId }, { "endRoundNumber", (ClientDbCache.RunningGame.Rounds.Count - 1).ToStringDefault() } });
+                            if (Settings.Default.DebugUseDevApi)
+                                msg = msg.ReplaceDefault("results", "testing_results");
+                            CurrentBot?.SendMessage(msg);
+
+                        }
+                    }
+
+
                 }
                 SendEndGameToMaps(ClientDbCache.RunningGame);
                 if (ClientDbCache.RunningGame.IsPartOfInfiniteGame)
@@ -404,10 +540,10 @@ namespace GeoChatter.Forms
             round.Flags = ClientDbCache.Instance.NextRoundRoundOptions;
             ClientDbCache.Instance.NextRoundRoundOptions = RoundOption.DEFAULT;
             SetRefreshMenuItemsEnabledState(true);
+            CreateAndAssignMapRoundSettings(round);
             SendStartRoundToJS(round);
             SendStartRoundToMaps(round);
-            guessesOpen = true;
-
+            ToggleGuesses(true, false);
             TriggerRoundStartActions();
         }
     }

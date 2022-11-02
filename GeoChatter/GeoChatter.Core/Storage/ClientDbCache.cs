@@ -321,19 +321,22 @@ namespace GeoChatter.Core.Storage
         {
             Player player = null;
             player = Players.FirstOrDefault(p => (p.PlatformId == id || p.PlayerName == name || p.DisplayName == name) && p.SourcePlatform == Platforms.YouTube);
-            if (player == null && !string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(displayName))
+            if (player == null)
             {
-                logger.Info($"Creating new YT player ('{name}' [{id}])");
-                player = new Player()
+                if (!string.IsNullOrEmpty(id) && (!string.IsNullOrEmpty(displayName) || !string.IsNullOrEmpty(name)))
                 {
-                    PlatformId = id,
-                    Channel = channelName,
-                    PlayerName = name,
-                    DisplayName = displayName,
-                    ProfilePictureUrl = profilePicUrl,
-                    SourcePlatform = Platforms.YouTube
-                };
-                Players.Add(player);
+                    logger.Info($"Creating new YT player ('{name}' [{id}])");
+                    player = new Player()
+                    {
+                        PlatformId = id,
+                        Channel = channelName,
+                        PlayerName = name,
+                        DisplayName = displayName ?? name,
+                        ProfilePictureUrl = profilePicUrl,
+                        SourcePlatform = Platforms.YouTube
+                    };
+                    Players.Add(player);
+                }
             }
             else
             {

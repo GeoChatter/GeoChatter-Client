@@ -52,6 +52,7 @@ namespace GeoChatter.Forms
             InitializeComponent();
             this.parent = parent;
             this.streamerbotClient = streamerbotClient;
+            
             this.obsClient = obsClient;
             showAdvancedSettings = parent?.ShowAdvancedSettings ?? false;
             HandleAdvancedSettings();
@@ -61,6 +62,7 @@ namespace GeoChatter.Forms
             // tabControl1.TabPages.Remove(tabGeneral);
             //propertyGrid1.SetLabelColumnWidth1(3);
             this.parent.ResetJSCTRLCheck();
+            this.tabControl1.TabPages.Remove(tabDevelopment);
         }
 
 
@@ -72,7 +74,7 @@ namespace GeoChatter.Forms
             Close();
         }
 
-        private void SaveSettings()
+        private async void SaveSettings()
         {
             logger.Debug("Saving settings");
 
@@ -98,9 +100,18 @@ namespace GeoChatter.Forms
 
             Settings.Default.ShortcutsFullscreenModifiers = scrFullscreen.Modifiers;
             Settings.Default.ShortcutsFullscreenKey = scrFullscreen.KeyCode;
+            if (tabControl1.TabPages.Contains(tabDevelopment))
+            {
+                bool reconnectNeeded = Settings.Default.DebugUseDevApi != chkDEVUseDevApi.Checked;
+                Settings.Default.DebugUseDevApi = chkDEVUseDevApi.Checked;
+                Settings.Default.DebugShowDevTools = chkDEVShowDevTools.Checked;
+                Settings.Default.DebugEnableRandomBotGuesses = chkDEVEnableRandomBotGuess.Checked;
+                if(reconnectNeeded)
+                    parent.ConnectToGuessApi(true, true);
+            }
 
 
-
+            Settings.Default.CustomRandomGuessingEnabled = allowCustomRandomGuesses.Checked;
 
             Settings.Default.TwitchChannel = txtGeneralChannelName.Text;
             
@@ -180,27 +191,32 @@ namespace GeoChatter.Forms
             Settings.Default.ScoreboardFGA = (byte)ScoreboardFGAnumericUpDown2.Value;
 
             Settings.Default.ScrollSpeed = (int)ScoreboardScrollSpeednumericUpDown1.Value;
-            if (chkStreamerBotConnectAtStartup.Checked && streamerbotClient.IsRunning())
+            if (chkStreamerBotConnectAtStartup.Checked && await streamerbotClient.IsRunning())
             {
                 Settings.Default.SpecialDistanceAction = checkBoxSpecialDistanceAction.Checked;
-                Settings.Default.SpecialDistanceActionID = ((StreamerbotAction)comboBoxSpecialDistanceActions.SelectedItem)?.id;
-                Settings.Default.SpecialDistanceActionName = ((StreamerbotAction)comboBoxSpecialDistanceActions.SelectedItem)?.name;
+                Settings.Default.SpecialDistanceActionID = ctrlBotSpecialDistance.ActionGuid;
+                Settings.Default.SpecialDistanceActionName = ctrlBotSpecialDistance.ActionName;
 
                 Settings.Default.SpecialScoreAction = checkBoxSpecialScoreAction.Checked;
-                Settings.Default.SpecialScoreActionID = ((StreamerbotAction)comboBoxSpecialScoreActions.SelectedItem)?.id;
-                Settings.Default.SpecialScoreActionName = ((StreamerbotAction)comboBoxSpecialScoreActions.SelectedItem)?.name;
+                Settings.Default.SpecialScoreActionID = ctrlBotSpecialScore.ActionGuid;
+                Settings.Default.SpecialScoreActionName = ctrlBotSpecialScore.ActionName;
 
                 Settings.Default.RoundStartAction = checkBoxRoundTimerExecuteStreamerBotAction.Checked;
-                Settings.Default.RoundStartActionID = ((StreamerbotAction)comboBoxRoundStartAction.SelectedItem)?.id;
-                Settings.Default.RoundStartActionName = ((StreamerbotAction)comboBoxRoundStartAction.SelectedItem)?.name;
+                Settings.Default.RoundStartActionID = ctrlBotRoundStart.ActionGuid; 
+                Settings.Default.RoundStartActionName = ctrlBotRoundStart.ActionName; 
+
+
+                Settings.Default.SendChatMsgsViaStreamerBot = checkBoxSendChatMsgsViaStreamerBot.Checked;
+                Settings.Default.SendChatActionId = ctrlBotChatMessages.ActionGuid;
+                Settings.Default.SendChatActionName = ctrlBotChatMessages.ActionName;
 
                 Settings.Default.RoundEndAction = chkBotRoundEndExecute.Checked;
-                Settings.Default.RoundEndActionID = ((StreamerbotAction)comboBoxRoundEndAction.SelectedItem)?.id;
-                Settings.Default.RoundEndActionName = ((StreamerbotAction)comboBoxRoundEndAction.SelectedItem)?.name;
+                Settings.Default.RoundEndActionID = ctrlBotRoundEnd.ActionGuid;
+                Settings.Default.RoundEndActionName = ctrlBotRoundEnd.ActionName;
 
                 Settings.Default.GameEndAction = chkBotGameEndExecute.Checked;
-                Settings.Default.GameEndActionID = ((StreamerbotAction)comboBoxGameEndAction.SelectedItem)?.id;
-                Settings.Default.GameEndActionName = ((StreamerbotAction)comboBoxGameEndAction.SelectedItem)?.name;
+                Settings.Default.GameEndActionID = ctrlBotGameEnd.ActionGuid;
+                Settings.Default.GameEndActionName = ctrlBotGameEnd.ActionName;
             }
             Settings.Default.OverlayInfoPopupShowStreak = chkGuessInfoStreak.Checked;
             Settings.Default.OverlayInfoPopupShowCoordinates = chkGuessInfoCoordinates.Checked;
@@ -534,7 +550,7 @@ namespace GeoChatter.Forms
         }
 
 
-        private void SettingsDialog_Load(object sender, EventArgs e)
+        private async void SettingsDialog_Load(object sender, EventArgs e)
         {
             logger.Debug("Loading settings");
             try
@@ -562,13 +578,13 @@ namespace GeoChatter.Forms
                 logger.Error(ex.Summarize());
             }
             logger.Debug("setting up streamer.bot");
-            if (chkStreamerBotConnectAtStartup.Checked && streamerbotClient.IsRunning())
+            if (chkStreamerBotConnectAtStartup.Checked && streamerbotClient.ConnectionSucceeded)
             {
             //    btnSave.Enabled = btnApply.Enabled = false;
               //  streamerbotClient.GetActions();
             }
 
-            SetUpStreambotInputs();
+            SetUpStreambotInputs(chkStreamerBotConnectAtStartup.Checked);
             logger.Debug("Setting up OBS");
             if (chkObsConnectAtStartup.Checked && obsClient.IsAlive())
             {
@@ -612,7 +628,8 @@ namespace GeoChatter.Forms
                 if (string.IsNullOrEmpty(svg))
                 {
                     var pack = FlagPackHelper.FlagPacks.FirstOrDefault(p => !string.IsNullOrEmpty(p.Flags.FirstOrDefault(f => f.Value.ToLowerInvariant() == code).Value));
-                    svg = File.ReadAllText($"Styles/flags/{pack.Name}/{code}.svg");
+                    if(pack != null)
+                        svg = File.ReadAllText($"Styles/flags/{pack.Name}/{code}.svg");
                 }
 
                 if (!string.IsNullOrEmpty(svg))
@@ -662,8 +679,6 @@ namespace GeoChatter.Forms
 
             propertyGrid1.SelectedObject = new DictionaryPropertyGridAdapter(settings);
             checkBoxEnableChatMsgs.Checked = Settings.Default.EnableTwitchChatMsgs && !string.IsNullOrEmpty(Settings.Default.oauthToken);
-            if (!checkBoxEnableChatMsgs.Checked)
-                groupBoxChatMessages.Enabled = false;
             btnForgetTwitch.Enabled = !string.IsNullOrEmpty(Settings.Default.oauthToken);
             btnAuthorizeAutomatically.Enabled = btnAuthorizeManually.Enabled = string.IsNullOrEmpty(Settings.Default.oauthToken);
 
@@ -698,6 +713,8 @@ namespace GeoChatter.Forms
                 }
             }
 
+
+            allowCustomRandomGuesses.Checked = Settings.Default.CustomRandomGuessingEnabled;
 
             txtGeneralChannelName.Text = Settings.Default.TwitchChannel;
             
@@ -773,7 +790,13 @@ namespace GeoChatter.Forms
                 streamer = ClientDbCache.Instance.GetPlayerByIDOrName(GCResourceRequestHandler.ClientUserID, GCResourceRequestHandler.ClientGeoGuessrName, profilePicUrl: GCResourceRequestHandler.ClientGeoGuessrPic, channelName: GCResourceRequestHandler.ClientUserID.ToLowerInvariant(), isStreamer: true);
             if(streamer != null)
                 txtStreamerDisplayname.Text = streamer.DisplayName;
-            SetStreamerBotActions();
+            this.ctrlBotRoundStart.SetAction(streamerbotClient, Settings.Default.RoundStartActionName, Settings.Default.RoundStartActionID);
+            this.ctrlBotRoundEnd.SetAction(streamerbotClient, Settings.Default.RoundEndActionName, Settings.Default.RoundEndActionID);
+            this.ctrlBotGameEnd.SetAction(streamerbotClient, Settings.Default.GameEndActionName, Settings.Default.GameEndActionID);
+            this.ctrlBotSpecialDistance.SetAction(streamerbotClient, Settings.Default.SpecialDistanceActionName, Settings.Default.SpecialDistanceActionID);
+            this.ctrlBotSpecialScore.SetAction(streamerbotClient, Settings.Default.SpecialScoreActionName, Settings.Default.SpecialScoreActionID);
+            this.ctrlBotChatMessages.SetAction(streamerbotClient, Settings.Default.SendChatActionName, Settings.Default.SendChatActionId);
+            //SetStreamerBotActions();
             checkBoxSpecialDistanceAction.Checked = Settings.Default.SpecialDistanceAction;
             checkBoxSpecialScoreAction.Checked = Settings.Default.SpecialScoreAction;
             checkBoxRoundTimerExecuteStreamerBotAction.Checked = Settings.Default.RoundStartAction;
@@ -801,7 +824,7 @@ namespace GeoChatter.Forms
             chkOBSRoundEndExecute.Checked = Settings.Default.ObsRoundEndExecute;
             comboOBSGameEndAction.SelectedItem = Settings.Default.ObsSpecialScoreAction;
             chkOBSGameEndExecute.Checked = Settings.Default.ObsGameEndExecute;
-
+            checkBoxSendChatMsgsViaStreamerBot.Checked = Settings.Default.SendChatMsgsViaStreamerBot;
             chkSendDoubleGuessMsg.Checked = Settings.Default.SendDoubleGuessMsg;
             chkSendSameGuessMessage.Checked = Settings.Default.SendSameGuessMessage;
             chkAllowSameLocationGuess.Checked = Settings.Default.AllowSameLocationGuess;
@@ -811,90 +834,112 @@ namespace GeoChatter.Forms
             scrSettings.SetShortcut(Settings.Default.ShortcutsSettingsKeycode, Settings.Default.ShortcutsSettingsModifiers);
             scrMenu.SetShortcut(Settings.Default.ShortcutsMenuKey, Settings.Default.ShortcutsMenuModifiers);
             scrFullscreen.SetShortcut(Settings.Default.ShortcutsFullscreenKey, Settings.Default.ShortcutsFullscreenModifiers);
+            SetTwitchInputs();
         }
-        List<StreamerbotAction> roundStartList, scoreList,distanceList, roundendList, gameendList;
-        private void SetStreamerBotActions()
-        {
-            if(streamerbotClient.IsRunning() && !streamerbotClient.Actions.Any())
-            {
-                streamerbotClient.GetActions();
-                Thread.Sleep(10);
-            }
-            if (streamerbotClient.Actions.Any() && tabControl1.TabPages.Contains(tabPageEvents))
-            {
+        List<StreamerbotAction> roundStartList, scoreList,distanceList, roundendList, gameendList, chatList;
+       
+        
+        
+        
+        //private void SetStreamerBotActions()
+        //{
+        //    if(streamerbotClient.IsRunning() && !streamerbotClient.Actions.Any())
+        //    {
+        //        streamerbotClient.GetActions();
+        //        Thread.Sleep(10);
+        //    }
+        //    if (streamerbotClient.Actions.Any())
+        //    {
+        //        chatList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+        //        comboBoxStreamerBotChatAction.DataSource = chatList;
+        //        comboBoxStreamerBotChatAction.DisplayMember = "name";
+        //        comboBoxStreamerBotChatAction.ValueMember = "id";
+        //        logger.Debug("setting chat msgs actions");
+
+        //        if (!string.IsNullOrEmpty(Settings.Default.SendChatActionId))
+        //        {
+
+        //            comboBoxStreamerBotChatAction.SelectedValue = Settings.Default.SendChatActionId;
+        //        }
+        //        if (tabControl1.TabPages.Contains(tabPageEvents))
+        //        {
 
 
-                logger.Debug("Actions from streamer bot received");
+        //            logger.Debug("Actions from streamer bot received");
 
-                logger.Debug("setting distance actions");
-                if (!streamerbotClient.Actions.Any(a => a.name == "[none]"))
-                    streamerbotClient.Actions.Add(new StreamerbotAction() { name = "[none]", id = string.Empty });
+        //            logger.Debug("setting distance actions");
+        //            if (!streamerbotClient.Actions.Any(a => a.name == "[none]"))
+        //                streamerbotClient.Actions.Add(new StreamerbotAction() { name = "[none]", id = string.Empty });
 
-                distanceList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
-                comboBoxSpecialDistanceActions.DataSource = distanceList;
-                comboBoxSpecialDistanceActions.DisplayMember = "name";
-                comboBoxSpecialDistanceActions.ValueMember = "id";
+        //            distanceList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+        //            comboBoxSpecialDistanceActions.DataSource = distanceList;
+        //            comboBoxSpecialDistanceActions.DisplayMember = "name";
+        //            comboBoxSpecialDistanceActions.ValueMember = "id";
 
-                scoreList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
-                comboBoxSpecialScoreActions.DataSource = scoreList;
-                comboBoxSpecialScoreActions.DisplayMember = "name";
-                comboBoxSpecialScoreActions.ValueMember = "id";
+        //            scoreList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+        //            comboBoxSpecialScoreActions.DataSource = scoreList;
+        //            comboBoxSpecialScoreActions.DisplayMember = "name";
+        //            comboBoxSpecialScoreActions.ValueMember = "id";
 
-                roundStartList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
-                comboBoxRoundStartAction.DataSource = roundStartList;
-                comboBoxRoundStartAction.DisplayMember = "name";
-                comboBoxRoundStartAction.ValueMember = "id";
-
-                roundendList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
-                comboBoxRoundEndAction.DataSource = roundendList;
-                comboBoxRoundEndAction.DisplayMember = "name";
-                comboBoxRoundEndAction.ValueMember = "id";
-
-                gameendList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
-                comboBoxGameEndAction.DataSource = gameendList;
-                comboBoxGameEndAction.DisplayMember = "name";
-                comboBoxGameEndAction.ValueMember = "id";
-
-                if (!string.IsNullOrEmpty(Settings.Default.SpecialDistanceActionID))
-                {
-
-                    comboBoxSpecialDistanceActions.SelectedValue = Settings.Default.SpecialDistanceActionID;
-                }
-
-                logger.Debug("Setting score actions");
-
-                if (!string.IsNullOrEmpty(Settings.Default.SpecialScoreActionID))
-                {
-                    comboBoxSpecialScoreActions.SelectedValue = Settings.Default.SpecialScoreActionID;
-                }
-                logger.Debug("setting round start actions");
-
-                if (!string.IsNullOrEmpty(Settings.Default.RoundStartActionID))
-                {
-
-                    comboBoxRoundStartAction.SelectedValue = Settings.Default.RoundStartActionID;
-                }
-                logger.Debug("setting round end actions");
-
-                if (!string.IsNullOrEmpty(Settings.Default.RoundEndActionID))
-                {
-                    comboBoxRoundEndAction.SelectedValue = Settings.Default.RoundEndActionID;
-
-                }
-                logger.Debug("setting game end actions");
-
-                if (!string.IsNullOrEmpty(Settings.Default.GameEndActionID))
-                {
-                    comboBoxGameEndAction.SelectedValue = Settings.Default.GameEndActionID;
-                }
+        //            roundStartList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+        //            comboBoxRoundStartAction.DataSource = roundStartList;
+        //            comboBoxRoundStartAction.DisplayMember = "name";
+        //            comboBoxRoundStartAction.ValueMember = "id";
 
 
-                if (chkStreamerBotConnectAtStartup.Checked)
-                {
-                    buttonConnectStreamerBot.Enabled = true;
-                }
-            }
-        }
+
+        //            roundendList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+        //            comboBoxRoundEndAction.DataSource = roundendList;
+        //            comboBoxRoundEndAction.DisplayMember = "name";
+        //            comboBoxRoundEndAction.ValueMember = "id";
+
+        //            gameendList = new List<StreamerbotAction>(streamerbotClient.Actions).OrderBy(a => a.name).ToList();
+        //            comboBoxGameEndAction.DataSource = gameendList;
+        //            comboBoxGameEndAction.DisplayMember = "name";
+        //            comboBoxGameEndAction.ValueMember = "id";
+
+        //            if (!string.IsNullOrEmpty(Settings.Default.SpecialDistanceActionID))
+        //            {
+
+        //                comboBoxSpecialDistanceActions.SelectedValue = Settings.Default.SpecialDistanceActionID;
+        //            }
+
+        //            logger.Debug("Setting score actions");
+
+        //            if (!string.IsNullOrEmpty(Settings.Default.SpecialScoreActionID))
+        //            {
+        //                comboBoxSpecialScoreActions.SelectedValue = Settings.Default.SpecialScoreActionID;
+        //            }
+        //            logger.Debug("setting round start actions");
+
+        //            if (!string.IsNullOrEmpty(Settings.Default.RoundStartActionID))
+        //            {
+
+        //                comboBoxRoundStartAction.SelectedValue = Settings.Default.RoundStartActionID;
+        //            }
+
+        //            logger.Debug("setting round end actions");
+
+        //            if (!string.IsNullOrEmpty(Settings.Default.RoundEndActionID))
+        //            {
+        //                comboBoxRoundEndAction.SelectedValue = Settings.Default.RoundEndActionID;
+
+        //            }
+        //            logger.Debug("setting game end actions");
+
+        //            if (!string.IsNullOrEmpty(Settings.Default.GameEndActionID))
+        //            {
+        //                comboBoxGameEndAction.SelectedValue = Settings.Default.GameEndActionID;
+        //            }
+
+
+        //            if (chkStreamerBotConnectAtStartup.Checked)
+        //            {
+        //                buttonConnectStreamerBot.Enabled = true;
+        //            }
+        //        }
+        //    }
+        //}
 
         private void BindTableOptionsToTreeview(TableOptions to)
         {
@@ -945,19 +990,19 @@ namespace GeoChatter.Forms
             txtStreamerBotIP.Enabled = false;
             txtStreamerBotPort.Enabled = false;
             chkStreamerBotConnectAtStartup.Enabled = false;
+            bool enableControls = false;
             if (chkStreamerBotConnectAtStartup.Checked)
             {
                 logger.Debug("connection because at startup");
-                if (!streamerbotClient.IsRunning())
+                if (!streamerbotClient.ConnectionSucceeded)
                 {
                     logger.Debug("disconnected, connect needed");
                     try
                     {
-                        if (streamerbotClient.Connect(txtStreamerBotIP.Text, txtStreamerBotPort.Text).Result)
+                        if (streamerbotClient.Connect(txtStreamerBotIP.Text, txtStreamerBotPort.Text, Settings.Default.SendChatActionId, Settings.Default.SendChatActionName, Settings.Default.SendChatMsgsViaStreamerBot, parent).Result)
                         {
                             logger.Debug("connection succeeded");
-                            streamerbotClient.GetActions();
-                            SetStreamerBotActions();
+                            enableControls = true;
                         }
                         else
                         {
@@ -969,14 +1014,10 @@ namespace GeoChatter.Forms
                 else
                 {
                     logger.Debug("already connected");
-                    if (sender == buttonConnectStreamerBot)
+                    if (sender == buttonConnectStreamerBot && buttonConnectStreamerBot.Text == "Disconnect")
                     {
                         var closed = await streamerbotClient.CloseConnection();
-                    }
-                    else
-                    {
-                        streamerbotClient.GetActions();
-                        SetStreamerBotActions();
+
                     }
                 }
 
@@ -1003,23 +1044,24 @@ namespace GeoChatter.Forms
                 }
 
             }
-            SetUpStreambotInputs();
+            SetUpStreambotInputs(enableControls);
             
         }
 
         private void chkStreamerBotConnectAtStartup_CheckedChanged(object sender, EventArgs e)
         {
-            SetUpStreambotInputs();
+            SetUpStreambotInputs(chkStreamerBotConnectAtStartup.Checked);
 
 
 
         }
 
-        private void SetUpStreambotInputs()
+        private async void SetUpStreambotInputs(bool enabled)
         {
+            enabled = streamerbotClient.ConnectionSucceeded;
             if (chkStreamerBotConnectAtStartup.Checked)
             {
-                if (streamerbotClient.IsRunning())
+                if (enabled)
                 {
                     buttonConnectStreamerBot.Text = "Disconnect";
                     txtStreamerBotIP.Enabled =
@@ -1042,16 +1084,16 @@ namespace GeoChatter.Forms
             buttonConnectStreamerBot.Enabled = true;
             checkBoxSpecialScoreAction.Enabled =
                checkBoxSpecialDistanceAction.Enabled =
-               comboBoxSpecialDistanceActions.Enabled =
+               ctrlBotSpecialDistance.Enabled =
                checkBoxRoundTimerExecuteStreamerBotAction.Enabled =
-               comboBoxRoundStartAction.Enabled =
+               ctrlBotRoundStart.Enabled =
                chkBotGameEndExecute.Enabled =
-               comboBoxGameEndAction.Enabled =
+               ctrlBotGameEnd.Enabled =
                chkBotRoundEndExecute.Enabled =
-               comboBoxRoundEndAction.Enabled =
-               checkBoxRoundTimerExecuteStreamerBotAction.Enabled =
-               comboBoxRoundStartAction.Enabled =
-               comboBoxSpecialScoreActions.Enabled = chkStreamerBotConnectAtStartup.Checked && streamerbotClient.IsRunning();
+               ctrlBotRoundEnd.Enabled =
+               checkBoxSendChatMsgsViaStreamerBot.Enabled =
+               ctrlBotSpecialScore.Enabled =
+               ctrlBotChatMessages.Enabled = chkStreamerBotConnectAtStartup.Checked && enabled;
         }
 
         private void tabPageOverlay_Click(object sender, EventArgs e)
@@ -1144,11 +1186,6 @@ namespace GeoChatter.Forms
         {
             TreeNode stageNode = treeView1.SelectedNode;
             treeView1.Nodes.Remove(stageNode);
-        }
-
-        private void checkBoxRoundTimerExecuteStreamerBotAction_CheckedChanged(object sender, EventArgs e)
-        {
-            comboBoxRoundStartAction.Enabled = checkBoxRoundTimerExecuteStreamerBotAction.Checked;
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
@@ -1366,6 +1403,8 @@ namespace GeoChatter.Forms
             {
                 link = "mailto:" + link;
             }
+            else
+                link = "https://geochatter.tv";
             // Navigate to a URL.
             GeneralPurposeUtils.OpenURL(link);
         }
@@ -1467,7 +1506,12 @@ namespace GeoChatter.Forms
 
         private void reconnectTwitchBotButton_Click(object sender, EventArgs e)
         {
-            
+
+            if (string.IsNullOrEmpty(txtGeneralChannelName.Text))
+            {
+                MessageBox.Show("You have to enter a channel name!", "Channel name is empty", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                return;
+            }
 
             if (Settings.Default.oauthToken != txtGeneralOauthToken.Text)
             {
@@ -1590,21 +1634,20 @@ namespace GeoChatter.Forms
             if (showAdvancedSettings && !tabControl1.TabPages.Contains(tabPageEvents))
             {
                 tabControl1.TabPages.Insert(3, tabPageEvents);
-                SetStreamerBotActions();
                 GetAndSetOBSScenes();
             }
             else if (!showAdvancedSettings && tabControl1.TabPages.Contains(tabPageEvents))
             {
                 tabControl1.TabPages.Remove(tabPageEvents);
             }
-            if (showAdvancedSettings && !tabControl1.TabPages.Contains(tabPageConnections))
-            {
-                tabControl1.TabPages.Insert(3, tabPageConnections);
-            }
-            else if (!showAdvancedSettings && tabControl1.TabPages.Contains(tabPageConnections))
-            {
-                tabControl1.TabPages.Remove(tabPageConnections);
-            }
+            //if (showAdvancedSettings && !tabControl1.TabPages.Contains(tabPageConnections))
+            //{
+            //    tabControl1.TabPages.Insert(3, tabPageConnections);
+            //}
+            //else if (!showAdvancedSettings && tabControl1.TabPages.Contains(tabPageConnections))
+            //{
+            //    tabControl1.TabPages.Remove(tabPageConnections);
+            //}
 
             
                 tabControl1.TabPages.Remove(tabPageLabels);
@@ -1612,8 +1655,13 @@ namespace GeoChatter.Forms
             btnShowAdvanced.Enabled = !showAdvancedSettings;
         }
 
-        private async void button1_Click(object sender, EventArgs e)
+        private async void btnAuthorizeAutomatically_Click(object sender, EventArgs e)
         {
+            if(string.IsNullOrEmpty(txtGeneralChannelName.Text))
+            {
+                MessageBox.Show("You have to enter a channel name!", "Channel name is empty", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                return;
+            }
             TwitchOAuthHelper.SendRequestToBrowser();
             TwitchAuthenticationModel model = await TwitchOAuthHelper.GetAuthenticationValuesAsync();
             if (!string.IsNullOrEmpty(model.Token))
@@ -1624,9 +1672,41 @@ namespace GeoChatter.Forms
             }
             reconnectTwitchBotButton_Click(reconnectTwitchBotButton, new EventArgs());
         }
-
-        private async void button2_Click(object sender, EventArgs e)
+        private void linkLabel36_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
+            GeneralPurposeUtils.OpenURL("https://github.com/GeoChatter");
+        }
+        int clickCounter = 0;
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            
+                
+
+            if (clickCounter == 5)
+            {
+                clickCounter = 0;
+                if (Control.ModifierKeys == (Keys.Shift | Keys.Control))
+                {
+                    this.tabControl1.TabPages.Add(tabDevelopment);
+                    chkDEVUseDevApi.Checked = Settings.Default.DebugUseDevApi;
+                    chkDEVShowDevTools.Checked = Settings.Default.DebugShowDevTools;
+                    chkDEVEnableRandomBotGuess.Checked = Settings.Default.DebugEnableRandomBotGuesses;
+                }
+            }
+            if (clickCounter < 5)
+                clickCounter++;
+
+
+        }
+
+        private async void btnAuthorizeManually_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtGeneralChannelName.Text))
+            {
+                MessageBox.Show("You have to enter a channel name!", "Channel name is empty", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                return;
+            }
+
             string url = TwitchOAuthHelper.SendRequestToBrowser(false);
             Thread thread = new(() => Clipboard.SetText(url));
             thread.SetApartmentState(ApartmentState.STA); //Set the thread to STA
@@ -1651,11 +1731,16 @@ namespace GeoChatter.Forms
 
         private void checkBoxEnableChatMsgs_CheckedChanged(object sender, EventArgs e)
         {
-            groupBoxChatMessages.Enabled = chkEnableMapOverlay.Enabled = chkAutoBan.Enabled = checkBoxEnableChatMsgs.Checked;
+            SetTwitchInputs();
+
+        }
+
+        private void SetTwitchInputs()
+        {
+            grpTwitchChatConnection.Enabled = chkEnableMapOverlay.Enabled = chkAutoBan.Enabled = checkBoxEnableChatMsgs.Checked;
 
             if (!checkBoxEnableChatMsgs.Checked)
                 chkEnableMapOverlay.Checked = chkAutoBan.Checked = false;
-
         }
 
         private void button1_Click_1(object sender, EventArgs e)

@@ -383,7 +383,7 @@ input:checked + .slider:before {
 
 /* Width */
 ::-webkit-scrollbar {
-    width: 15px;
+    width: 10px;
 }
 
 /* Track */
@@ -1360,6 +1360,8 @@ th.sorting, th.sorting_asc, th.sorting_desc {
     font-size: 18px;
     overflow-x: hidden;
     width: var(--platform-icon-width-hidden);
+    padding-left: 2px;
+    z-index: 1000;
 }
 
 [data-colfield="#{$PlayerNameFieldName}"] > span:last-child:hover:before {
@@ -1397,3 +1399,57 @@ th.sorting, th.sorting_asc, th.sorting_desc {
     --platform-icon-width: 27px;
     --platform-icon-width-hidden: 4px;
 }
+
+#roundSettingsContainer {
+    text-transform: unset;
+}
+
+.clusterInfoWindowRowContainer {
+    display: flex;
+    width: fit-content;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    max-height: 50vh;
+    overflow-y: hidden
+}
+
+.clusterInfoWindowRow {
+    padding: 2px
+}
+
+.checkboxlist {
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 20px;
+    border: 2px solid #e7e7e7aa;
+    backdrop-filter: hue-rotate(315deg);
+    border-radius: var(--gc-border-radius-default);
+}
+
+.checkboxlistroot {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: stretch;
+    height: 300px;
+}
+
+.numericinputSetting {
+    width: 3rem;
+    border-radius: var(--gc-border-radius-default);
+    padding: 4px;
+}
+.settingRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: var(--gc-border-radius-default);
+    transition: backdrop-filter 0.3s ease;
+    padding: 0 3px;
+}
+    .settingRow:hover {
+        backdrop-filter: brightness(0.5);
+        transition: backdrop-filter 0.5s ease;
+    }

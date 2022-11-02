@@ -70,7 +70,7 @@ namespace GeoChatter.Test
         {
             for (int i = 0; i < 1e+4; i++)
             {
-                Coordinates c = BorderHelper.GetRandomPointCloseOrWithinAPolygon(out Feature feature);
+                Coordinates c = BorderHelper.GetRandomPointCloseOrWithinARandomPolygon(out Feature feature);
 
                 Assert.IsNotNull(c);
                 Assert.IsNotNull(feature);
@@ -84,7 +84,7 @@ namespace GeoChatter.Test
         {
             for (int i = 0; i < 1e+4; i++)
             {
-                Coordinates c = BorderHelper.GetRandomPointCloseOrWithinAPolygon();
+                Coordinates c = BorderHelper.GetRandomPointCloseOrWithinARandomPolygon();
 
                 Assert.IsNotNull(c);
                 Assert.AreNotEqual(0D, c.Longitude);
