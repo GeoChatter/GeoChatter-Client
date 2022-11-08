@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@googlemaps/markerclusterer": "^2.0.11",
+    "@googlemaps/markerclusterer": "^2.0.13",
     "devextreme": "^22.1.3",
     "exceljs": "^4.3.0",
     "file-saver": "^2.0.5",
