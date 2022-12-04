@@ -1113,14 +1113,23 @@ namespace GeoChatter.Forms
             }
         }
 
-
+        private static List<GGMap> favMaps = new List<GGMap>();
         public void PlayRandomMap()
         {
-            GeoGuessrClient.LikedMaps(out List<GGMap> maps);
-            GGMap map = maps.RandomPick();
-            browser.GetMainFrame().LoadUrl($"https://www.geoguessr.com/maps/{map.playUrl}");
-            Thread.Sleep(500);
-            RefreshBrowser();
+            if (!favMaps.Any())
+            {
+                
+                GeoGuessrClient.LikedMaps(out List<GGMap> maps);
+                favMaps = maps;
+            }
+            GGMap map = favMaps.RandomPick();
+            if (map != null)
+            {
+                favMaps.Remove(map);
+                browser.GetMainFrame().LoadUrl($"https://www.geoguessr.com/maps/{map.playUrl}");
+                Thread.Sleep(500);
+                RefreshBrowser();
+            }
         }
     }
 }
