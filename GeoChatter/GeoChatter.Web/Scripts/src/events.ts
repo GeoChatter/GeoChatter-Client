@@ -116,6 +116,7 @@ export namespace EventHandler
     {
         Control.AddCopyMapLinkButton();
         Control.AddCopyResultLinkButton();
+        Control.AddPlayRandomMapLinkButton();
     }
 
     export function OnExitGameEvent(_el: Element, e: WheelEvent): void
@@ -210,6 +211,7 @@ export namespace EventHandler
         }
         Control.AddCopyResultLinkButton();
         Control.AddCopyMapLinkButton();
+        Control.AddPlayRandomMapLinkButton();
     }
 
     export async function OnNewGuessEvent(_el: Element, e: EventArgs)

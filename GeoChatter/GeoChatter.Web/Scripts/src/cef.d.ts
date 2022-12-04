@@ -149,6 +149,8 @@ declare export global
 
         /** Get random coordinates formatted "latitude, longitude" */
         copyMapLink(): Promise<void>
+          /** Get random coordinates formatted "latitude, longitude" */
+        playRandomMap(): Promise<void>
 
         /** Get random coordinates formatted "latitude, longitude" */
         copyResultLink(): Promise<void>

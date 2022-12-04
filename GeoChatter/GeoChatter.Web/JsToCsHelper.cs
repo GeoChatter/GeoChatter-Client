@@ -513,6 +513,14 @@ namespace GeoChatter.Web
         {
            mainForm?.CopyMapLink();
         }
+            /// <summary>
+        /// Get a random point close or within a border polygon
+        /// </summary>
+        /// <returns></returns>
+        public void PlayRandomMap()
+        {
+           mainForm?.PlayRandomMap();
+        }
         
         /// <summary>
         /// Get a random point close or within a border polygon

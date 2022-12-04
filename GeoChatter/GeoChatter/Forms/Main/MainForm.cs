@@ -38,6 +38,8 @@ using System.Windows.Forms;
 using GeoChatter.Core.Common.Extensions;
 using TwitchLib.Client.Events;
 using System.Reflection;
+using System.Linq;
+using System.Threading;
 
 namespace GeoChatter.Forms
 {
@@ -202,7 +204,6 @@ namespace GeoChatter.Forms
             devToolsToolStripMenuItem.Visible = Settings.Default.DebugShowDevTools;
 
             SplashScreenHelper.SetPercentage(100, "Connecting to guess server....");
-
 
         }
 
@@ -1110,6 +1111,16 @@ namespace GeoChatter.Forms
                 guessApiClient = new();
                 await ConnectToGuessApi(true);
             }
+        }
+
+
+        public void PlayRandomMap()
+        {
+            GeoGuessrClient.LikedMaps(out List<GGMap> maps);
+            GGMap map = maps.RandomPick();
+            browser.GetMainFrame().LoadUrl($"https://www.geoguessr.com/maps/{map.playUrl}");
+            Thread.Sleep(500);
+            RefreshBrowser();
         }
     }
 }

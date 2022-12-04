@@ -105,6 +105,7 @@ export namespace GeoChatter
                 subtree: true,
             });
             Control.AddCopyMapLinkButton();
+            Control.AddPlayRandomMapLinkButton();
             Control.AddCopyResultLinkButton();
         })
             .then(Initialize);

@@ -333,6 +333,8 @@ namespace GeoChatter.Forms
                 NextChangeIsRefresh = false;
 
                 Zoom(0);
+
+               
             }
         }
 

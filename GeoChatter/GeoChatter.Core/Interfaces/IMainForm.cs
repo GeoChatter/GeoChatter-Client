@@ -190,6 +190,8 @@ namespace GeoChatter.Core.Interfaces
         /// </summary>
         void CloseRound();
 
+        void PlayRandomMap();
+
         /// <summary>
         /// Process a guess for given player data
         /// </summary>

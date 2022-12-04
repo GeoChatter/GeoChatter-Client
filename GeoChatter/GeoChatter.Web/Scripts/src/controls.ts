@@ -13,6 +13,7 @@ export namespace Control
 {
     var RandomGuessBtnAdderInterval: number;
     var MapLinkInterval: number;
+    var MapRandomInterval: number;
     var ResultLinkInterval: number;
 
     export const LastSWCorrectLocEmbed = {
@@ -856,6 +857,12 @@ export namespace Control
         await CefSharp.BindObjectAsync('jsHelper');
         jsHelper.copyMapLink();
     }
+
+    export async function PlayRandomMap(this: HTMLButtonElement, _ev: MouseEvent)
+    {
+        await CefSharp.BindObjectAsync('jsHelper');
+        jsHelper.playRandomMap();
+    }
      export async function CopyResultLink(this: HTMLButtonElement, _ev: MouseEvent)
     {
         await CefSharp.BindObjectAsync('jsHelper');
@@ -936,6 +943,48 @@ export namespace Control
                     mapBtn.innerText = "Copy link";
                     mapBtn.addEventListener("click", CopyMapLink);
                 } 
+                //clearInterval(window.RandomGuessBtnAdder);
+                //window.RandomGuessBtnAdder = null;
+            }, 50)
+        }
+    }
+
+    export function AddPlayRandomMapLinkButton() {
+        if (!MapRandomInterval) {
+
+            MapRandomInterval = window.setInterval(() => {
+                var isDifferentStage = $("#mapRandomButton").data("stage") != GeoChatter.Main.CurrentGame?.Stage.toString();
+                let btn = $("#mapRandomButton")[0];
+                if (!btn || isDifferentStage) {
+
+                    if (isDifferentStage && btn) {
+                        btn.remove();
+                        console.log("old random map button removed")
+                    }
+
+             
+                        var container = $(".header_logo__5cSig")[0]
+                        var cssClass = "mapRandomBtnPage";
+                    
+                    if (!container) {
+                        console.log("Couldn't find container to add map link button to")
+                        return;
+                    }
+                    var mapBtn = document.createElement("button");
+                    mapBtn.id = "mapRandomButton";
+                    if (GeoChatter.Main.CurrentGame?.Stage == Enum.GAMESTAGE.ENDGAME
+                        || GeoChatter.Main.CurrentGame?.Stage == Enum.GAMESTAGE.ENDROUND) {
+                        container.insertBefore(mapBtn, container.firstChild);
+                    } else {
+                        container.appendChild(mapBtn);
+                    }
+                    if (GeoChatter.Main.CurrentGame)
+                        $(mapBtn).data("stage", GeoChatter.Main.CurrentGame.Stage.toString());
+                    mapBtn.classList.add(cssClass);
+                    $(mapBtn).data("tooltip", "Play a random liked map");
+                    mapBtn.innerText = "Random liked map";
+                    mapBtn.addEventListener("click", PlayRandomMap);
+                }
                 //clearInterval(window.RandomGuessBtnAdder);
                 //window.RandomGuessBtnAdder = null;
             }, 50)
