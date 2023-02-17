@@ -280,7 +280,6 @@ namespace GeoChatter.Forms
             this.linkLabel6 = new System.Windows.Forms.LinkLabel();
             this.linkLabel4 = new System.Windows.Forms.LinkLabel();
             this.linkLabel3 = new System.Windows.Forms.LinkLabel();
-            this.linkLabel2 = new System.Windows.Forms.LinkLabel();
             this.label16 = new System.Windows.Forms.Label();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.label15 = new System.Windows.Forms.Label();
@@ -2865,7 +2864,6 @@ namespace GeoChatter.Forms
             this.tabPageAbout.Controls.Add(this.linkLabel6);
             this.tabPageAbout.Controls.Add(this.linkLabel4);
             this.tabPageAbout.Controls.Add(this.linkLabel3);
-            this.tabPageAbout.Controls.Add(this.linkLabel2);
             this.tabPageAbout.Controls.Add(this.label16);
             this.tabPageAbout.Controls.Add(this.linkLabel1);
             this.tabPageAbout.Controls.Add(this.label15);
@@ -3287,7 +3285,7 @@ namespace GeoChatter.Forms
             // 
             this.linkLabel7.AutoSize = true;
             this.linkLabel7.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.linkLabel7.Location = new System.Drawing.Point(168, 428);
+            this.linkLabel7.Location = new System.Drawing.Point(168, 407);
             this.linkLabel7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.linkLabel7.Name = "linkLabel7";
             this.linkLabel7.Size = new System.Drawing.Size(145, 20);
@@ -3313,7 +3311,7 @@ namespace GeoChatter.Forms
             // 
             this.linkLabel4.AutoSize = true;
             this.linkLabel4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.linkLabel4.Location = new System.Drawing.Point(126, 367);
+            this.linkLabel4.Location = new System.Drawing.Point(126, 346);
             this.linkLabel4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.linkLabel4.Name = "linkLabel4";
             this.linkLabel4.Size = new System.Drawing.Size(212, 20);
@@ -3326,7 +3324,7 @@ namespace GeoChatter.Forms
             // 
             this.linkLabel3.AutoSize = true;
             this.linkLabel3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.linkLabel3.Location = new System.Drawing.Point(279, 329);
+            this.linkLabel3.Location = new System.Drawing.Point(279, 308);
             this.linkLabel3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.linkLabel3.Name = "linkLabel3";
             this.linkLabel3.Size = new System.Drawing.Size(262, 20);
@@ -3335,19 +3333,6 @@ namespace GeoChatter.Forms
             this.linkLabel3.Text = "https://twitch.tv/NoBuddyIsPerfect";
             this.linkLabel3.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
-            // linkLabel2
-            // 
-            this.linkLabel2.AutoSize = true;
-            this.linkLabel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.linkLabel2.Location = new System.Drawing.Point(214, 309);
-            this.linkLabel2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.linkLabel2.Name = "linkLabel2";
-            this.linkLabel2.Size = new System.Drawing.Size(211, 20);
-            this.linkLabel2.TabIndex = 3;
-            this.linkLabel2.TabStop = true;
-            this.linkLabel2.Text = "https://github.com/semihM/";
-            this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
-            // 
             // label16
             // 
             this.label16.AutoSize = true;
@@ -3355,9 +3340,10 @@ namespace GeoChatter.Forms
             this.label16.Location = new System.Drawing.Point(57, 268);
             this.label16.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(496, 180);
+            this.label16.Size = new System.Drawing.Size(496, 160);
             this.label16.TabIndex = 2;
-            this.label16.Text = resources.GetString("label16.Text");
+            this.label16.Text = "Client developer:\r\n\r\n - NoBuddyIsPerfect (Twitch:                                " +
+    "                     )\r\n \r\nContact:\r\n\r\nMap developer:\r\n - soeren from ";
             // 
             // linkLabel1
             // 
@@ -3653,7 +3639,6 @@ namespace GeoChatter.Forms
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.LinkLabel linkLabel3;
-        private System.Windows.Forms.LinkLabel linkLabel2;
         private System.Windows.Forms.LinkLabel linkLabel4;
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.Label label21;

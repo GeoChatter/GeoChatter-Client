@@ -2659,17 +2659,6 @@ This token only gives GeoChatter permission to read &amp;&amp; write chat &amp;&
         bl09Dt+dDsAF4A3AG4A3AO+hUyfv/wPvnmhDMsNSJAAAAABJRU5ErkJggg==
 </value>
   </data>
-  <data name="label16.Text" xml:space="preserve">
-    <value>Client developers:
-
- - rhinoooo_ (Github:                                          )
- - NoBuddyIsPerfect (Twitch:                                                     )
- 
-Contact:
-
-Map developer:
- - soeren from </value>
-  </data>
   <metadata name="colorDialog1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>449, 17</value>
   </metadata>
