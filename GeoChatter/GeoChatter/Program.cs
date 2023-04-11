@@ -171,11 +171,11 @@ namespace GeoChatter
         [SupportedOSPlatform("windows7.0")]
         private static void AutoUpdaterInit()
         {
-#if DEBUG
-            string versionXML = Settings.Default.Link_VersionXML_Debug;
-#else
+//#if DEBUG
+//            string versionXML = Settings.Default.Link_VersionXML_Debug;
+//#else
             string versionXML = Settings.Default.Link_VersionXML;
-#endif
+//#endif
             // AutoUpdater.InstalledVersion = new Version("0.7.0.0");
             AutoUpdater.Synchronous = true;
             AutoUpdater.RunUpdateAsAdmin = true;

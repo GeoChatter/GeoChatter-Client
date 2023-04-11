@@ -186,7 +186,7 @@ namespace GeoChatter.Core.Helpers
         /// <returns></returns>
         private static string GetUrl(string ClientID)
         {
-            StringBuilder sb = new("https://api.twitch.tv/kraken/oauth2/authorize");
+            StringBuilder sb = new("https://id.twitch.tv/oauth2/authorize");
             sb.Append("?response_type=token");
             sb.Append("&client_id=bmb7wvyrs88jdza7zo2sva60rc661t");// ClientID);
             sb.Append("&redirect_uri=").Append(ReturnUrl);
